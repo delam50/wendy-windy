@@ -23,3 +23,53 @@ html {
   background: transparent;
   overflow-x: hidden;
 }
+
+@keyframes wendy-typing {
+  0%,
+  80%,
+  100% {
+    opacity: 0.36;
+    transform: translateY(0);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.wendy-typing-dot {
+  animation: wendy-typing 1.1s ease-in-out infinite;
+}
+
+.wendy-typing-dot:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.wendy-typing-dot:nth-child(3) {
+  animation-delay: 240ms;
+}
+
+.wendy-scrollbar {
+  scrollbar-color: rgba(196, 106, 45, 0.7) rgba(255, 255, 255, 0.06);
+  scrollbar-width: thin;
+}
+
+.wendy-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wendy-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.wendy-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(196, 106, 45, 0.72);
+  border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wendy-typing-dot {
+    animation: none;
+  }
+}
