@@ -134,6 +134,73 @@ html {
   }
 }
 
+@keyframes wendy-launcher-knock {
+  0% {
+    filter: brightness(1);
+    transform: translateY(14px) scale(0.94);
+    box-shadow:
+      0 14px 32px rgba(0, 0, 0, 0.36),
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 0 18px rgba(215, 122, 52, 0.18),
+      0 0 40px rgba(215, 122, 52, 0.08);
+  }
+
+  16% {
+    filter: brightness(1.06);
+    transform: translateY(-5px) scale(1.035) rotate(-1.2deg);
+    box-shadow:
+      0 24px 54px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(244, 173, 121, 0.32),
+      0 0 42px rgba(244, 173, 121, 0.58),
+      0 0 92px rgba(215, 122, 52, 0.32);
+  }
+
+  28% {
+    filter: brightness(1);
+    transform: translateY(0) scale(0.995) rotate(0.7deg);
+  }
+
+  40% {
+    filter: brightness(1.08);
+    transform: translateY(-4px) scale(1.026) rotate(1deg);
+    box-shadow:
+      0 24px 56px rgba(0, 0, 0, 0.52),
+      0 0 0 1px rgba(244, 173, 121, 0.34),
+      0 0 48px rgba(244, 173, 121, 0.62),
+      0 0 104px rgba(215, 122, 52, 0.34);
+  }
+
+  52% {
+    filter: brightness(1);
+    transform: translateY(0) scale(1) rotate(-0.35deg);
+  }
+
+  64% {
+    filter: brightness(1.045);
+    transform: translateY(-2px) scale(1.014) rotate(0.25deg);
+    box-shadow:
+      0 24px 54px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(244, 173, 121, 0.26),
+      0 0 36px rgba(244, 173, 121, 0.46),
+      0 0 82px rgba(215, 122, 52, 0.26);
+  }
+
+  82% {
+    filter: brightness(1);
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    filter: brightness(1);
+    transform: translateY(0) scale(1);
+    box-shadow:
+      0 22px 48px rgba(0, 0, 0, 0.48),
+      0 0 0 1px rgba(255, 255, 255, 0.1),
+      0 0 34px rgba(215, 122, 52, 0.36),
+      0 0 70px rgba(215, 122, 52, 0.18);
+  }
+}
+
 .wendy-panel-glow {
   box-shadow:
     0 28px 70px rgba(0, 0, 0, 0.58),
@@ -161,6 +228,11 @@ html {
 
 .wendy-launcher-breathe {
   animation: wendy-launcher-breathe 3.8s ease-in-out infinite;
+}
+
+.wendy-launcher-knock {
+  animation: wendy-launcher-knock 1320ms cubic-bezier(0.19, 1, 0.22, 1) 360ms both;
+  transform-origin: 78% 82%;
 }
 
 .wendy-orange-hover {
@@ -245,7 +317,8 @@ html {
   .wendy-resource-enter,
   .wendy-online-indicator,
   .wendy-widget-arrive,
-  .wendy-launcher-breathe {
+  .wendy-launcher-breathe,
+  .wendy-launcher-knock {
     animation: none;
   }
 }

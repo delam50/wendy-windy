@@ -60,5 +60,280 @@
     "leadFormSubmitted": false,
     "resourceRecommended": false,
     "metadata": {}
+  },
+  {
+    "id": "0ea402ce-ceab-4d5f-b79a-6603b8e7d53c",
+    "timestamp": "2026-05-07T21:32:11.587Z",
+    "event": "widget_opened",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "3b76bf42-5453-485e-bd85-6b733b3d413c",
+    "timestamp": "2026-05-07T21:32:28.739Z",
+    "event": "message_sent",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "8c06d896-ae93-4305-ab36-c9fe2d5d8d77",
+    "timestamp": "2026-05-07T21:32:32.040Z",
+    "event": "chat_response",
+    "detectedIntent": [
+      "educational intent",
+      "pricing intent"
+    ],
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": true,
+    "topicCategory": "pricing",
+    "metadata": {
+      "source": "api_chat"
+    }
+  },
+  {
+    "id": "d407c9aa-7cf3-43b6-93b6-aedb502d1a7d",
+    "timestamp": "2026-05-07T21:32:32.050Z",
+    "event": "assistant_response_received",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "c21e0c5a-4dd3-4635-9030-6976ae3ca5bc",
+    "timestamp": "2026-05-07T21:33:17.436Z",
+    "event": "message_sent",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "325e9b93-f4c3-4f85-b957-7347454dfc95",
+    "timestamp": "2026-05-07T21:33:19.960Z",
+    "event": "chat_response",
+    "detectedIntent": [
+      "educational intent",
+      "pricing intent"
+    ],
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": true,
+    "topicCategory": "pricing",
+    "metadata": {
+      "source": "api_chat"
+    }
+  },
+  {
+    "id": "45a619d1-9940-475f-888f-a8ee0915c301",
+    "timestamp": "2026-05-07T21:33:19.970Z",
+    "event": "assistant_response_received",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "eee5f362-26ce-450d-9eea-55e86fb5b5a9",
+    "timestamp": "2026-05-07T21:34:51.389Z",
+    "event": "message_sent",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "f0486b9e-85e3-4b06-98bc-193861d49d8b",
+    "timestamp": "2026-05-07T21:34:54.655Z",
+    "event": "chat_response",
+    "detectedIntent": [
+      "pricing intent"
+    ],
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": true,
+    "topicCategory": "pricing",
+    "metadata": {
+      "source": "api_chat"
+    }
+  },
+  {
+    "id": "d75c71e9-5383-4434-bb9a-ab12ed0d40e9",
+    "timestamp": "2026-05-07T21:34:54.665Z",
+    "event": "assistant_response_received",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "2459e962-8589-462b-8a47-1bca7fc1b626",
+    "timestamp": "2026-05-07T21:35:58.590Z",
+    "event": "message_sent",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "b5a193a4-64c1-4b23-b5aa-d58320933d85",
+    "timestamp": "2026-05-07T21:36:00.678Z",
+    "event": "chat_response",
+    "detectedIntent": [
+      "educational intent",
+      "pricing intent"
+    ],
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": true,
+    "topicCategory": "pricing",
+    "metadata": {
+      "source": "api_chat"
+    }
+  },
+  {
+    "id": "fd3668d2-bd7a-4eb9-8a54-dd36009fee21",
+    "timestamp": "2026-05-07T21:36:00.687Z",
+    "event": "assistant_response_received",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "7f4ee33a-0f21-475c-bcf0-91fa2d55bc26",
+    "timestamp": "2026-05-07T21:56:23.486Z",
+    "event": "widget_opened",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "9763687d-27d3-482b-9574-7b321e503df3",
+    "timestamp": "2026-05-07T21:56:25.287Z",
+    "event": "widget_closed",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {
+      "source": "header_minimize"
+    }
+  },
+  {
+    "id": "a27180ce-da0d-4783-a8bc-b6e2b5552ae7",
+    "timestamp": "2026-05-07T21:56:29.815Z",
+    "event": "widget_opened",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "63bdc093-43ac-4fd0-9aa2-b7e26e788ef9",
+    "timestamp": "2026-05-07T21:58:10.490Z",
+    "event": "message_sent",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "8174d9a9-66ef-47a4-8a00-4e999f5722be",
+    "timestamp": "2026-05-07T21:58:13.288Z",
+    "event": "chat_response",
+    "detectedIntent": [
+      "educational intent",
+      "pricing intent"
+    ],
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": true,
+    "topicCategory": "pricing",
+    "metadata": {
+      "source": "api_chat"
+    }
+  },
+  {
+    "id": "ff06d122-1f4d-4a0c-b124-f52483f9d814",
+    "timestamp": "2026-05-07T21:58:13.296Z",
+    "event": "assistant_response_received",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "dff6ab03-42f6-4b5e-b911-84c514b231de",
+    "timestamp": "2026-05-07T21:58:30.177Z",
+    "event": "message_sent",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "67ca92cd-93e7-4cd0-9f65-8d40e05ea586",
+    "timestamp": "2026-05-07T21:58:32.634Z",
+    "event": "chat_response",
+    "detectedIntent": [
+      "educational intent",
+      "pricing intent"
+    ],
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": true,
+    "topicCategory": "pricing",
+    "metadata": {
+      "source": "api_chat"
+    }
+  },
+  {
+    "id": "11f6f542-a77b-4680-9745-2bacfbb8d677",
+    "timestamp": "2026-05-07T21:58:32.641Z",
+    "event": "assistant_response_received",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "2606b9cf-76ee-4b2b-b473-520df243fc46",
+    "timestamp": "2026-05-07T21:58:45.338Z",
+    "event": "widget_closed",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {
+      "source": "header_minimize"
+    }
   }
 ]

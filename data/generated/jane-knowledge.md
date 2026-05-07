@@ -1,6 +1,6 @@
 # Windy Ridge Chiropractic Jane Booking Knowledge
 
-Generated from https://windyridgechiropractic.janeapp.com/ at 2026-05-06T20:55:35.749Z.
+Generated from https://windyridgechiropractic.janeapp.com/ at 2026-05-07T21:25:39.392Z.
 
 This file contains public-facing Jane booking information only. Use listed prices as approximate/current listed pricing, never as a guarantee. Pricing can vary depending on services performed, provider, location, and updates in Jane. Encourage visitors to confirm details directly through Jane booking.
 

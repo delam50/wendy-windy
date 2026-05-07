@@ -58,6 +58,7 @@ type PageContext = {
 
 const SESSION_MESSAGES_KEY = "wendy.session.messages";
 const SESSION_MEMORY_KEY = "wendy.session.memory";
+const SESSION_LAUNCHER_KNOCK_KEY = "wendy.session.launcherKnockPlayed";
 const MAX_SESSION_MESSAGES = 12;
 
 const defaultQuickActions: QuickAction[] = [
@@ -661,10 +662,21 @@ function persistSession(messages: Message[], memory: SessionMemory) {
   window.sessionStorage.setItem(SESSION_MEMORY_KEY, JSON.stringify(memory));
 }
 
+function shouldPlayLauncherKnock() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return window.sessionStorage.getItem(SESSION_LAUNCHER_KNOCK_KEY) !== "true";
+}
+
 export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const latestAssistantMessageRef = useRef<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [playLauncherKnock, setPlayLauncherKnock] = useState(() =>
+    shouldPlayLauncherKnock(),
+  );
   const [messages, setMessages] = useState<Message[]>(() => loadSessionMessages());
   const latestAssistantScrollCountRef = useRef(
     messages.filter((message) => message.role === "assistant").length,
@@ -714,6 +726,14 @@ export default function Home() {
       bookingLinkClicked: hasClickedBookingLink,
     });
   }, [hasClickedBookingLink, messages, sessionMemory]);
+
+  useEffect(() => {
+    if (!playLauncherKnock) {
+      return;
+    }
+
+    window.sessionStorage.setItem(SESSION_LAUNCHER_KNOCK_KEY, "true");
+  }, [playLauncherKnock]);
 
   useEffect(() => {
     window.parent?.postMessage(
@@ -1502,8 +1522,17 @@ export default function Home() {
           aria-expanded={isOpen}
           aria-label={isOpen ? "Chat is open" : "Open Wendy chat"}
           className={`wendy-launcher-glow flex min-h-16 max-w-full items-center justify-center gap-3 rounded-full border border-[#f4ad79]/40 bg-[linear-gradient(135deg,#df8440,#b85f25)] px-5 py-3.5 text-center text-sm font-bold leading-5 text-white ring-1 ring-white/15 transition duration-300 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_24px_58px_rgba(0,0,0,0.5),0_0_46px_rgba(215,122,52,0.42)] focus:outline-none focus:ring-4 focus:ring-[#d77a34]/50 active:translate-y-0 active:scale-[0.98] sm:min-h-20 sm:px-6 sm:py-4 ${
-            isOpen ? "" : "wendy-launcher-breathe"
+            isOpen
+              ? ""
+              : playLauncherKnock
+                ? "wendy-launcher-knock"
+                : "wendy-launcher-breathe"
           }`}
+          onAnimationEnd={(event) => {
+            if (event.animationName === "wendy-launcher-knock") {
+              setPlayLauncherKnock(false);
+            }
+          }}
           onClick={openChat}
           type="button"
         >

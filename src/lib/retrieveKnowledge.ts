@@ -13,6 +13,23 @@ type KnowledgeChunk = {
   text: string;
 };
 
+type BlogIndexArticle = {
+  title: string;
+  url: string;
+  summary?: string;
+  category?: string;
+  tags?: string[];
+  relevantKeywords?: string[];
+  excerpt?: string;
+  sourceType?: string;
+  headings?: string[];
+};
+
+type BlogMatchResult = {
+  score: number;
+  reasons: string[];
+};
+
 export type RetrievedResource = {
   title: string;
   summary: string;
@@ -269,6 +286,7 @@ const TOP_CHUNK_COUNT = 8;
 const MIN_CHUNK_COUNT = 5;
 
 let cachedChunks: KnowledgeChunk[] | undefined;
+let cachedBlogIndex: BlogIndexArticle[] | undefined;
 
 function normalize(value: string) {
   return value.toLowerCase().replace(/&amp;/g, "&");
@@ -401,6 +419,40 @@ function loadKnowledgeChunks() {
   });
 
   return cachedChunks;
+}
+
+function loadBlogIndex() {
+  if (cachedBlogIndex) {
+    return cachedBlogIndex;
+  }
+
+  try {
+    const rawIndex = JSON.parse(
+      readFileSync(
+        path.join(process.cwd(), "data", "generated", "blog-index.json"),
+        "utf8",
+      ),
+    ) as unknown;
+
+    cachedBlogIndex = Array.isArray(rawIndex)
+      ? rawIndex
+          .filter((article): article is BlogIndexArticle =>
+            Boolean(
+              article &&
+                typeof article === "object" &&
+                "title" in article &&
+                "url" in article &&
+                typeof article.title === "string" &&
+                typeof article.url === "string",
+            ),
+          )
+          .filter((article) => article.url.startsWith("http"))
+      : [];
+  } catch {
+    cachedBlogIndex = [];
+  }
+
+  return cachedBlogIndex;
 }
 
 function countMatches(text: string, keywords: string[], weight: number) {
@@ -653,6 +705,342 @@ function getResourceSummary(chunk: KnowledgeChunk) {
   return "A Windy Ridge resource with more detail on this topic.";
 }
 
+function getBlogArticleSearchText(article: BlogIndexArticle) {
+  return normalize(
+    [
+      article.title,
+      article.url,
+      article.summary,
+      article.category,
+      article.tags?.join(" "),
+      article.relevantKeywords?.join(" "),
+      article.headings?.join(" "),
+      article.excerpt,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+}
+
+const RESOURCE_TOPIC_GROUPS = [
+  {
+    label: "dry needling",
+    queryPhrases: [
+      "dry needling",
+      "needling",
+      "after dry needling",
+      "dry needling aftercare",
+      "what to expect after dry needling",
+      "soreness after dry needling",
+    ],
+    articlePhrases: ["dry needling", "needling", "soft tissue"],
+  },
+  {
+    label: "low back pain",
+    queryPhrases: ["low back pain", "lower back pain", "back pain", "sciatica"],
+    articlePhrases: ["low back pain", "lower back pain", "back pain", "sciatica"],
+  },
+  {
+    label: "neck pain",
+    queryPhrases: ["neck pain", "tech neck", "posture", "desk work"],
+    articlePhrases: ["neck pain", "tech neck", "posture", "desk work"],
+  },
+  {
+    label: "headaches / migraines",
+    queryPhrases: ["headache", "headaches", "migraine", "migraines"],
+    articlePhrases: ["headache", "headaches", "migraine", "migraines"],
+  },
+  {
+    label: "cost / insurance",
+    queryPhrases: ["cost", "price", "pricing", "insurance", "cash", "rates"],
+    articlePhrases: ["cost", "price", "pricing", "insurance", "cash", "rates"],
+  },
+  {
+    label: "pregnancy / postpartum",
+    queryPhrases: ["pregnancy", "pregnant", "postpartum", "prenatal"],
+    articlePhrases: ["pregnancy", "pregnant", "postpartum", "prenatal"],
+  },
+  {
+    label: "pediatrics / newborn",
+    queryPhrases: ["pediatric", "pediatrics", "newborn", "baby", "infant"],
+    articlePhrases: ["pediatric", "pediatrics", "newborn", "baby", "infant"],
+  },
+  {
+    label: "Big Sky",
+    queryPhrases: ["big sky", "skiing", "ski"],
+    articlePhrases: ["big sky", "skiing", "ski"],
+  },
+  {
+    label: "first visit",
+    queryPhrases: ["first visit", "new patient", "what to expect", "exam"],
+    articlePhrases: ["first visit", "new patient", "what to expect", "exam"],
+  },
+  {
+    label: "animal chiropractic",
+    queryPhrases: ["animal chiropractic", "pet chiropractic", "dog chiropractic", "small animal"],
+    articlePhrases: ["animal chiropractic", "pet chiropractic", "dog chiropractic", "small animal"],
+  },
+  {
+    label: "massage therapy",
+    queryPhrases: ["massage", "massage therapy", "tight muscles"],
+    articlePhrases: ["massage", "massage therapy", "tight muscles"],
+  },
+];
+
+const AFTERCARE_INTENT_PHRASES = [
+  "what to expect",
+  "aftercare",
+  "soreness",
+  "normal after",
+  "recovery",
+  "side effects",
+  "after treatment",
+  "after dry needling",
+];
+
+function getSlugText(url: string) {
+  try {
+    const pathname = new URL(url).pathname;
+    const slug = pathname.split("/").filter(Boolean).at(-1) ?? pathname;
+
+    return normalize(slug.replace(/[-_]+/g, " "));
+  } catch {
+    return normalize(url.replace(/[-_]+/g, " "));
+  }
+}
+
+function includesPhrase(text: string, phrases: string[]) {
+  return phrases.some((phrase) => text.includes(phrase));
+}
+
+function scoreFieldMatches(
+  fieldLabel: string,
+  fieldText: string,
+  phrases: string[],
+  weight: number,
+  reasons: string[],
+) {
+  const matches = phrases.filter((phrase) => fieldText.includes(phrase));
+
+  if (matches.length === 0) {
+    return 0;
+  }
+
+  reasons.push(`${fieldLabel}: ${matches.slice(0, 3).join(", ")}`);
+  return matches.reduce((score, phrase) => {
+    return score + weight + (phrase.includes(" ") ? 8 : 0);
+  }, 0);
+}
+
+function scoreBlogArticle(
+  article: BlogIndexArticle,
+  input: Required<RetrievalInput>,
+  queryKeywords: string[],
+  pageKeywords: string[],
+): BlogMatchResult {
+  const normalizedQuery = normalize(input.query);
+  const normalizedConversationContext = normalize(input.conversationContext);
+  const normalizedPageContext = normalize(input.pageContext);
+  const normalizedTitle = normalize(article.title);
+  const normalizedUrl = normalize(article.url);
+  const normalizedSlug = getSlugText(article.url);
+  const normalizedTags = normalize(article.tags?.join(" ") ?? "");
+  const normalizedCategory = normalize(article.category ?? "");
+  const normalizedHeadings = normalize(article.headings?.join(" ") ?? "");
+  const normalizedExcerpt = normalize(`${article.summary ?? ""} ${article.excerpt ?? ""}`);
+  const searchText = getBlogArticleSearchText(article);
+  const contextText = `${normalizedQuery} ${normalizedConversationContext} ${normalizedPageContext}`;
+  const reasons: string[] = [];
+  let score = 0;
+
+  for (const topic of RESOURCE_TOPIC_GROUPS) {
+    if (!includesPhrase(contextText, topic.queryPhrases)) {
+      continue;
+    }
+
+    const fieldScore =
+      scoreFieldMatches("title", normalizedTitle, topic.articlePhrases, 120, reasons) +
+      scoreFieldMatches("slug", normalizedSlug, topic.articlePhrases, 100, reasons) +
+      scoreFieldMatches("tags", normalizedTags, topic.articlePhrases, 78, reasons) +
+      scoreFieldMatches("category", normalizedCategory, topic.articlePhrases, 56, reasons) +
+      scoreFieldMatches("headings", normalizedHeadings, topic.articlePhrases, 42, reasons) +
+      scoreFieldMatches("excerpt", normalizedExcerpt, topic.articlePhrases, 18, reasons);
+
+    if (fieldScore > 0) {
+      reasons.push(`topic intent: ${topic.label}`);
+      score += fieldScore;
+    } else {
+      score -= 24;
+    }
+  }
+
+  if (includesPhrase(contextText, AFTERCARE_INTENT_PHRASES)) {
+    const aftercareScore =
+      scoreFieldMatches("aftercare title", normalizedTitle, AFTERCARE_INTENT_PHRASES, 70, reasons) +
+      scoreFieldMatches("aftercare slug", normalizedSlug, AFTERCARE_INTENT_PHRASES, 62, reasons) +
+      scoreFieldMatches("aftercare tags", normalizedTags, AFTERCARE_INTENT_PHRASES, 45, reasons) +
+      scoreFieldMatches("aftercare headings", normalizedHeadings, AFTERCARE_INTENT_PHRASES, 34, reasons) +
+      scoreFieldMatches("aftercare excerpt", normalizedExcerpt, AFTERCARE_INTENT_PHRASES, 16, reasons);
+
+    score += aftercareScore;
+
+    if (aftercareScore === 0) {
+      score -= 18;
+    }
+  }
+
+  for (const term of PRIORITY_TERMS) {
+    if (normalizedQuery.includes(term) && searchText.includes(term)) {
+      score += term.includes(" ") ? 28 : 14;
+    }
+
+    if (normalizedPageContext.includes(term) && searchText.includes(term)) {
+      score += term.includes(" ") ? 18 : 9;
+    }
+
+    if (normalizedConversationContext.includes(term) && searchText.includes(term)) {
+      score += term.includes(" ") ? 10 : 5;
+    }
+  }
+
+  for (const term of CONDITION_TERMS) {
+    if (normalizedQuery.includes(term) && searchText.includes(term)) {
+      score += normalizedTitle.includes(term) || normalizedUrl.includes(term)
+        ? 34
+        : 18;
+    }
+  }
+
+  for (const term of CORNERSTONE_TERMS) {
+    if (
+      (normalizedQuery.includes(term) || normalizedPageContext.includes(term)) &&
+      searchText.includes(term)
+    ) {
+      score += normalizedTitle.includes(term) || normalizedUrl.includes(term)
+        ? 24
+        : 12;
+    }
+  }
+
+  for (const group of RELATED_TERM_GROUPS) {
+    const queryHasRelatedTerm = group.some(
+      (term) =>
+        normalizedQuery.includes(term) ||
+        normalizedPageContext.includes(term) ||
+        normalizedConversationContext.includes(term),
+    );
+    const articleHasRelatedTerm = group.some((term) => searchText.includes(term));
+
+    if (queryHasRelatedTerm && articleHasRelatedTerm) {
+      score += 13;
+    }
+  }
+
+  if (/\b(blogs?|articles?|resources?|more reading|additional reading|send me a link|send a link|link|more info|anything on this|read more|reading)\b/i.test(normalizedQuery)) {
+    score += 10;
+  }
+
+  score += countMatches(searchText, queryKeywords, 4);
+  score += countMatches(searchText, pageKeywords, 3);
+  score += countMatches(normalizedTitle, queryKeywords, 7);
+  score += countMatches(normalizedTitle, pageKeywords, 5);
+
+  if (/general chiropractic education/i.test(article.category ?? "")) {
+    const hasSpecificFieldMatch =
+      reasons.some((reason) => /title|slug|tags|category|headings/.test(reason));
+
+    if (hasSpecificFieldMatch) {
+      score -= 6;
+    } else if (RESOURCE_TOPIC_GROUPS.some((topic) => includesPhrase(contextText, topic.queryPhrases))) {
+      score -= 28;
+      reasons.push("penalty: broad general article for specific topic intent");
+    }
+  }
+
+  return { score, reasons };
+}
+
+function getBlogArticleSummary(article: BlogIndexArticle) {
+  const summary = article.summary || article.excerpt;
+
+  if (!summary) {
+    return "A Windy Ridge article with practical detail on this topic.";
+  }
+
+  return summary.length > 170 ? `${summary.slice(0, 167).trim()}...` : summary;
+}
+
+function retrieveBlogResources(
+  input: Required<RetrievalInput>,
+  limit: number,
+  excludedUrls: Set<string>,
+) {
+  const queryKeywords = extractKeywords(input.query);
+  const pageKeywords = extractKeywords(input.pageContext);
+  const fallbackMinimumScore = input.wantsMoreResources ? 6 : 10;
+  const seenUrls = new Set<string>();
+  const scoredArticles = loadBlogIndex()
+    .filter((article) => !excludedUrls.has(article.url.toLowerCase()))
+    .map((article) => {
+      const match = scoreBlogArticle(article, input, queryKeywords, pageKeywords);
+
+      return {
+        article,
+        score: match.score,
+        reasons: match.reasons,
+      };
+    })
+    .sort((first, second) => second.score - first.score);
+  const resources = scoredArticles
+    .filter(({ score }) => score >= fallbackMinimumScore)
+    .filter(({ article }) => {
+      const url = article.url.toLowerCase();
+
+      if (seenUrls.has(url)) {
+        return false;
+      }
+
+      seenUrls.add(url);
+      return true;
+    })
+    .slice(0, limit)
+    .map<RetrievedResource>(({ article, score }) => ({
+      title: article.title,
+      summary: getBlogArticleSummary(article),
+      url: article.url,
+      type: article.category ? `Blog • ${article.category}` : "Blog",
+      score,
+    }));
+
+  const selectedResources = resources.length > 0
+    ? resources
+    : scoredArticles
+      .filter(({ article }) => !seenUrls.has(article.url.toLowerCase()))
+      .slice(0, limit)
+      .map<RetrievedResource>(({ article, score }) => ({
+        title: article.title,
+        summary: getBlogArticleSummary(article),
+        url: article.url,
+        type: article.category ? `Blog • ${article.category}` : "Blog",
+        score,
+      }));
+
+  if (process.env.NODE_ENV !== "production" && input.query.trim()) {
+    console.log("[Wendy blog retrieval]", {
+      query: input.query,
+      topCandidates: scoredArticles.slice(0, 5).map(({ article, score, reasons }) => ({
+        title: article.title,
+        category: article.category,
+        tags: article.tags ?? [],
+        score,
+        why: reasons.slice(0, 8),
+      })),
+    });
+  }
+
+  return selectedResources;
+}
+
 function isJaneBookingChunk(chunk: KnowledgeChunk) {
   return Boolean(chunk.url?.includes("windyridgechiropractic.janeapp.com"));
 }
@@ -670,6 +1058,11 @@ export function retrieveResources(
   const limit = maxResources ?? (retrievalInput.wantsMoreResources ? 4 : 1);
   const fallbackMinimumScore = retrievalInput.wantsMoreResources ? 8 : 12;
   const seenUrls = new Set<string>();
+  const blogResources = retrieveBlogResources(retrievalInput, limit, excludedUrls);
+
+  for (const resource of blogResources) {
+    seenUrls.add(resource.url.toLowerCase());
+  }
 
   const resources = loadKnowledgeChunks()
     .filter((chunk) => chunk.url)
@@ -716,9 +1109,16 @@ export function retrieveResources(
       type: getResourceType(chunk),
       score,
     }));
+  const combinedResources = [...blogResources, ...resources]
+    .filter((resource, index, allResources) => {
+      const url = resource.url.toLowerCase();
 
-  if (resources.length > 0 || retrievalInput.includeBookingResource) {
-    return resources;
+      return allResources.findIndex((candidate) => candidate.url.toLowerCase() === url) === index;
+    })
+    .slice(0, limit);
+
+  if (combinedResources.length > 0 || retrievalInput.includeBookingResource) {
+    return combinedResources;
   }
 
   return loadKnowledgeChunks()
