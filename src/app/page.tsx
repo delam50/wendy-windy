@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { trackAnalyticsEvent } from "@/lib/analytics";
@@ -44,28 +45,20 @@ const MAX_SESSION_MESSAGES = 12;
 
 const quickActions: QuickAction[] = [
   {
-    label: "Book",
-    url: "https://windyridgechiropractic.janeapp.com/",
+    label: "What does a first visit look like?",
+    prompt: "What does a first visit look like at Windy Ridge?",
   },
   {
-    label: "First visit",
-    url: "https://windyridgechiropractic.com/what-to-expect-on-your-first-visit-to-windy-ridge-chiropractic/",
+    label: "How much does care typically cost?",
+    prompt: "How much does care typically cost at Windy Ridge?",
   },
   {
-    label: "Services",
-    url: "https://windyridgechiropractic.com/chiropractic-services/",
+    label: "Can chiropractic help back or neck pain?",
+    prompt: "Can chiropractic help back or neck pain?",
   },
   {
-    label: "Bozeman",
-    prompt: "Tell me what I should know about the Bozeman location.",
-  },
-  {
-    label: "Big Sky",
-    prompt: "Tell me what I should know about the Big Sky location.",
-  },
-  {
-    label: "Cost",
-    prompt: "What should I know about insurance and cost before booking?",
+    label: "Which location should I book at?",
+    prompt: "Which Windy Ridge location should I book at, Bozeman or Big Sky?",
   },
 ];
 
@@ -109,13 +102,15 @@ function renderMessageContent(content: string) {
       return part;
     }
 
+    const href = part.replace(/[),.!?]+$/, "");
+
     return (
       <a
         className="font-semibold text-[#f2a36f] underline decoration-[#f2a36f]/50 underline-offset-4 transition hover:text-white"
-        href={part}
+        href={href}
         key={`${part}-${index}`}
         onClick={() => {
-          if (part.includes("windyridgechiropractic.janeapp.com")) {
+          if (href.includes("windyridgechiropractic.janeapp.com")) {
             window.dispatchEvent(new Event("wendy-booking-link-clicked"));
             trackAnalyticsEvent("booking_link_clicked", {
               ...getAnalyticsPageMetadata(),
@@ -127,10 +122,91 @@ function renderMessageContent(content: string) {
         rel="noopener noreferrer"
         target="_blank"
       >
-        {part}
+        {href}
       </a>
     );
   });
+}
+
+function getResourceUrl(content: string) {
+  const urls = content.match(/https?:\/\/[^\s)]+/g) ?? [];
+
+  return urls
+    .map((url) => url.replace(/[),.!?]+$/, ""))
+    .find(
+      (url) =>
+        url.includes("windyridgechiropractic.com") &&
+        !url.includes("windyridgechiropractic.janeapp.com"),
+    );
+}
+
+function titleCase(value: string) {
+  return value.replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+}
+
+function getResourceTitle(url: string) {
+  try {
+    const parsedUrl = new URL(url);
+    const segments = parsedUrl.pathname.split("/").filter(Boolean);
+    const lastSegment = segments.at(-1);
+
+    if (!lastSegment) {
+      return "Windy Ridge Chiropractic";
+    }
+
+    return titleCase(
+      decodeURIComponent(lastSegment)
+        .replace(/-/g, " ")
+        .replace(/&#038;/g, "&")
+        .replace(/\s+/g, " ")
+        .trim(),
+    );
+  } catch {
+    return "Windy Ridge Resource";
+  }
+}
+
+function getResourceDescription(url: string) {
+  if (url.includes("/chiropractic-services/")) {
+    return "A Windy Ridge service page with more detail on care options.";
+  }
+
+  if (url.includes("cost") || url.includes("insurance")) {
+    return "Helpful context on cost, insurance, and what to confirm in JaneApp.";
+  }
+
+  if (url.includes("big-sky") || url.includes("bozeman")) {
+    return "Local Windy Ridge information for Bozeman and Big Sky patients.";
+  }
+
+  return "A quick Windy Ridge article if you want to read a little deeper.";
+}
+
+function renderResourceCard(content: string) {
+  const resourceUrl = getResourceUrl(content);
+
+  if (!resourceUrl) {
+    return null;
+  }
+
+  return (
+    <a
+      className="wendy-message-enter mt-2 block max-w-[92%] rounded-2xl border border-[#c46a2d]/30 bg-[#2d261f]/90 p-3.5 text-left shadow-lg shadow-black/20 transition duration-200 hover:-translate-y-0.5 hover:border-[#c46a2d]/70 hover:bg-[#35291f] sm:max-w-[88%]"
+      href={resourceUrl}
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#f2a36f]">
+        Windy Ridge resource
+      </p>
+      <p className="mt-1 text-sm font-semibold leading-6 text-white">
+        {getResourceTitle(resourceUrl)}
+      </p>
+      <p className="mt-1 text-xs leading-5 text-[#d6d6d6]">
+        {getResourceDescription(resourceUrl)}
+      </p>
+    </a>
+  );
 }
 
 function getPageContext(): PageContext {
@@ -504,7 +580,7 @@ export default function Home() {
       source: action.url ? "link" : "prompt",
     });
 
-    if (action.label === "Book" && action.url) {
+    if (action.url?.includes("windyridgechiropractic.janeapp.com")) {
       setHasClickedBookingLink(true);
       setSessionMemory((currentMemory) => ({
         ...currentMemory,
@@ -639,10 +715,10 @@ export default function Home() {
 
   function renderQuickActions() {
     return (
-      <div className="ml-1 mt-3 grid w-full max-w-[92%] grid-cols-2 gap-2 sm:max-w-[88%]">
+      <div className="ml-1 mt-3 grid w-full max-w-[94%] grid-cols-1 gap-2 sm:max-w-[90%]">
         {quickActions.map((action) => {
           const className =
-            "min-h-11 rounded-2xl border border-white/12 bg-[#252525] px-3.5 py-2.5 text-left text-xs font-semibold leading-5 text-[#f4f4f4] shadow-lg shadow-black/15 transition duration-200 hover:-translate-y-0.5 hover:border-[#c46a2d] hover:bg-[#332820] hover:text-white hover:shadow-[#c46a2d]/10 focus:outline-none focus:ring-2 focus:ring-[#c46a2d]/35 active:translate-y-0 active:scale-[0.99]";
+            "min-h-11 rounded-2xl border border-white/12 bg-white/[0.055] px-3.5 py-2.5 text-left text-xs font-semibold leading-5 text-[#f4f4f4] shadow-lg shadow-black/15 backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:border-[#c46a2d] hover:bg-[#332820]/80 hover:text-white hover:shadow-[#c46a2d]/10 focus:outline-none focus:ring-2 focus:ring-[#c46a2d]/35 active:translate-y-0 active:scale-[0.99]";
 
           if (action.url) {
             return (
@@ -831,24 +907,41 @@ export default function Home() {
       >
         <div
           aria-hidden={!isOpen}
-          className={`flex h-[min(650px,calc(100dvh_-_7rem_-_env(safe-area-inset-bottom)))] w-full min-w-0 flex-col overflow-hidden rounded-3xl border border-white/12 bg-[#2a2a2a] shadow-2xl shadow-black/45 transition-all duration-200 ease-out will-change-transform ${
+          className={`flex h-[min(650px,calc(100dvh_-_7rem_-_env(safe-area-inset-bottom)))] w-full min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-white/15 bg-[#232323]/92 shadow-2xl shadow-black/55 ring-1 ring-[#c46a2d]/10 backdrop-blur-xl transition-all duration-300 ease-out will-change-transform ${
             isOpen
               ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
-              : "pointer-events-none translate-y-3 scale-[0.98] opacity-0"
+              : "pointer-events-none translate-y-5 scale-[0.97] opacity-0"
           }`}
         >
-            <header className="shrink-0 border-b border-white/12 bg-[#1f1f1f] px-4 py-3.5 shadow-lg shadow-black/10 sm:px-5 sm:py-4">
+            <header className="shrink-0 border-b border-white/12 bg-[#1f1f1f]/88 px-4 py-3.5 shadow-lg shadow-black/15 backdrop-blur-xl sm:px-5 sm:py-4">
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c46a2d]">
-                    Windy Ridge
-                  </p>
-                  <h1 className="mt-1 break-words text-lg font-semibold leading-7 text-white">
-                    Chat with Wendy
-                  </h1>
-                  <p className="mt-1 break-words text-xs leading-5 text-[#d6d6d6]">
-                    Move better, feel better, get back to life unrestricted.
-                  </p>
+                <div className="flex min-w-0 items-start gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/12 bg-white p-1.5 shadow-lg shadow-black/20">
+                    <Image
+                      alt="Windy Ridge Chiropractic"
+                      className="h-full w-full object-contain"
+                      height={96}
+                      src="/logo.png"
+                      width={96}
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f2a36f]">
+                        Meet Wendy
+                      </p>
+                      <span
+                        aria-label="Wendy is online"
+                        className="wendy-online-indicator h-2 w-2 rounded-full bg-[#f2a36f] shadow-[0_0_14px_rgba(242,163,111,0.95)]"
+                      />
+                    </div>
+                    <h1 className="mt-1 break-words text-[15px] font-semibold leading-6 text-white">
+                      Windy Ridge’s AI Care Assistant
+                    </h1>
+                    <p className="mt-0.5 break-words text-xs leading-5 text-[#d6d6d6]">
+                      Life. Unrestricted.
+                    </p>
+                  </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <button
@@ -870,19 +963,19 @@ export default function Home() {
               </div>
             </header>
 
-            <div className="wendy-scrollbar min-h-0 min-w-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto px-3.5 py-4 sm:px-4 sm:py-5">
+            <div className="wendy-scrollbar min-h-0 min-w-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto bg-[radial-gradient(circle_at_top_left,rgba(196,106,45,0.14),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent)] px-3.5 py-4 sm:px-4 sm:py-5">
               {messages.map((message, index) => (
-                <div key={`${message.role}-${index}`}>
+                <div className="wendy-message-enter" key={`${message.role}-${index}`}>
                   <div
                     className={`flex ${
                       message.role === "user" ? "justify-end" : "justify-start"
                     }`}
                   >
                     <div
-                      className={`max-w-[92%] overflow-hidden break-words rounded-2xl px-4 py-3.5 text-sm leading-7 shadow-lg shadow-black/20 sm:max-w-[88%] ${
+                      className={`max-w-[92%] overflow-hidden break-words rounded-2xl px-4 py-3.5 text-sm leading-7 shadow-lg shadow-black/20 backdrop-blur sm:max-w-[88%] ${
                         message.role === "user"
-                          ? "rounded-br-md bg-[#c46a2d] text-white"
-                          : "rounded-bl-md border border-white/12 bg-[#1f1f1f] text-[#f4f4f4]"
+                          ? "rounded-br-md bg-[#c46a2d] text-white shadow-[#c46a2d]/10"
+                          : "rounded-bl-md border border-white/12 bg-[#1f1f1f]/88 text-[#f4f4f4]"
                       }`}
                     >
                       <span className="whitespace-pre-wrap">
@@ -893,6 +986,7 @@ export default function Home() {
                   {index === 0 && messages.length === 1
                     ? renderQuickActions()
                     : null}
+                  {message.role === "assistant" ? renderResourceCard(message.content) : null}
                   {index === messages.length - 1 ? renderLeadCaptureOffer() : null}
                   {index === messages.length - 1 ? renderLeadCaptureForm() : null}
                 </div>
@@ -912,7 +1006,7 @@ export default function Home() {
             </div>
 
             <form
-              className="shrink-0 border-t border-white/12 bg-[#252525] p-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))] sm:p-4"
+              className="shrink-0 border-t border-white/12 bg-[#252525]/92 p-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:p-4"
               onSubmit={handleSubmit}
             >
               {error ? (
@@ -925,7 +1019,7 @@ export default function Home() {
               </label>
               <div className="flex min-w-0 items-end gap-2">
                 <textarea
-                  className="max-h-24 min-h-14 min-w-0 flex-1 resize-none rounded-2xl border border-white/12 bg-[#1f1f1f] px-4 py-3 text-base leading-7 text-white outline-none transition duration-200 placeholder:text-[#9f9f9f] focus:border-[#c46a2d] focus:ring-2 focus:ring-[#c46a2d]/30 sm:max-h-28 sm:text-sm"
+                  className="max-h-24 min-h-14 min-w-0 flex-1 resize-none rounded-2xl border border-white/12 bg-[#1f1f1f]/90 px-4 py-3 text-base leading-7 text-white outline-none transition duration-200 placeholder:text-[#9f9f9f] focus:border-[#c46a2d] focus:ring-2 focus:ring-[#c46a2d]/30 sm:max-h-28 sm:text-sm"
                   id="chat-message"
                   onChange={(event) => setInput(event.target.value)}
                   placeholder="Ask Wendy..."
@@ -953,11 +1047,25 @@ export default function Home() {
         <button
           aria-expanded={isOpen}
           aria-label={isOpen ? "Chat is open" : "Open Wendy chat"}
-          className="flex min-h-16 max-w-full items-center justify-center rounded-full border border-[#f2a36f]/25 bg-[#c46a2d] px-5 py-3.5 text-center text-sm font-bold leading-5 text-white shadow-2xl shadow-black/40 transition duration-200 hover:-translate-y-0.5 hover:bg-[#a95722] hover:shadow-[#c46a2d]/20 focus:outline-none focus:ring-4 focus:ring-[#c46a2d]/35 active:translate-y-0 active:scale-[0.98] sm:min-h-20 sm:px-7 sm:py-4"
+          className="flex min-h-16 max-w-full items-center justify-center gap-3 rounded-full border border-[#f2a36f]/30 bg-[#c46a2d] px-5 py-3.5 text-center text-sm font-bold leading-5 text-white shadow-2xl shadow-black/45 ring-1 ring-white/10 transition duration-300 hover:-translate-y-0.5 hover:bg-[#a95722] hover:shadow-[#c46a2d]/25 focus:outline-none focus:ring-4 focus:ring-[#c46a2d]/35 active:translate-y-0 active:scale-[0.98] sm:min-h-20 sm:px-6 sm:py-4"
           onClick={openChat}
           type="button"
         >
-          Wendy 1.0 - Friendly Chatbot
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white p-1 shadow-lg shadow-black/20">
+            <Image
+              alt=""
+              className="h-full w-full object-contain"
+              height={80}
+              src="/logo.png"
+              width={80}
+            />
+          </span>
+          <span className="text-left">
+            <span className="block">Meet Wendy</span>
+            <span className="block text-xs font-semibold text-white/80">
+              Windy Ridge AI
+            </span>
+          </span>
         </button>
       </section>
     </main>

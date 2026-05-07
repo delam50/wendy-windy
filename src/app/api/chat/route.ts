@@ -180,7 +180,7 @@ export async function POST(request: Request) {
           ? [
               {
                 role: "system" as const,
-                content: `Retrieved Windy Ridge website and JaneApp knowledge for this user message. Treat this as general website information, answer briefly, and offer source URLs naturally when useful. For current booking, availability, appointment details, and pricing confirmation, recommend JaneApp because listed details can change:\n${retrievedKnowledge}`,
+                content: `Retrieved Windy Ridge website and JaneApp knowledge for this user message. Treat this as general website information, answer briefly, and offer source URLs naturally when useful. If a chunk is marked as the primary related resource, you may recommend that one resource after answering, using a natural line like "We actually have an article on that here if you'd like to read more." Do not recommend more than one resource link. For current booking, availability, appointment details, and pricing confirmation, recommend JaneApp because listed details can change:\n${retrievedKnowledge}`,
               },
             ]
           : []),

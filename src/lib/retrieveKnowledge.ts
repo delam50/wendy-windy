@@ -15,6 +15,8 @@ type KnowledgeChunk = {
 
 type ScoredKnowledgeChunk = KnowledgeChunk & {
   score: number;
+  resourceScore: number;
+  isPrimaryResource?: boolean;
 };
 
 type RetrievalInput = {
@@ -92,6 +94,39 @@ const PRIORITY_TERMS = [
   "dalgardno",
   "james",
   "beaudry",
+];
+
+const CONDITION_TERMS = [
+  "neck pain",
+  "low back pain",
+  "lower back pain",
+  "back pain",
+  "headache",
+  "headaches",
+  "migraine",
+  "migraines",
+  "dry needling",
+  "pregnancy",
+  "pregnant",
+  "pediatric",
+  "pediatrics",
+  "sports injury",
+  "massage",
+  "cupping",
+  "sciatica",
+  "disc",
+  "posture",
+];
+
+const CORNERSTONE_TERMS = [
+  "first visit",
+  "cost",
+  "pricing",
+  "insurance",
+  "services",
+  "chiropractic services",
+  "big sky chiropractor",
+  "bozeman chiropractor",
 ];
 
 const STOP_WORDS = new Set([
@@ -343,6 +378,81 @@ function scoreChunk(
   return score;
 }
 
+function isResourceCandidate(chunk: KnowledgeChunk) {
+  if (!chunk.url) {
+    return false;
+  }
+
+  return /sitemap|blog|website/i.test(chunk.source);
+}
+
+function scoreResourceCandidate(
+  chunk: KnowledgeChunk,
+  input: Required<RetrievalInput>,
+  queryKeywords: string[],
+  pageKeywords: string[],
+) {
+  if (!isResourceCandidate(chunk)) {
+    return 0;
+  }
+
+  const normalizedQuery = normalize(input.query);
+  const normalizedPageContext = normalize(input.pageContext);
+  const normalizedTitle = normalize(chunk.title);
+  const normalizedUrl = normalize(chunk.url ?? "");
+  const normalizedText = normalize(chunk.text);
+  const resourceText = `${normalizedTitle} ${normalizedUrl} ${normalizedText}`;
+  let score = 0;
+
+  for (const term of CONDITION_TERMS) {
+    if (normalizedQuery.includes(term) && resourceText.includes(term)) {
+      score += normalizedTitle.includes(term) || normalizedUrl.includes(term)
+        ? 30
+        : 16;
+    }
+  }
+
+  for (const term of CORNERSTONE_TERMS) {
+    if (
+      (normalizedQuery.includes(term) || normalizedPageContext.includes(term)) &&
+      resourceText.includes(term)
+    ) {
+      score += normalizedTitle.includes(term) || normalizedUrl.includes(term)
+        ? 18
+        : 10;
+    }
+  }
+
+  if (/bozeman|big sky|four corners/.test(normalizedQuery)) {
+    if (/bozeman|big sky|four corners/.test(resourceText)) {
+      score += 12;
+    }
+  }
+
+  if (/bozeman|big sky|four corners/.test(normalizedPageContext)) {
+    if (/bozeman|big sky|four corners/.test(resourceText)) {
+      score += 10;
+    }
+  }
+
+  if (/\/chiropractic-services\//.test(normalizedUrl)) {
+    score += 12;
+  }
+
+  if (/\/chiropractic-services\/?$/.test(normalizedUrl)) {
+    score += 14;
+  }
+
+  if (/first|cost|insurance|services|big-sky|bozeman/.test(normalizedUrl)) {
+    score += 8;
+  }
+
+  score += countMatches(resourceText, queryKeywords, 3);
+  score += countMatches(resourceText, pageKeywords, 2);
+
+  return score;
+}
+
 function normalizeRetrievalInput(input: string | RetrievalInput): Required<RetrievalInput> {
   if (typeof input === "string") {
     return {
@@ -386,16 +496,27 @@ export function retrieveKnowledge(
   );
   const seenChunkKeys = new Set<string>();
   const scoredChunks = loadKnowledgeChunks()
-    .map<ScoredKnowledgeChunk>((chunk) => ({
-      ...chunk,
-      score: scoreChunk(
+    .map<ScoredKnowledgeChunk>((chunk) => {
+      const resourceScore = scoreResourceCandidate(
         chunk,
         retrievalInput,
         queryKeywords,
-        contextKeywords,
         pageKeywords,
-      ),
-    }))
+      );
+
+      return {
+        ...chunk,
+        resourceScore,
+        score:
+          scoreChunk(
+            chunk,
+            retrievalInput,
+            queryKeywords,
+            contextKeywords,
+            pageKeywords,
+          ) + Math.min(resourceScore, 30),
+      };
+    })
     .filter((chunk) => chunk.score > 0)
     .sort((a, b) => b.score - a.score)
     .filter((chunk) => {
@@ -410,6 +531,14 @@ export function retrieveKnowledge(
     })
     .slice(0, selectedChunkCount);
 
+  const primaryResource = scoredChunks
+    .filter((chunk) => chunk.resourceScore >= 24)
+    .sort((a, b) => b.resourceScore - a.resourceScore)[0];
+
+  if (primaryResource) {
+    primaryResource.isPrimaryResource = true;
+  }
+
   if (scoredChunks.length === 0) {
     return "";
   }
@@ -417,10 +546,13 @@ export function retrieveKnowledge(
   return scoredChunks
     .map((chunk, index) => {
       const sourceUrl = chunk.url ? `\nSource URL: ${chunk.url}` : "";
+      const resourceNote = chunk.isPrimaryResource
+        ? "\nResource note: Primary related article or service page. If useful, recommend only this one resource naturally after answering."
+        : "";
 
       return `Relevant knowledge chunk ${index + 1}
 Source: ${chunk.source}
-Title: ${chunk.title}${sourceUrl}
+Title: ${chunk.title}${sourceUrl}${resourceNote}
 Content: ${chunk.text}`;
     })
     .join("\n\n---\n\n");

@@ -38,6 +38,31 @@ html {
   }
 }
 
+@keyframes wendy-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes wendy-online-glow {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.18);
+  }
+}
+
 .wendy-typing-dot {
   animation: wendy-typing 1.1s ease-in-out infinite;
 }
@@ -48,6 +73,14 @@ html {
 
 .wendy-typing-dot:nth-child(3) {
   animation-delay: 240ms;
+}
+
+.wendy-message-enter {
+  animation: wendy-message-in 180ms ease-out both;
+}
+
+.wendy-online-indicator {
+  animation: wendy-online-glow 1.8s ease-in-out infinite;
 }
 
 .wendy-scrollbar {
@@ -70,6 +103,11 @@ html {
 
 @media (prefers-reduced-motion: reduce) {
   .wendy-typing-dot {
+    animation: none;
+  }
+
+  .wendy-message-enter,
+  .wendy-online-indicator {
     animation: none;
   }
 }
