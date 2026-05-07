@@ -232,7 +232,7 @@ html {
 
 .wendy-launcher-knock {
   animation: wendy-launcher-knock 1320ms cubic-bezier(0.19, 1, 0.22, 1) 360ms both;
-  transform-origin: 78% 82%;
+  transform-origin: 50% 50%;
 }
 
 .wendy-orange-hover {
