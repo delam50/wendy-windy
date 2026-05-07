@@ -31,6 +31,7 @@ type SessionMemory = {
   discussedPricing?: boolean;
   bookingInfoProvided?: boolean;
   bookingLinkClicked?: boolean;
+  recommendedResourceUrls?: string[];
 };
 
 type PageContext = {
@@ -67,6 +68,9 @@ const friendlyConnectionError =
 
 const leadSuccessMessage =
   "Brilliant, I’ll pass this along to the Windy Ridge team. You can also book directly here if you’d like the fastest option: https://windyridgechiropractic.janeapp.com/";
+
+const leadNotificationErrorMessage =
+  "Thanks, I saved your details, but Wendy had trouble emailing the Windy Ridge team just now. Please try again in a moment, or book directly here for the fastest option: https://windyridgechiropractic.janeapp.com/";
 
 const welcomeMessage: Message = {
   role: "assistant",
@@ -128,16 +132,20 @@ function renderMessageContent(content: string) {
   });
 }
 
-function getResourceUrl(content: string) {
+function getResourceUrls(content: string) {
   const urls = content.match(/https?:\/\/[^\s)]+/g) ?? [];
 
-  return urls
-    .map((url) => url.replace(/[),.!?]+$/, ""))
-    .find(
-      (url) =>
-        url.includes("windyridgechiropractic.com") &&
-        !url.includes("windyridgechiropractic.janeapp.com"),
-    );
+  return Array.from(
+    new Set(
+      urls
+        .map((url) => url.replace(/[),.!?]+$/, ""))
+        .filter(
+          (url) =>
+            url.includes("windyridgechiropractic.com") &&
+            !url.includes("windyridgechiropractic.janeapp.com"),
+        ),
+    ),
+  );
 }
 
 function titleCase(value: string) {
@@ -167,45 +175,91 @@ function getResourceTitle(url: string) {
 }
 
 function getResourceDescription(url: string) {
+  const title = getResourceTitle(url);
+
   if (url.includes("/chiropractic-services/")) {
-    return "A Windy Ridge service page with more detail on care options.";
+    return `Windy Ridge details on ${title.toLowerCase()} and care options.`;
   }
 
   if (url.includes("cost") || url.includes("insurance")) {
-    return "Helpful context on cost, insurance, and what to confirm in JaneApp.";
+    return "Helpful context on cost, insurance, and what to confirm through JaneApp.";
   }
 
   if (url.includes("big-sky") || url.includes("bozeman")) {
     return "Local Windy Ridge information for Bozeman and Big Sky patients.";
   }
 
-  return "A quick Windy Ridge article if you want to read a little deeper.";
+  return `A short Windy Ridge resource on ${title.toLowerCase()}.`;
 }
 
-function renderResourceCard(content: string) {
-  const resourceUrl = getResourceUrl(content);
+function getResourceSnippet(content: string, url: string) {
+  const escapedUrl = url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const nearbyText =
+    content
+      .match(new RegExp(`([^\\n.?!]{35,180})${escapedUrl}`))?.[1]
+      ?.replace(/^[\s:-]+|[\s:-]+$/g, "")
+      .trim() ?? "";
 
-  if (!resourceUrl) {
+  if (
+    nearbyText &&
+    !/book here|janeapp|fastest option/i.test(nearbyText)
+  ) {
+    return nearbyText.length > 150
+      ? `${nearbyText.slice(0, 147).trim()}...`
+      : nearbyText;
+  }
+
+  const cleanedContent = content
+    .replace(url, "")
+    .replace(/https?:\/\/[^\s)]+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const sentences = cleanedContent
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(
+      (sentence) =>
+        sentence.length >= 35 &&
+        !/book here|janeapp|fastest option/i.test(sentence),
+    );
+  const snippet = sentences.at(-1);
+
+  if (!snippet) {
+    return getResourceDescription(url);
+  }
+
+  return snippet.length > 150 ? `${snippet.slice(0, 147).trim()}...` : snippet;
+}
+
+function renderResourceCards(content: string) {
+  const resourceUrls = getResourceUrls(content).slice(0, 4);
+
+  if (resourceUrls.length === 0) {
     return null;
   }
 
   return (
-    <a
-      className="wendy-message-enter mt-2 block max-w-[92%] rounded-2xl border border-[#c46a2d]/30 bg-[#2d261f]/90 p-3.5 text-left shadow-lg shadow-black/20 transition duration-200 hover:-translate-y-0.5 hover:border-[#c46a2d]/70 hover:bg-[#35291f] sm:max-w-[88%]"
-      href={resourceUrl}
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#f2a36f]">
-        Windy Ridge resource
-      </p>
-      <p className="mt-1 text-sm font-semibold leading-6 text-white">
-        {getResourceTitle(resourceUrl)}
-      </p>
-      <p className="mt-1 text-xs leading-5 text-[#d6d6d6]">
-        {getResourceDescription(resourceUrl)}
-      </p>
-    </a>
+    <div className="mt-2 grid max-w-[92%] gap-2 sm:max-w-[88%]">
+      {resourceUrls.map((resourceUrl) => (
+        <a
+          className="wendy-message-enter block rounded-2xl border border-[#c46a2d]/30 bg-[#2d261f]/90 p-3.5 text-left shadow-lg shadow-black/20 transition duration-200 hover:-translate-y-0.5 hover:border-[#c46a2d]/70 hover:bg-[#35291f]"
+          href={resourceUrl}
+          key={resourceUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#f2a36f]">
+            Windy Ridge resource
+          </p>
+          <p className="mt-1 break-words text-sm font-semibold leading-6 text-white">
+            {getResourceTitle(resourceUrl)}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-[#d6d6d6]">
+            {getResourceSnippet(content, resourceUrl)}
+          </p>
+        </a>
+      ))}
+    </div>
   );
 }
 
@@ -365,6 +419,11 @@ function loadSessionMemory(): SessionMemory {
       discussedPricing: Boolean(parsed.discussedPricing),
       bookingInfoProvided: Boolean(parsed.bookingInfoProvided),
       bookingLinkClicked: Boolean(parsed.bookingLinkClicked),
+      recommendedResourceUrls: Array.isArray(parsed.recommendedResourceUrls)
+        ? parsed.recommendedResourceUrls
+            .filter((url) => typeof url === "string")
+            .slice(-12)
+        : [],
     };
   } catch {
     return emptySessionMemory;
@@ -508,6 +567,12 @@ export default function Home() {
         nextMemory,
         assistantChatMessage,
       );
+      const recommendedResourceUrls = Array.from(
+        new Set([
+          ...(memoryAfterAssistant.recommendedResourceUrls ?? []),
+          ...getResourceUrls(assistantMessage),
+        ]),
+      ).slice(-12);
 
       trackAnalyticsEvent("assistant_response_received", {
         ...getAnalyticsPageMetadata(),
@@ -515,7 +580,10 @@ export default function Home() {
         bookingLinkClicked: hasClickedBookingLink,
       });
 
-      setSessionMemory(memoryAfterAssistant);
+      setSessionMemory({
+        ...memoryAfterAssistant,
+        recommendedResourceUrls,
+      });
       setMessages((currentMessages) =>
         trimMessagesForSession([...currentMessages, assistantChatMessage]),
       );
@@ -670,7 +738,36 @@ export default function Home() {
       if (!response.ok) {
         const data = (await response.json().catch(() => ({}))) as {
           errors?: string[];
+          leadSaved?: boolean;
         };
+
+        if (data.leadSaved) {
+          setMessages((currentMessages) => [
+            ...currentMessages,
+            { role: "assistant", content: leadNotificationErrorMessage },
+          ]);
+          setShowLeadForm(false);
+          setLeadForm(emptyLeadForm);
+          setHasClickedBookingLink(true);
+          setSessionMemory((currentMemory) => ({
+            ...currentMemory,
+            preferredLocation:
+              leadForm.location === "Bozeman" || leadForm.location === "Big Sky"
+                ? leadForm.location
+                : currentMemory.preferredLocation,
+            concern: leadForm.mainConcern.trim()
+              ? "general follow-up concern"
+              : currentMemory.concern,
+            bookingInfoProvided: true,
+            bookingLinkClicked: true,
+          }));
+          trackAnalyticsEvent("error_shown", {
+            ...getAnalyticsPageMetadata(),
+            errorType: "lead_email_notification",
+            leadLocationPreference: leadForm.location || undefined,
+          });
+          return;
+        }
 
         throw new Error(data.errors?.[0] ?? "Lead submission failed.");
       }
@@ -986,7 +1083,7 @@ export default function Home() {
                   {index === 0 && messages.length === 1
                     ? renderQuickActions()
                     : null}
-                  {message.role === "assistant" ? renderResourceCard(message.content) : null}
+                  {message.role === "assistant" ? renderResourceCards(message.content) : null}
                   {index === messages.length - 1 ? renderLeadCaptureOffer() : null}
                   {index === messages.length - 1 ? renderLeadCaptureForm() : null}
                 </div>

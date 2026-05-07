@@ -23,6 +23,7 @@ type SessionMemory = {
   discussedPricing?: boolean;
   bookingInfoProvided?: boolean;
   bookingLinkClicked?: boolean;
+  recommendedResourceUrls?: string[];
 };
 
 type ChatRequestBody = {
@@ -89,6 +90,18 @@ function getRetrievalQuery(messages: ChatMessage[]) {
   return [latestUserMessage?.content ?? "", recentContext].filter(Boolean).join("\n");
 }
 
+function userWantsMoreResources(messages: ChatMessage[]) {
+  const latestUserMessage = messages.findLast((message) => message.role === "user");
+
+  if (!latestUserMessage) {
+    return false;
+  }
+
+  return /\b(more|additional|another|other)\s+(blogs?|resources?|articles?|reading)\b|\b(additional reading|more reading|read more)\b/i.test(
+    latestUserMessage.content,
+  );
+}
+
 function getSessionMemory(body: ChatRequestBody): SessionMemory {
   const memory = body.sessionMemory;
 
@@ -105,6 +118,13 @@ function getSessionMemory(body: ChatRequestBody): SessionMemory {
     discussedPricing: Boolean(memory.discussedPricing),
     bookingInfoProvided: Boolean(memory.bookingInfoProvided),
     bookingLinkClicked: Boolean(memory.bookingLinkClicked),
+    recommendedResourceUrls: Array.isArray(memory.recommendedResourceUrls)
+      ? memory.recommendedResourceUrls
+          .filter((url) => typeof url === "string")
+          .map((url) => sanitizeContextValue(url, 500))
+          .filter(Boolean)
+          .slice(-12)
+      : [],
   };
 }
 
@@ -120,6 +140,9 @@ function formatSessionMemory(memory: SessionMemory) {
       : "",
     memory.bookingLinkClicked
       ? "The visitor has already clicked a booking link this session."
+      : "",
+    memory.recommendedResourceUrls?.length
+      ? `Resource URLs already recommended this session. Avoid repeating these unless the user asks for the same link again:\n${memory.recommendedResourceUrls.join("\n")}`
       : "",
   ].filter(Boolean);
 
@@ -149,10 +172,13 @@ export async function POST(request: Request) {
   const pageContext = getPageContext(body);
   const sessionMemory = getSessionMemory(body);
   const sessionMemoryContext = formatSessionMemory(sessionMemory);
+  const wantsMoreResources = userWantsMoreResources(messages);
   const retrievedKnowledge = retrieveKnowledge({
     query: getRetrievalQuery(messages),
     conversationContext: sessionMemoryContext,
     pageContext,
+    excludedUrls: sessionMemory.recommendedResourceUrls ?? [],
+    wantsMoreResources,
   });
 
   if (messages.length === 0) {
@@ -180,7 +206,7 @@ export async function POST(request: Request) {
           ? [
               {
                 role: "system" as const,
-                content: `Retrieved Windy Ridge website and JaneApp knowledge for this user message. Treat this as general website information, answer briefly, and offer source URLs naturally when useful. If a chunk is marked as the primary related resource, you may recommend that one resource after answering, using a natural line like "We actually have an article on that here if you'd like to read more." Do not recommend more than one resource link. For current booking, availability, appointment details, and pricing confirmation, recommend JaneApp because listed details can change:\n${retrievedKnowledge}`,
+                content: `Retrieved Windy Ridge website and JaneApp knowledge for this user message. Treat this as general website information, answer briefly, and offer source URLs naturally when useful. By default, if a chunk is marked as the primary related resource, you may recommend that one resource after answering, using a natural line like "We actually have an article on that here if you'd like to read more." Do not recommend more than one resource link by default. If the user explicitly asked for more blogs, more resources, more articles, or additional reading, you may include 2 to 4 resource links from chunks marked as primary or additional resource options. For current booking, availability, appointment details, and pricing confirmation, recommend JaneApp because listed details can change:\n${retrievedKnowledge}`,
               },
             ]
           : []),

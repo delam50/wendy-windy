@@ -17,12 +17,15 @@ type ScoredKnowledgeChunk = KnowledgeChunk & {
   score: number;
   resourceScore: number;
   isPrimaryResource?: boolean;
+  isAdditionalResource?: boolean;
 };
 
 type RetrievalInput = {
   query: string;
   conversationContext?: string;
   pageContext?: string;
+  excludedUrls?: string[];
+  wantsMoreResources?: boolean;
 };
 
 const KNOWLEDGE_FILES: KnowledgeFile[] = [
@@ -127,6 +130,19 @@ const CORNERSTONE_TERMS = [
   "chiropractic services",
   "big sky chiropractor",
   "bozeman chiropractor",
+];
+
+const RELATED_TERM_GROUPS = [
+  ["desk", "desk worker", "screen", "computer", "tech neck", "posture"],
+  ["ski", "skiing", "slopes", "winter", "big sky", "back pain", "neck pain"],
+  ["hike", "hiking", "trail", "outdoor", "active", "mobility"],
+  ["run", "runner", "trail runner", "athlete", "sports injury", "training"],
+  ["headache", "migraine", "tension", "neck pain", "tmj"],
+  ["low back", "lower back", "back pain", "disc", "sciatica", "sitting"],
+  ["pregnancy", "pregnant", "prenatal", "webster", "pelvis"],
+  ["pediatric", "child", "kids", "family", "growth"],
+  ["cost", "pricing", "insurance", "cash", "rate"],
+  ["first visit", "exam", "evaluation", "new patient", "what to expect"],
 ];
 
 const STOP_WORDS = new Set([
@@ -423,6 +439,18 @@ function scoreResourceCandidate(
     }
   }
 
+  for (const group of RELATED_TERM_GROUPS) {
+    const queryHasRelatedTerm = group.some(
+      (term) =>
+        normalizedQuery.includes(term) || normalizedPageContext.includes(term),
+    );
+    const resourceHasRelatedTerm = group.some((term) => resourceText.includes(term));
+
+    if (queryHasRelatedTerm && resourceHasRelatedTerm) {
+      score += 10;
+    }
+  }
+
   if (/bozeman|big sky|four corners/.test(normalizedQuery)) {
     if (/bozeman|big sky|four corners/.test(resourceText)) {
       score += 12;
@@ -459,6 +487,8 @@ function normalizeRetrievalInput(input: string | RetrievalInput): Required<Retri
       query: input,
       conversationContext: "",
       pageContext: "",
+      excludedUrls: [],
+      wantsMoreResources: false,
     };
   }
 
@@ -466,6 +496,8 @@ function normalizeRetrievalInput(input: string | RetrievalInput): Required<Retri
     query: input.query,
     conversationContext: input.conversationContext ?? "",
     pageContext: input.pageContext ?? "",
+    excludedUrls: input.excludedUrls ?? [],
+    wantsMoreResources: Boolean(input.wantsMoreResources),
   };
 }
 
@@ -495,6 +527,9 @@ export function retrieveKnowledge(
     Math.max(MIN_CHUNK_COUNT, maxChunks),
   );
   const seenChunkKeys = new Set<string>();
+  const excludedUrls = new Set(
+    retrievalInput.excludedUrls.map((url) => url.toLowerCase()),
+  );
   const scoredChunks = loadKnowledgeChunks()
     .map<ScoredKnowledgeChunk>((chunk) => {
       const resourceScore = scoreResourceCandidate(
@@ -518,6 +553,10 @@ export function retrieveKnowledge(
       };
     })
     .filter((chunk) => chunk.score > 0)
+    .filter(
+      (chunk) =>
+        !chunk.url || !excludedUrls.has(chunk.url.toLowerCase()),
+    )
     .sort((a, b) => b.score - a.score)
     .filter((chunk) => {
       const key = `${chunk.url ?? chunk.source}:${chunk.title}:${chunk.text.slice(0, 80)}`;
@@ -531,12 +570,19 @@ export function retrieveKnowledge(
     })
     .slice(0, selectedChunkCount);
 
-  const primaryResource = scoredChunks
+  const resourceCandidates = scoredChunks
     .filter((chunk) => chunk.resourceScore >= 24)
-    .sort((a, b) => b.resourceScore - a.resourceScore)[0];
+    .sort((a, b) => b.resourceScore - a.resourceScore);
+  const primaryResource = resourceCandidates[0];
 
   if (primaryResource) {
     primaryResource.isPrimaryResource = true;
+  }
+
+  if (retrievalInput.wantsMoreResources) {
+    resourceCandidates.slice(1, 4).forEach((chunk) => {
+      chunk.isAdditionalResource = true;
+    });
   }
 
   if (scoredChunks.length === 0) {
@@ -548,6 +594,8 @@ export function retrieveKnowledge(
       const sourceUrl = chunk.url ? `\nSource URL: ${chunk.url}` : "";
       const resourceNote = chunk.isPrimaryResource
         ? "\nResource note: Primary related article or service page. If useful, recommend only this one resource naturally after answering."
+        : chunk.isAdditionalResource
+          ? "\nResource note: Additional relevant resource option. Only include this if the user explicitly asked for more blogs, more resources, more articles, or additional reading."
         : "";
 
       return `Relevant knowledge chunk ${index + 1}
