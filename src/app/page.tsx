@@ -1088,7 +1088,7 @@ export default function Home() {
     <main className="min-h-dvh overflow-x-hidden bg-transparent text-white">
       <section
         aria-label="Windy Ridge Chiropractic chat widget"
-        className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-50 flex max-h-[100dvh] min-w-0 flex-col items-end gap-3 overflow-x-hidden sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[380px] sm:gap-4"
+        className="wendy-widget-arrive fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-50 flex max-h-[100dvh] min-w-0 flex-col items-end gap-3 overflow-x-hidden sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[380px] sm:gap-4"
       >
         <div
           aria-hidden={!isOpen}
