@@ -40,4 +40,18 @@ export function trackAnalyticsEvent(
   // Future adapters can forward this to Google Analytics, Monday.com,
   // Vercel Analytics, or a custom dashboard from this single handoff point.
   console.log("[Wendy analytics]", analyticsEvent);
+
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  void fetch("/api/conversation-insights", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(analyticsEvent),
+  }).catch(() => {
+    // Analytics should never interrupt the visitor experience.
+  });
 }

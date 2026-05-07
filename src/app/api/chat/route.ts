@@ -2,7 +2,8 @@ import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 import { formatClinicKnowledge } from "@/data/knowledge";
-import { retrieveKnowledge } from "@/lib/retrieveKnowledge";
+import { logConversationInsight } from "@/lib/conversationInsights";
+import { retrieveKnowledge, retrieveResources } from "@/lib/retrieveKnowledge";
 import { systemPrompt } from "@/lib/systemPrompt";
 
 export const runtime = "nodejs";
@@ -33,6 +34,15 @@ type ChatRequestBody = {
   pageUrl?: string;
   sessionMemory?: SessionMemory;
 };
+
+type IntentCategory =
+  | "booking intent"
+  | "educational intent"
+  | "pricing intent"
+  | "insurance intent"
+  | "provider matching"
+  | "urgent/red-flag symptoms"
+  | "location intent";
 
 const MAX_API_MESSAGES = 10;
 
@@ -100,6 +110,267 @@ function userWantsMoreResources(messages: ChatMessage[]) {
   return /\b(more|additional|another|other)\s+(blogs?|resources?|articles?|reading)\b|\b(additional reading|more reading|read more)\b/i.test(
     latestUserMessage.content,
   );
+}
+
+function userHasResourceIntent(messages: ChatMessage[]) {
+  const latestUserMessage = getLatestUserContent(messages);
+
+  return /\b(blogs?|articles?|resources?|more reading|additional reading|send me a link|send a link|link|more info|anything on this|read more|reading)\b/i.test(
+    latestUserMessage,
+  );
+}
+
+function getLatestUserContent(messages: ChatMessage[]) {
+  return messages.findLast((message) => message.role === "user")?.content ?? "";
+}
+
+function includesAny(text: string, patterns: RegExp[]) {
+  return patterns.some((pattern) => pattern.test(text));
+}
+
+function detectIntentCategories(
+  messages: ChatMessage[],
+  pageContext: string,
+): IntentCategory[] {
+  const latestUserMessage = getLatestUserContent(messages);
+  const combinedContext = `${latestUserMessage}\n${pageContext}`.toLowerCase();
+  const intents = new Set<IntentCategory>();
+
+  if (
+    includesAny(combinedContext, [
+      /\b(book|booking|schedule|appointment|availability|available|openings?|come in|be seen|new patient)\b/,
+      /\bcan i get in|how soon|sign me up|ready to book\b/,
+    ])
+  ) {
+    intents.add("booking intent");
+  }
+
+  if (
+    includesAny(combinedContext, [
+      /\b(learn|explain|what is|what does|how does|why|article|resource|blog|read|details|information|info)\b/,
+      /\b(can chiropractic help|is chiropractic|what should i expect)\b/,
+    ])
+  ) {
+    intents.add("educational intent");
+  }
+
+  if (
+    includesAny(combinedContext, [
+      /\b(price|pricing|cost|cash|rate|rates|fee|fees|how much|\$)\b/,
+    ])
+  ) {
+    intents.add("pricing intent");
+  }
+
+  if (includesAny(combinedContext, [/\b(insurance|insured|coverage|covered|copay|deductible|benefits)\b/])) {
+    intents.add("insurance intent");
+  }
+
+  if (
+    includesAny(combinedContext, [
+      /\b(provider|doctor|dr\.?|chiropractor|therapist|massage|who should|which doctor|which provider|who do i book)\b/,
+      /\b(kyle|dave|david|josh|joshua|claire|michelle|nichole|james)\b/,
+      /\b(pregnan|postpartum|newborn|baby|pediatric|ski|skiing|athlete|performance|rehab|four corners|big sky massage|bozeman massage)\b/,
+      /\b(pet|pets|dog|dogs|cat|cats|animal|animals|small animal|veterinary|animal adjustment|animal adjustments|chiropractic for pets)\b/,
+    ])
+  ) {
+    intents.add("provider matching");
+  }
+
+  if (
+    includesAny(combinedContext, [
+      /\b(urgent|emergency|er|severe|unbearable|worst pain|rapidly worsening|major trauma|car accident|fall|fever)\b/,
+      /\b(chest pain|trouble breathing|shortness of breath|sudden weakness|numbness in groin|saddle anesthesia)\b/,
+      /\b(loss of bowel|loss of bladder|can't control bowel|can't control bladder|stroke|fainting)\b/,
+    ])
+  ) {
+    intents.add("urgent/red-flag symptoms");
+  }
+
+  if (
+    includesAny(combinedContext, [
+      /\b(location|where|bozeman|big sky|four corners|belgrade|which clinic|which office)\b/,
+    ])
+  ) {
+    intents.add("location intent");
+  }
+
+  if (intents.size === 0) {
+    intents.add("educational intent");
+  }
+
+  return Array.from(intents);
+}
+
+function detectTopicCategory(messages: ChatMessage[], pageContext: string) {
+  const text = `${getLatestUserContent(messages)}\n${pageContext}`.toLowerCase();
+
+  if (/\b(pet|pets|dog|dogs|cat|cats|animal|animals|small animal|veterinary)\b/.test(text)) {
+    return "small animal chiropractic";
+  }
+
+  if (/\b(pregnan|postpartum|newborn|baby|pediatric|child|kids|family)\b/.test(text)) {
+    return "pregnancy pediatric family care";
+  }
+
+  if (/\b(price|pricing|cost|cash|rate|rates|fee|fees|\$)\b/.test(text)) {
+    return "pricing";
+  }
+
+  if (/\b(insurance|coverage|copay|deductible|benefits)\b/.test(text)) {
+    return "insurance";
+  }
+
+  if (/\b(first visit|new patient|what to expect|nervous)\b/.test(text)) {
+    return "first visit";
+  }
+
+  if (/\b(massage|massage therapy|bodywork)\b/.test(text)) {
+    return "massage therapy";
+  }
+
+  if (/\b(neck pain|headache|headaches|migraine|migraines)\b/.test(text)) {
+    return "neck pain headaches migraines";
+  }
+
+  if (/\b(low back|lower back|back pain|sciatica|disc)\b/.test(text)) {
+    return "back pain";
+  }
+
+  if (/\b(ski|skiing|hiking|athlete|performance|training|outdoor|active)\b/.test(text)) {
+    return "active lifestyle performance";
+  }
+
+  if (/\b(bozeman|big sky|four corners|location|where)\b/.test(text)) {
+    return "locations";
+  }
+
+  if (/\b(book|booking|schedule|appointment|availability)\b/.test(text)) {
+    return "booking";
+  }
+
+  return "general clinic question";
+}
+
+function getProviderRoutingGuidance(messages: ChatMessage[], pageContext: string) {
+  const text = `${getLatestUserContent(messages)}\n${pageContext}`.toLowerCase();
+  const guidance: string[] = [];
+
+  if (/\b(pet|pets|dog|dogs|cat|cats|animal|animals|small animal|veterinary|animal adjustment|animal adjustments|chiropractic for pets)\b/.test(text)) {
+    guidance.push(
+      "Pet, dog, animal, small animal, veterinary chiropractic, or animal adjustment questions: Windy Ridge offers small animal chiropractic care in clinic with Dr. Josh at the Bozeman Four Corners location. Do not diagnose animal conditions or promise outcomes. Encourage checking JaneApp or contacting the clinic for availability, and advise consulting a veterinarian for urgent, worsening, or concerning symptoms.",
+    );
+  }
+
+  if (/\b(pregnan|postpartum|newborn|baby|infant|pediatric|child|kids|mom|moms)\b/.test(text)) {
+    guidance.push(
+      "Pregnancy, postpartum, newborn, pediatric, or family care: conversationally mention Dr. Claire at Four Corners; she also provides at-home visits for moms and newborns.",
+    );
+  }
+
+  if (/\b(active|outdoor|ski|skiing|hiking|athlete|performance|training|trail|runner|rehab|mobility|movement|sport)\b/.test(text)) {
+    guidance.push(
+      "Active, outdoor, performance, skiing, hiking, rehab, or movement restoration goals: conversationally mention Dr. Kyle; he practices at both locations, with Big Sky on Thursdays only.",
+    );
+  }
+
+  if (
+    /\b(massage|massage therapy|bodywork)\b/.test(text) &&
+    /\b(big sky)\b/.test(text)
+  ) {
+    guidance.push("Massage therapy in Big Sky: route to Nichole.");
+  }
+
+  if (
+    /\b(massage|massage therapy|bodywork)\b/.test(text) &&
+    /\b(bozeman|four corners|belgrade|gallatin)\b/.test(text)
+  ) {
+    guidance.push("Massage therapy at Bozeman Four Corners: route to James.");
+  }
+
+  if (
+    /\b(four corners|bozeman|belgrade|gallatin|general chiropractor|general care|adjustment|chiropractic care)\b/.test(text) &&
+    !/\b(pregnan|postpartum|newborn|baby|pediatric|massage|ski|skiing|athlete|performance|rehab|pet|dog|cat|animal|veterinary)\b/.test(text)
+  ) {
+    guidance.push(
+      "General Four Corners chiropractic care: conversationally mention Dr. Josh or Dr. Dave. Dr. Dave is the senior provider and clinic owner; Dr. Josh practices at Four Corners only.",
+    );
+  }
+
+  return guidance;
+}
+
+function formatIntentGuidance(
+  messages: ChatMessage[],
+  pageContext: string,
+  sessionMemory: SessionMemory,
+) {
+  const intents = detectIntentCategories(messages, pageContext);
+  const providerGuidance = getProviderRoutingGuidance(messages, pageContext);
+  const strategy: string[] = [];
+
+  if (intents.includes("urgent/red-flag symptoms")) {
+    strategy.push(
+      "Urgent/red-flag symptoms: be direct and brief. Tell the user to seek urgent or emergency medical care right away before discussing booking or resources.",
+    );
+  }
+
+  if (intents.includes("booking intent")) {
+    strategy.push(
+      "Booking intent: give a direct JaneApp scheduling CTA unless a booking link was already provided recently.",
+    );
+  }
+
+  if (intents.includes("educational intent")) {
+    strategy.push(
+      "Educational intent: answer first in plain language, then offer one highly relevant article/resource when retrieved knowledge provides one.",
+    );
+  }
+
+  if (intents.includes("pricing intent")) {
+    strategy.push(
+      "Pricing intent: use JaneApp/current listed pricing language only, say pricing can vary depending on services performed, and suggest confirming in JaneApp.",
+    );
+  }
+
+  if (intents.includes("insurance intent")) {
+    strategy.push(
+      "Insurance intent: keep it practical and cautious; do not promise coverage. Suggest confirming benefits with insurance and current options with the clinic or JaneApp.",
+    );
+  }
+
+  if (intents.includes("provider matching")) {
+    strategy.push(
+      "Provider matching: make provider recommendations conversational, not diagnostic. Mention one or two good-fit providers, not a long roster.",
+    );
+  }
+
+  if (intents.includes("location intent")) {
+    strategy.push(
+      "Location intent: be specific about Bozeman Four Corners and Big Sky. Mention Big Sky Thursday availability for Dr. Kyle when relevant.",
+    );
+  }
+
+  if (!sessionMemory.bookingInfoProvided && !sessionMemory.bookingLinkClicked) {
+    strategy.push(
+      "CTA behavior: educational users get resources first; ready-to-book users get JaneApp; nervous or new users get a short first-visit explanation.",
+    );
+  } else {
+    strategy.push(
+      "CTA behavior: avoid repeating the same booking link unless the user clearly asks to book or needs the link again.",
+    );
+  }
+
+  return [
+    `Detected Wendy intent categories: ${intents.join(", ")}`,
+    providerGuidance.length
+      ? `Provider routing guidance:\n${providerGuidance.join("\n")}`
+      : "",
+    `Response strategy:\n${strategy.join("\n")}`,
+    "Keep the answer concise, locally specific to Bozeman/Big Sky when relevant, and grounded in retrieved knowledge.",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 function getSessionMemory(body: ChatRequestBody): SessionMemory {
@@ -172,14 +443,50 @@ export async function POST(request: Request) {
   const pageContext = getPageContext(body);
   const sessionMemory = getSessionMemory(body);
   const sessionMemoryContext = formatSessionMemory(sessionMemory);
+  const detectedIntents = detectIntentCategories(messages, pageContext);
+  const topicCategory = detectTopicCategory(messages, pageContext);
+  const intentGuidance = formatIntentGuidance(messages, pageContext, sessionMemory);
+  const hasResourceIntent = userHasResourceIntent(messages);
   const wantsMoreResources = userWantsMoreResources(messages);
+  const includeBookingResource = detectedIntents.includes("booking intent");
   const retrievedKnowledge = retrieveKnowledge({
-    query: getRetrievalQuery(messages),
+    query: [getRetrievalQuery(messages), intentGuidance].join("\n"),
     conversationContext: sessionMemoryContext,
     pageContext,
     excludedUrls: sessionMemory.recommendedResourceUrls ?? [],
     wantsMoreResources,
+    includeBookingResource,
   });
+  const resources = retrieveResources(
+    {
+      query: [getRetrievalQuery(messages), intentGuidance].join("\n"),
+      conversationContext: sessionMemoryContext,
+      pageContext,
+      excludedUrls: sessionMemory.recommendedResourceUrls ?? [],
+      wantsMoreResources,
+      includeBookingResource,
+    },
+    wantsMoreResources || hasResourceIntent ? 4 : 1,
+  );
+
+  if (process.env.NODE_ENV === "development") {
+    console.log("[Wendy resource retrieval]", {
+      resourceIntent: hasResourceIntent,
+      wantsMoreResources,
+      matchedResources: resources.map((resource) => ({
+        title: resource.title,
+        score: resource.score,
+        type: resource.type,
+      })),
+      resourceCardsReturned: resources.length,
+    });
+  }
+  const publicResources = resources.map((resource) => ({
+    title: resource.title,
+    summary: resource.summary,
+    url: resource.url,
+    type: resource.type,
+  }));
 
   if (messages.length === 0) {
     return Response.json(
@@ -194,6 +501,10 @@ export async function POST(request: Request) {
       messages: [
         { role: "system", content: systemPrompt },
         { role: "system", content: formatClinicKnowledge() },
+        {
+          role: "system" as const,
+          content: intentGuidance,
+        },
         ...(sessionMemoryContext
           ? [
               {
@@ -206,7 +517,23 @@ export async function POST(request: Request) {
           ? [
               {
                 role: "system" as const,
-                content: `Retrieved Windy Ridge website and JaneApp knowledge for this user message. Treat this as general website information, answer briefly, and offer source URLs naturally when useful. By default, if a chunk is marked as the primary related resource, you may recommend that one resource after answering, using a natural line like "We actually have an article on that here if you'd like to read more." Do not recommend more than one resource link by default. If the user explicitly asked for more blogs, more resources, more articles, or additional reading, you may include 2 to 4 resource links from chunks marked as primary or additional resource options. For current booking, availability, appointment details, and pricing confirmation, recommend JaneApp because listed details can change:\n${retrievedKnowledge}`,
+                content: `Retrieved Windy Ridge website and JaneApp knowledge for this user message. Treat this as general website information, answer briefly, and offer source URLs naturally when useful. Resource cards are rendered separately by the app, so keep the answer conversational and do not force a bare list of links. For current booking, availability, appointment details, and pricing confirmation, recommend JaneApp because listed details can change:\n${retrievedKnowledge}`,
+              },
+            ]
+          : []),
+        ...(resources.length > 0
+          ? [
+              {
+                role: "system" as const,
+                content: `Dedicated recommendable resource cards selected for this user. Answer first, then briefly introduce these resources if relevant. The UI will render the cards separately, so do not duplicate every card URL in the prose unless it is essential:\n${resources
+                  .map(
+                    (resource, index) =>
+                      `${index + 1}. ${resource.title}
+Type: ${resource.type}
+Summary: ${resource.summary}
+URL: ${resource.url}`,
+                  )
+                  .join("\n\n")}`,
               },
             ]
           : []),
@@ -228,7 +555,28 @@ export async function POST(request: Request) {
       return Response.json({ error: publicErrorMessage }, { status: 502 });
     }
 
-    return Response.json({ message });
+    try {
+      await logConversationInsight({
+        event: "chat_response",
+        pageTitle: sanitizeContextValue(body.pageTitle, 180),
+        pageUrl: sanitizeContextValue(body.pageUrl, 500),
+        detectedIntent: detectedIntents,
+        bookingLinkClicked: Boolean(sessionMemory.bookingLinkClicked),
+        resourceRecommended:
+          resources.length > 0 ||
+          /https?:\/\/(?:www\.)?windyridgechiropractic\.com\/(?!.*janeapp)/i.test(
+            message,
+          ),
+        topicCategory,
+        metadata: {
+          source: "api_chat",
+        },
+      });
+    } catch (error) {
+      console.error("Wendy conversation insight logging failed:", error);
+    }
+
+    return Response.json({ message, resources: publicResources });
   } catch (error) {
     console.error("OpenAI chat request failed:", error);
     return Response.json({ error: publicErrorMessage }, { status: 502 });

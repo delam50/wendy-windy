@@ -13,6 +13,14 @@ type KnowledgeChunk = {
   text: string;
 };
 
+export type RetrievedResource = {
+  title: string;
+  summary: string;
+  url: string;
+  type: string;
+  score: number;
+};
+
 type ScoredKnowledgeChunk = KnowledgeChunk & {
   score: number;
   resourceScore: number;
@@ -26,9 +34,14 @@ type RetrievalInput = {
   pageContext?: string;
   excludedUrls?: string[];
   wantsMoreResources?: boolean;
+  includeBookingResource?: boolean;
 };
 
 const KNOWLEDGE_FILES: KnowledgeFile[] = [
+  {
+    label: "Generated clinic identity knowledge",
+    path: path.join(process.cwd(), "data", "generated", "clinic-identity.md"),
+  },
   {
     label: "Generated website knowledge",
     path: path.join(process.cwd(), "data", "generated", "website-knowledge.md"),
@@ -97,6 +110,24 @@ const PRIORITY_TERMS = [
   "dalgardno",
   "james",
   "beaudry",
+  "nichole",
+  "massage",
+  "therapist",
+  "animal",
+  "animals",
+  "small animal",
+  "pet",
+  "pets",
+  "dog",
+  "dogs",
+  "cat",
+  "cats",
+  "veterinary",
+  "exercises",
+  "exercise",
+  "chiropractor vs pt",
+  "physical therapy",
+  "physical therapist",
 ];
 
 const CONDITION_TERMS = [
@@ -119,6 +150,15 @@ const CONDITION_TERMS = [
   "sciatica",
   "disc",
   "posture",
+  "small animal chiropractic",
+  "animal chiropractic",
+  "pet chiropractic",
+  "dog chiropractic",
+  "veterinary chiropractic",
+  "animal adjustments",
+  "exercises",
+  "exercise",
+  "chiropractor vs pt",
 ];
 
 const CORNERSTONE_TERMS = [
@@ -143,6 +183,9 @@ const RELATED_TERM_GROUPS = [
   ["pediatric", "child", "kids", "family", "growth"],
   ["cost", "pricing", "insurance", "cash", "rate"],
   ["first visit", "exam", "evaluation", "new patient", "what to expect"],
+  ["pet", "pets", "dog", "dogs", "cat", "cats", "animal", "animals", "veterinary"],
+  ["exercise", "exercises", "mobility", "stretch", "strength", "rehab"],
+  ["chiropractor", "physical therapy", "physical therapist", "pt", "rehab"],
 ];
 
 const STOP_WORDS = new Set([
@@ -489,6 +532,7 @@ function normalizeRetrievalInput(input: string | RetrievalInput): Required<Retri
       pageContext: "",
       excludedUrls: [],
       wantsMoreResources: false,
+      includeBookingResource: false,
     };
   }
 
@@ -498,7 +542,146 @@ function normalizeRetrievalInput(input: string | RetrievalInput): Required<Retri
     pageContext: input.pageContext ?? "",
     excludedUrls: input.excludedUrls ?? [],
     wantsMoreResources: Boolean(input.wantsMoreResources),
+    includeBookingResource: Boolean(input.includeBookingResource),
   };
+}
+
+function getResourceType(chunk: KnowledgeChunk) {
+  const url = chunk.url?.toLowerCase() ?? "";
+  const source = chunk.source.toLowerCase();
+
+  if (url.includes("janeapp.com")) {
+    return "Booking Page";
+  }
+
+  if (url.includes("first-visit") || /first visit/i.test(chunk.title)) {
+    return "First Visit Guide";
+  }
+
+  if (url.includes("cost") || url.includes("insurance")) {
+    return "Cost & Insurance Page";
+  }
+
+  if (url.includes("big-sky") || url.includes("bozeman") || url.includes("four-corners")) {
+    return "Location Page";
+  }
+
+  if (url.includes("/chiropractic-services/") || /service/i.test(chunk.title)) {
+    return "Service Page";
+  }
+
+  if (/blog/.test(source) || !url.includes("/chiropractic-services/")) {
+    return "Blog";
+  }
+
+  return "Resource";
+}
+
+function getResourceSummary(chunk: KnowledgeChunk) {
+  const text = chunk.text
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(chunk.title, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const sentence = text
+    .split(/(?<=[.!?])\s+/)
+    .map((value) => value.trim())
+    .find((value) => value.length >= 40);
+
+  if (sentence) {
+    return sentence.length > 160 ? `${sentence.slice(0, 157).trim()}...` : sentence;
+  }
+
+  return "A Windy Ridge resource with more detail on this topic.";
+}
+
+function isJaneBookingChunk(chunk: KnowledgeChunk) {
+  return Boolean(chunk.url?.includes("windyridgechiropractic.janeapp.com"));
+}
+
+export function retrieveResources(
+  input: string | RetrievalInput,
+  maxResources?: number,
+): RetrievedResource[] {
+  const retrievalInput = normalizeRetrievalInput(input);
+  const queryKeywords = extractKeywords(retrievalInput.query);
+  const pageKeywords = extractKeywords(retrievalInput.pageContext);
+  const excludedUrls = new Set(
+    retrievalInput.excludedUrls.map((url) => url.toLowerCase()),
+  );
+  const limit = maxResources ?? (retrievalInput.wantsMoreResources ? 4 : 1);
+  const fallbackMinimumScore = retrievalInput.wantsMoreResources ? 8 : 12;
+  const seenUrls = new Set<string>();
+
+  const resources = loadKnowledgeChunks()
+    .filter((chunk) => chunk.url)
+    .filter((chunk) => {
+      const url = chunk.url?.toLowerCase() ?? "";
+
+      if (excludedUrls.has(url)) {
+        return false;
+      }
+
+      if (isJaneBookingChunk(chunk) && !retrievalInput.includeBookingResource) {
+        return false;
+      }
+
+      return isResourceCandidate(chunk) || isJaneBookingChunk(chunk);
+    })
+    .map((chunk) => {
+      const resourceScore =
+        scoreResourceCandidate(chunk, retrievalInput, queryKeywords, pageKeywords) +
+        (isJaneBookingChunk(chunk) ? 8 : 0);
+
+      return {
+        chunk,
+        score: resourceScore || scoreChunk(chunk, retrievalInput, queryKeywords, [], pageKeywords),
+      };
+    })
+    .filter(({ score }) => score >= fallbackMinimumScore)
+    .sort((a, b) => b.score - a.score)
+    .filter(({ chunk }) => {
+      const url = chunk.url?.toLowerCase();
+
+      if (!url || seenUrls.has(url)) {
+        return false;
+      }
+
+      seenUrls.add(url);
+      return true;
+    })
+    .slice(0, limit)
+    .map<RetrievedResource>(({ chunk, score }) => ({
+      title: chunk.title,
+      summary: getResourceSummary(chunk),
+      url: chunk.url ?? "",
+      type: getResourceType(chunk),
+      score,
+    }));
+
+  if (resources.length > 0 || retrievalInput.includeBookingResource) {
+    return resources;
+  }
+
+  return loadKnowledgeChunks()
+    .filter((chunk) => chunk.url && !excludedUrls.has(chunk.url.toLowerCase()))
+    .filter((chunk) => isResourceCandidate(chunk))
+    .sort((a, b) => {
+      const aType = getResourceType(a);
+      const bType = getResourceType(b);
+      const typeWeight = (type: string) =>
+        type === "First Visit Guide" ? 4 : type === "Service Page" ? 3 : type === "Blog" ? 2 : 1;
+
+      return typeWeight(bType) - typeWeight(aType);
+    })
+    .slice(0, limit)
+    .map((chunk) => ({
+      title: chunk.title,
+      summary: getResourceSummary(chunk),
+      url: chunk.url ?? "",
+      type: getResourceType(chunk),
+      score: 0,
+    }));
 }
 
 export function retrieveKnowledge(

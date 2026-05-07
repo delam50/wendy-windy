@@ -1,13 +1,28 @@
 "use client";
 
 import Image from "next/image";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import {
+  FormEvent,
+  KeyboardEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { trackAnalyticsEvent } from "@/lib/analytics";
 
 type Message = {
   role: "user" | "assistant";
   content: string;
+  resources?: ResourceCard[];
+};
+
+type ResourceCard = {
+  title: string;
+  summary: string;
+  url: string;
+  type: string;
 };
 
 type QuickAction = {
@@ -95,6 +110,30 @@ function trimMessagesForSession(messages: Message[]) {
   }
 
   return [welcomeMessage, ...messages.slice(-(MAX_SESSION_MESSAGES - 1))];
+}
+
+function sanitizeResourceCards(resources: unknown) {
+  if (!Array.isArray(resources)) {
+    return [];
+  }
+
+  return resources
+    .filter((resource): resource is Record<string, unknown> =>
+      Boolean(resource && typeof resource === "object"),
+    )
+    .map((resource) => ({
+      // Keep cards strictly user-facing. Retrieval scores/debug fields are
+      // intentionally not copied into the UI model.
+      title: typeof resource.title === "string" ? resource.title : "Windy Ridge Resource",
+      summary:
+        typeof resource.summary === "string"
+          ? resource.summary
+          : "A Windy Ridge resource with more detail.",
+      url: typeof resource.url === "string" ? resource.url : "",
+      type: typeof resource.type === "string" ? resource.type : "Resource",
+    }))
+    .filter((resource) => resource.url.startsWith("http"))
+    .slice(0, 4);
 }
 
 function renderMessageContent(content: string) {
@@ -231,32 +270,47 @@ function getResourceSnippet(content: string, url: string) {
   return snippet.length > 150 ? `${snippet.slice(0, 147).trim()}...` : snippet;
 }
 
-function renderResourceCards(content: string) {
-  const resourceUrls = getResourceUrls(content).slice(0, 4);
+function renderResourceCards(content: string, resources: ResourceCard[] = []) {
+  const resourceCards =
+    resources.length > 0
+      ? resources
+      : getResourceUrls(content)
+          .slice(0, 4)
+          .map((resourceUrl) => ({
+            title: getResourceTitle(resourceUrl),
+            summary: getResourceSnippet(content, resourceUrl),
+            url: resourceUrl,
+            type: getResourceDescription(resourceUrl).includes("cost")
+              ? "Cost & Insurance Page"
+              : "Resource",
+          }));
 
-  if (resourceUrls.length === 0) {
+  if (resourceCards.length === 0) {
     return null;
   }
 
   return (
     <div className="mt-2 grid max-w-[92%] gap-2 sm:max-w-[88%]">
-      {resourceUrls.map((resourceUrl) => (
+      {resourceCards.map((resource) => (
         <a
-          className="wendy-message-enter block rounded-2xl border border-[#c46a2d]/30 bg-[#2d261f]/90 p-3.5 text-left shadow-lg shadow-black/20 transition duration-200 hover:-translate-y-0.5 hover:border-[#c46a2d]/70 hover:bg-[#35291f]"
-          href={resourceUrl}
-          key={resourceUrl}
+          className="group wendy-message-enter block rounded-2xl border border-[#c46a2d]/30 bg-[#2d261f]/90 p-3.5 text-left shadow-lg shadow-black/20 transition duration-200 hover:-translate-y-0.5 hover:border-[#c46a2d]/70 hover:bg-[#35291f]"
+          href={resource.url}
+          key={resource.url}
           rel="noopener noreferrer"
           target="_blank"
         >
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#f2a36f]">
-            Windy Ridge resource
+            {resource.type}
           </p>
           <p className="mt-1 break-words text-sm font-semibold leading-6 text-white">
-            {getResourceTitle(resourceUrl)}
+            {resource.title}
           </p>
           <p className="mt-1 text-xs leading-5 text-[#d6d6d6]">
-            {getResourceSnippet(content, resourceUrl)}
+            {resource.summary}
           </p>
+          <span className="mt-3 inline-flex rounded-full border border-[#c46a2d]/35 px-3 py-1 text-[11px] font-semibold text-[#f2a36f] transition group-hover:border-[#c46a2d]">
+            Open resource
+          </span>
         </a>
       ))}
     </div>
@@ -392,7 +446,11 @@ function loadSessionMessages() {
         (message) =>
           (message.role === "user" || message.role === "assistant") &&
           typeof message.content === "string",
-      ),
+      ).map((message) => ({
+        role: message.role,
+        content: message.content,
+        resources: sanitizeResourceCards(message.resources),
+      })),
     );
   } catch {
     return [welcomeMessage];
@@ -443,6 +501,7 @@ function persistSession(messages: Message[], memory: SessionMemory) {
 }
 
 export default function Home() {
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(() => loadSessionMessages());
   const [input, setInput] = useState("");
@@ -478,6 +537,19 @@ export default function Home() {
       bookingLinkClicked: hasClickedBookingLink,
     });
   }, [hasClickedBookingLink, messages, sessionMemory]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: isSending ? "auto" : "smooth",
+        block: "end",
+      });
+    });
+  }, [error, isOpen, isSending, messages, showLeadForm]);
 
   useEffect(() => {
     window.parent?.postMessage(
@@ -552,6 +624,7 @@ export default function Home() {
 
       const data = (await response.json().catch(() => ({}))) as {
         message?: string;
+        resources?: ResourceCard[];
       };
 
       if (!response.ok || !data.message) {
@@ -559,9 +632,11 @@ export default function Home() {
       }
 
       const assistantMessage = data.message;
+      const assistantResources = sanitizeResourceCards(data.resources);
       const assistantChatMessage: Message = {
         role: "assistant",
         content: assistantMessage,
+        resources: assistantResources,
       };
       const memoryAfterAssistant = mergeSessionMemory(
         nextMemory,
@@ -571,6 +646,7 @@ export default function Home() {
         new Set([
           ...(memoryAfterAssistant.recommendedResourceUrls ?? []),
           ...getResourceUrls(assistantMessage),
+          ...assistantResources.map((resource) => resource.url),
         ]),
       ).slice(-12);
 
@@ -601,6 +677,18 @@ export default function Home() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     void sendMessage(input);
+  }
+
+  function handleMessageKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key !== "Enter" || event.shiftKey) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (canSend) {
+      void sendMessage(input);
+    }
   }
 
   function clearChat() {
@@ -1083,7 +1171,9 @@ export default function Home() {
                   {index === 0 && messages.length === 1
                     ? renderQuickActions()
                     : null}
-                  {message.role === "assistant" ? renderResourceCards(message.content) : null}
+                  {message.role === "assistant"
+                    ? renderResourceCards(message.content, message.resources)
+                    : null}
                   {index === messages.length - 1 ? renderLeadCaptureOffer() : null}
                   {index === messages.length - 1 ? renderLeadCaptureForm() : null}
                 </div>
@@ -1100,6 +1190,7 @@ export default function Home() {
                   <span className="sr-only">Wendy is typing</span>
                 </div>
               ) : null}
+              <div aria-hidden="true" ref={messagesEndRef} />
             </div>
 
             <form
@@ -1118,6 +1209,7 @@ export default function Home() {
                 <textarea
                   className="max-h-24 min-h-14 min-w-0 flex-1 resize-none rounded-2xl border border-white/12 bg-[#1f1f1f]/90 px-4 py-3 text-base leading-7 text-white outline-none transition duration-200 placeholder:text-[#9f9f9f] focus:border-[#c46a2d] focus:ring-2 focus:ring-[#c46a2d]/30 sm:max-h-28 sm:text-sm"
                   id="chat-message"
+                  onKeyDown={handleMessageKeyDown}
                   onChange={(event) => setInput(event.target.value)}
                   placeholder="Ask Wendy..."
                   rows={1}

@@ -3,6 +3,8 @@ import path from "node:path";
 
 import nodemailer from "nodemailer";
 
+import { logConversationInsight } from "@/lib/conversationInsights";
+
 export const runtime = "nodejs";
 
 type LeadRequestBody = {
@@ -218,6 +220,22 @@ export async function POST(request: Request) {
     hasEmail: Boolean(leadRecord.email),
     emailSent,
   });
+
+  try {
+    await logConversationInsight({
+      event: "lead_form_submitted",
+      pageTitle: leadRecord.pageTitle,
+      pageUrl: leadRecord.pageUrl,
+      leadFormSubmitted: true,
+      topicCategory: "lead follow-up request",
+      metadata: {
+        leadLocationPreference: leadRecord.location,
+        source: "api_leads",
+      },
+    });
+  } catch (error) {
+    console.error("Wendy conversation insight logging failed:", error);
+  }
 
   if (!emailSent) {
     return Response.json(
