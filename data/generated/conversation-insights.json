@@ -1,7 +1,7 @@
 [
   {
-    "id": "1499fefb-cf71-44e0-ae45-96205cc750b3",
-    "timestamp": "2026-05-07T17:59:45.212Z",
+    "id": "d94b25d7-3bc2-41b6-b647-0525b67c5a6c",
+    "timestamp": "2026-05-07T20:31:05.343Z",
     "event": "chat_response",
     "detectedIntent": [
       "educational intent"
@@ -16,8 +16,8 @@
     }
   },
   {
-    "id": "4703ef40-7802-4e3e-b698-6270b084a837",
-    "timestamp": "2026-05-07T17:59:45.225Z",
+    "id": "ceaa46d4-de4f-4fc2-aa65-7cbba8af8a21",
+    "timestamp": "2026-05-07T20:31:05.351Z",
     "event": "assistant_response_received",
     "bookingLinkClicked": false,
     "leadFormOpened": false,
@@ -26,18 +26,8 @@
     "metadata": {}
   },
   {
-    "id": "baa5e6b1-8c2a-4695-84b7-fd7a05b7478d",
-    "timestamp": "2026-05-07T17:59:49.287Z",
-    "event": "lead_form_opened",
-    "bookingLinkClicked": false,
-    "leadFormOpened": true,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "63a46325-1a00-4cda-b846-234e21a95498",
-    "timestamp": "2026-05-07T17:59:54.972Z",
+    "id": "bbe756e7-24b1-4ecf-b90d-0fbde9e46fa5",
+    "timestamp": "2026-05-07T20:31:16.658Z",
     "event": "message_sent",
     "bookingLinkClicked": false,
     "leadFormOpened": false,
@@ -46,63 +36,29 @@
     "metadata": {}
   },
   {
-    "id": "bc83ee9a-bf7c-43c3-b395-6cd01938c9ad",
-    "timestamp": "2026-05-07T17:59:56.888Z",
+    "id": "5d886fbd-d5c0-424e-ae9a-4f721b53c1c6",
+    "timestamp": "2026-05-07T20:31:19.097Z",
     "event": "chat_response",
     "detectedIntent": [
-      "educational intent"
+      "pricing intent"
     ],
     "bookingLinkClicked": false,
     "leadFormOpened": false,
     "leadFormSubmitted": false,
     "resourceRecommended": true,
-    "topicCategory": "general clinic question",
+    "topicCategory": "pricing",
     "metadata": {
       "source": "api_chat"
     }
   },
   {
-    "id": "1f620e08-f6da-46a7-8f06-50f8d3bf700a",
-    "timestamp": "2026-05-07T17:59:56.898Z",
+    "id": "eddc07ee-0e9c-415e-bfb5-2a69d87e3622",
+    "timestamp": "2026-05-07T20:31:19.109Z",
     "event": "assistant_response_received",
     "bookingLinkClicked": false,
     "leadFormOpened": false,
     "leadFormSubmitted": false,
     "resourceRecommended": false,
     "metadata": {}
-  },
-  {
-    "id": "fe8ecf04-6fc3-4f53-90a6-777adbaddff0",
-    "timestamp": "2026-05-07T18:00:13.575Z",
-    "event": "widget_closed",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {
-      "source": "header_minimize"
-    }
-  },
-  {
-    "id": "b32c0a0f-44b5-48bf-adf3-cb4334d16e72",
-    "timestamp": "2026-05-07T18:05:24.633Z",
-    "event": "widget_opened",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "f3770e54-12b4-47b9-9464-acb6255e640b",
-    "timestamp": "2026-05-07T18:05:30.304Z",
-    "event": "widget_closed",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {
-      "source": "header_minimize"
-    }
   }
 ]

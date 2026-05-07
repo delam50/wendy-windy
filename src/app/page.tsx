@@ -13,6 +13,7 @@ import {
 import { trackAnalyticsEvent } from "@/lib/analytics";
 
 type Message = {
+  id?: string;
   role: "user" | "assistant";
   content: string;
   resources?: ResourceCard[];
@@ -59,7 +60,7 @@ const SESSION_MESSAGES_KEY = "wendy.session.messages";
 const SESSION_MEMORY_KEY = "wendy.session.memory";
 const MAX_SESSION_MESSAGES = 12;
 
-const quickActions: QuickAction[] = [
+const defaultQuickActions: QuickAction[] = [
   {
     label: "What does a first visit look like?",
     prompt: "What does a first visit look like at Windy Ridge?",
@@ -75,6 +76,97 @@ const quickActions: QuickAction[] = [
   {
     label: "Which location should I book at?",
     prompt: "Which Windy Ridge location should I book at, Bozeman or Big Sky?",
+  },
+];
+
+const contextualQuickActionSets: Array<{
+  patterns: RegExp[];
+  actions: QuickAction[];
+}> = [
+  {
+    patterns: [/\bback pain\b/, /\blow(?:er)? back\b/, /\bsciatica\b/, /\bdisc\b/],
+    actions: [
+      {
+        label: "Can chiropractic help sciatica?",
+        prompt: "Can chiropractic help sciatica?",
+      },
+      {
+        label: "What causes low back pain after skiing?",
+        prompt: "What causes low back pain after skiing around Big Sky?",
+      },
+      {
+        label: "What should I expect on my first visit?",
+        prompt: "What should I expect on my first visit at Windy Ridge?",
+      },
+    ],
+  },
+  {
+    patterns: [/\bneck pain\b/, /\bheadaches?\b/, /\bmigraines?\b/, /\bposture\b/],
+    actions: [
+      {
+        label: "Can neck tension contribute to headaches?",
+        prompt: "Can neck tension contribute to headaches?",
+      },
+      {
+        label: "Do you have blogs on migraines?",
+        prompt: "Do you have blogs or resources on migraines?",
+      },
+      {
+        label: "Can posture cause neck pain?",
+        prompt: "Can posture or desk work cause neck pain?",
+      },
+    ],
+  },
+  {
+    patterns: [/\bpregnan/, /\bpostpartum\b/, /\bnewborn\b/, /\bpediatric\b/, /\bbaby\b/],
+    actions: [
+      {
+        label: "Is chiropractic safe during pregnancy?",
+        prompt: "Is chiropractic safe during pregnancy?",
+      },
+      {
+        label: "Do you offer postpartum care?",
+        prompt: "Does Windy Ridge offer postpartum care?",
+      },
+      {
+        label: "Can Dr. Claire see newborns?",
+        prompt: "Can Dr. Claire see newborns?",
+      },
+    ],
+  },
+  {
+    patterns: [/\bbig sky\b/, /\bski(?:ing)?\b/, /\bsnowboard\b/],
+    actions: [
+      {
+        label: "Who practices in Big Sky?",
+        prompt: "Who practices at Windy Ridge in Big Sky?",
+      },
+      {
+        label: "Do you treat skiing injuries?",
+        prompt: "Does Windy Ridge help with skiing injuries?",
+      },
+      {
+        label: "Can I book Thursday appointments?",
+        prompt: "Can I book Thursday appointments in Big Sky?",
+      },
+    ],
+  },
+  {
+    patterns: [/\binsurance\b/, /\bcost\b/, /\bpricing\b/, /\bcash\b/, /\brates?\b/],
+    actions: [
+      {
+        label: "How does insurance work?",
+        prompt: "How does insurance work at Windy Ridge?",
+      },
+      {
+        label: "What does a first visit cost?",
+        prompt: "What does a first visit cost at Windy Ridge?",
+      },
+      {
+        label: "Do you offer cash pricing?",
+        prompt: "Does Windy Ridge offer cash pricing?",
+      },
+    ],
   },
 ];
 
@@ -110,6 +202,45 @@ function trimMessagesForSession(messages: Message[]) {
   }
 
   return [welcomeMessage, ...messages.slice(-(MAX_SESSION_MESSAGES - 1))];
+}
+
+function createMessageId() {
+  return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+}
+
+function wait(milliseconds: number) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, milliseconds);
+  });
+}
+
+function getRevealChunks(content: string) {
+  const words = content.split(/(\s+)/);
+  const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
+  const wordsPerChunk = wordCount > 90 ? 8 : wordCount > 40 ? 6 : 4;
+  const chunks: string[] = [];
+  let currentChunk = "";
+  let currentWordCount = 0;
+
+  for (const token of words) {
+    currentChunk += token;
+
+    if (token.trim()) {
+      currentWordCount += 1;
+    }
+
+    if (currentWordCount >= wordsPerChunk) {
+      chunks.push(currentChunk);
+      currentChunk = "";
+      currentWordCount = 0;
+    }
+  }
+
+  if (currentChunk) {
+    chunks.push(currentChunk);
+  }
+
+  return chunks;
 }
 
 function sanitizeResourceCards(resources: unknown) {
@@ -290,7 +421,7 @@ function renderResourceCards(content: string, resources: ResourceCard[] = []) {
   }
 
   return (
-    <div className="mt-2 grid max-w-[92%] gap-2 sm:max-w-[88%]">
+    <div className="wendy-resource-enter mt-2 grid max-w-[92%] gap-2 sm:max-w-[88%]">
       {resourceCards.map((resource) => (
         <a
           className="group wendy-message-enter block rounded-2xl border border-[#d77a34]/40 bg-[linear-gradient(145deg,rgba(55,39,28,0.96),rgba(38,33,29,0.94))] p-3.5 text-left shadow-lg shadow-black/20 ring-1 ring-[#f4ad79]/5 transition duration-200 hover:-translate-y-0.5 hover:border-[#d77a34]/75 hover:bg-[#3b2b20] hover:shadow-[#d77a34]/15"
@@ -341,6 +472,35 @@ function getPageContext(): PageContext {
     pageTitle,
     pageUrl,
   };
+}
+
+function getContextualQuickActions(pageContext: PageContext) {
+  const contextText = `${pageContext.pageTitle} ${pageContext.pageUrl} ${pageContext.pageContext}`
+    .toLowerCase()
+    .replace(/[-_/]+/g, " ");
+
+  if (!contextText.trim()) {
+    return defaultQuickActions;
+  }
+
+  const matchedSet = contextualQuickActionSets.find((set) =>
+    set.patterns.some((pattern) => pattern.test(contextText)),
+  );
+
+  if (!matchedSet) {
+    return defaultQuickActions;
+  }
+
+  const rotationSeed = Array.from(contextText).reduce(
+    (total, character) => total + character.charCodeAt(0),
+    0,
+  );
+  const rotationOffset = rotationSeed % matchedSet.actions.length;
+
+  return [
+    ...matchedSet.actions.slice(rotationOffset),
+    ...matchedSet.actions.slice(0, rotationOffset),
+  ];
 }
 
 function getAnalyticsPageMetadata() {
@@ -447,6 +607,7 @@ function loadSessionMessages() {
           (message.role === "user" || message.role === "assistant") &&
           typeof message.content === "string",
       ).map((message) => ({
+        id: typeof message.id === "string" ? message.id : createMessageId(),
         role: message.role,
         content: message.content,
         resources: sanitizeResourceCards(message.resources),
@@ -510,6 +671,7 @@ export default function Home() {
   );
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [isRevealing, setIsRevealing] = useState(false);
   const [error, setError] = useState("");
   const [sessionMemory, setSessionMemory] = useState<SessionMemory>(() =>
     loadSessionMemory(),
@@ -521,10 +683,14 @@ export default function Home() {
   const [leadForm, setLeadForm] = useState<LeadForm>(emptyLeadForm);
   const [leadError, setLeadError] = useState("");
   const [isSubmittingLead, setIsSubmittingLead] = useState(false);
+  const suggestedQuickActions = useMemo(
+    () => getContextualQuickActions(getPageContext()),
+    [],
+  );
 
   const canSend = useMemo(
-    () => input.trim().length > 0 && !isSending,
-    [input, isSending],
+    () => input.trim().length > 0 && !isSending && !isRevealing,
+    [input, isRevealing, isSending],
   );
 
   const shouldOfferLeadCapture = useMemo(
@@ -619,7 +785,7 @@ export default function Home() {
   async function sendMessage(content: string) {
     const trimmedContent = content.trim();
 
-    if (!trimmedContent || isSending) {
+    if (!trimmedContent || isSending || isRevealing) {
       return;
     }
 
@@ -629,7 +795,11 @@ export default function Home() {
       bookingLinkClicked: hasClickedBookingLink,
     });
 
-    const userMessage: Message = { role: "user", content: trimmedContent };
+    const userMessage: Message = {
+      id: createMessageId(),
+      role: "user",
+      content: trimmedContent,
+    };
     const nextMemory = mergeSessionMemory(sessionMemory, userMessage);
     const nextMessages: Message[] = trimMessagesForSession([
       ...messages,
@@ -676,10 +846,11 @@ export default function Home() {
 
       const assistantMessage = data.message;
       const assistantResources = sanitizeResourceCards(data.resources);
+      const assistantMessageId = createMessageId();
       const assistantChatMessage: Message = {
+        id: assistantMessageId,
         role: "assistant",
         content: assistantMessage,
-        resources: assistantResources,
       };
       const memoryAfterAssistant = mergeSessionMemory(
         nextMemory,
@@ -703,10 +874,43 @@ export default function Home() {
         ...memoryAfterAssistant,
         recommendedResourceUrls,
       });
+      setIsSending(false);
+      setIsRevealing(true);
       setMessages((currentMessages) =>
-        trimMessagesForSession([...currentMessages, assistantChatMessage]),
+        trimMessagesForSession([
+          ...currentMessages,
+          {
+            id: assistantMessageId,
+            role: "assistant",
+            content: "",
+          },
+        ]),
       );
       setShowLeadForm(false);
+
+      const revealChunks = getRevealChunks(assistantMessage);
+
+      for (let chunkIndex = 0; chunkIndex < revealChunks.length; chunkIndex += 1) {
+        const revealedContent = revealChunks.slice(0, chunkIndex + 1).join("");
+        setMessages((currentMessages) =>
+          currentMessages.map((message) =>
+            message.id === assistantMessageId
+              ? { ...message, content: revealedContent }
+              : message,
+          ),
+        );
+        await wait(22);
+      }
+
+      await wait(140);
+
+      setMessages((currentMessages) =>
+        currentMessages.map((message) =>
+          message.id === assistantMessageId
+            ? { ...message, content: assistantMessage, resources: assistantResources }
+            : message,
+        ),
+      );
     } catch {
       setError(friendlyConnectionError);
       trackAnalyticsEvent("error_shown", {
@@ -715,6 +919,7 @@ export default function Home() {
       });
     } finally {
       setIsSending(false);
+      setIsRevealing(false);
     }
   }
 
@@ -741,6 +946,7 @@ export default function Home() {
     setInput("");
     setError("");
     setIsSending(false);
+    setIsRevealing(false);
     setHasClickedBookingLink(false);
     setSessionMemory(emptySessionMemory);
     setShowLeadForm(false);
@@ -946,7 +1152,7 @@ export default function Home() {
   function renderQuickActions() {
     return (
       <div className="ml-1 mt-3 grid w-full max-w-[94%] grid-cols-1 gap-2 sm:max-w-[90%]">
-        {quickActions.map((action) => {
+        {suggestedQuickActions.map((action) => {
           const className =
             "wendy-orange-hover min-h-11 rounded-2xl border border-white/12 bg-[linear-gradient(145deg,rgba(255,255,255,0.065),rgba(215,122,52,0.045))] px-3.5 py-2.5 text-left text-xs font-semibold leading-5 text-[#f7f7f7] shadow-lg shadow-black/15 backdrop-blur hover:-translate-y-0.5 hover:border-[#d77a34] hover:bg-[#3a2a20]/85 hover:text-white hover:shadow-[#d77a34]/25 focus:outline-none focus:ring-2 focus:ring-[#d77a34]/50 active:translate-y-0 active:scale-[0.99]";
 
@@ -1235,12 +1441,17 @@ export default function Home() {
               {isSending ? (
                 <div
                   aria-label="Wendy is typing"
-                  className="inline-flex max-w-[92%] items-center gap-2 rounded-2xl rounded-bl-md border border-white/12 bg-[#1f1f1f] px-4 py-4 shadow-lg shadow-black/20 sm:max-w-[88%]"
+                  className="wendy-thinking-card inline-flex max-w-[92%] items-center gap-3 rounded-2xl rounded-bl-md border border-[#d77a34]/25 bg-[linear-gradient(145deg,rgba(31,31,31,0.96),rgba(49,38,31,0.9))] px-4 py-3.5 shadow-lg shadow-black/20 sm:max-w-[88%]"
                   role="status"
                 >
-                  <span className="wendy-typing-dot h-2.5 w-2.5 rounded-full bg-[#d77a34]" />
-                  <span className="wendy-typing-dot h-2.5 w-2.5 rounded-full bg-[#d77a34]" />
-                  <span className="wendy-typing-dot h-2.5 w-2.5 rounded-full bg-[#d77a34]" />
+                  <span className="flex items-center gap-1.5">
+                    <span className="wendy-typing-dot h-2.5 w-2.5 rounded-full bg-[#d77a34] shadow-[0_0_14px_rgba(215,122,52,0.45)]" />
+                    <span className="wendy-typing-dot h-2.5 w-2.5 rounded-full bg-[#d77a34] shadow-[0_0_14px_rgba(215,122,52,0.45)]" />
+                    <span className="wendy-typing-dot h-2.5 w-2.5 rounded-full bg-[#d77a34] shadow-[0_0_14px_rgba(215,122,52,0.45)]" />
+                  </span>
+                  <span className="text-xs font-medium leading-5 text-[#d6d6d6]">
+                    Wendy is checking the best fit...
+                  </span>
                   <span className="sr-only">Wendy is typing</span>
                 </div>
               ) : null}

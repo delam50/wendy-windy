@@ -38,6 +38,21 @@ html {
   }
 }
 
+@keyframes wendy-thinking-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 10px 28px rgba(0, 0, 0, 0.22),
+      0 0 18px rgba(215, 122, 52, 0.12);
+  }
+
+  50% {
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.26),
+      0 0 28px rgba(215, 122, 52, 0.22);
+  }
+}
+
 @keyframes wendy-message-in {
   from {
     opacity: 0;
@@ -50,24 +65,36 @@ html {
   }
 }
 
+@keyframes wendy-resource-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes wendy-online-glow {
   0%,
   100% {
     opacity: 0.78;
     transform: scale(1);
     box-shadow:
-      0 0 0 3px rgba(242, 163, 111, 0.1),
-      0 0 16px rgba(242, 163, 111, 0.72),
-      0 0 34px rgba(196, 106, 45, 0.28);
+      0 0 0 3px rgba(244, 173, 121, 0.1),
+      0 0 16px rgba(244, 173, 121, 0.72),
+      0 0 34px rgba(215, 122, 52, 0.28);
   }
 
   50% {
     opacity: 1;
     transform: scale(1.14);
     box-shadow:
-      0 0 0 5px rgba(242, 163, 111, 0.14),
-      0 0 22px rgba(242, 163, 111, 0.88),
-      0 0 46px rgba(196, 106, 45, 0.34);
+      0 0 0 5px rgba(244, 173, 121, 0.14),
+      0 0 22px rgba(244, 173, 121, 0.88),
+      0 0 46px rgba(215, 122, 52, 0.34);
   }
 }
 
@@ -95,15 +122,15 @@ html {
       0 22px 48px rgba(0, 0, 0, 0.48),
       0 0 0 1px rgba(255, 255, 255, 0.1),
       0 0 26px rgba(215, 122, 52, 0.3),
-      0 0 60px rgba(196, 106, 45, 0.16);
+      0 0 60px rgba(215, 122, 52, 0.16);
   }
 
   50% {
     box-shadow:
       0 24px 54px rgba(0, 0, 0, 0.52),
-      0 0 0 1px rgba(242, 163, 111, 0.22),
+      0 0 0 1px rgba(244, 173, 121, 0.22),
       0 0 34px rgba(215, 122, 52, 0.4),
-      0 0 78px rgba(196, 106, 45, 0.22);
+      0 0 78px rgba(215, 122, 52, 0.22);
   }
 }
 
@@ -112,7 +139,7 @@ html {
     0 28px 70px rgba(0, 0, 0, 0.58),
     0 0 0 1px rgba(255, 255, 255, 0.08),
     0 0 48px rgba(215, 122, 52, 0.19),
-    0 0 84px rgba(196, 106, 45, 0.08),
+    0 0 84px rgba(215, 122, 52, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
@@ -129,7 +156,7 @@ html {
     0 22px 48px rgba(0, 0, 0, 0.48),
     0 0 0 1px rgba(255, 255, 255, 0.1),
     0 0 34px rgba(215, 122, 52, 0.36),
-    0 0 70px rgba(196, 106, 45, 0.18);
+    0 0 70px rgba(215, 122, 52, 0.18);
 }
 
 .wendy-launcher-breathe {
@@ -174,6 +201,14 @@ html {
   animation: wendy-message-in 180ms ease-out both;
 }
 
+.wendy-thinking-card {
+  animation: wendy-thinking-glow 1.8s ease-in-out infinite;
+}
+
+.wendy-resource-enter {
+  animation: wendy-resource-in 260ms ease-out 90ms both;
+}
+
 .wendy-online-indicator {
   animation: wendy-online-glow 1.8s ease-in-out infinite;
 }
@@ -183,7 +218,7 @@ html {
 }
 
 .wendy-scrollbar {
-  scrollbar-color: rgba(196, 106, 45, 0.7) rgba(255, 255, 255, 0.06);
+  scrollbar-color: rgba(215, 122, 52, 0.7) rgba(255, 255, 255, 0.06);
   scrollbar-width: thin;
 }
 
@@ -196,7 +231,7 @@ html {
 }
 
 .wendy-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(196, 106, 45, 0.72);
+  background: rgba(215, 122, 52, 0.72);
   border-radius: 999px;
 }
 
@@ -206,6 +241,8 @@ html {
   }
 
   .wendy-message-enter,
+  .wendy-thinking-card,
+  .wendy-resource-enter,
   .wendy-online-indicator,
   .wendy-widget-arrive,
   .wendy-launcher-breathe {

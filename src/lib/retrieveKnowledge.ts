@@ -75,9 +75,29 @@ const KNOWLEDGE_FILES: KnowledgeFile[] = [
 const PRIORITY_TERMS = [
   "pricing",
   "cost",
+  "cash pricing",
+  "cash price",
+  "cash rate",
+  "cash rates",
   "insurance",
   "first visit",
+  "new patient",
+  "new patient exam",
+  "new patient evaluation",
+  "follow-up",
+  "follow up",
+  "follow-up visit",
+  "return visit",
+  "soft tissue",
+  "adjustment and soft tissue",
+  "adjustment + soft tissue",
+  "patient responsibility",
+  "deductible",
+  "deductibles",
+  "copay",
+  "copays",
   "bozeman",
+  "four corners",
   "big sky",
   "dry needling",
   "neck pain",
@@ -140,6 +160,9 @@ const CONDITION_TERMS = [
   "migraine",
   "migraines",
   "dry needling",
+  "soft tissue",
+  "adjustment and soft tissue",
+  "adjustment + soft tissue",
   "pregnancy",
   "pregnant",
   "pediatric",
@@ -165,7 +188,9 @@ const CORNERSTONE_TERMS = [
   "first visit",
   "cost",
   "pricing",
+  "cash pricing",
   "insurance",
+  "four corners",
   "services",
   "chiropractic services",
   "big sky chiropractor",
@@ -181,7 +206,26 @@ const RELATED_TERM_GROUPS = [
   ["low back", "lower back", "back pain", "disc", "sciatica", "sitting"],
   ["pregnancy", "pregnant", "prenatal", "webster", "pelvis"],
   ["pediatric", "child", "kids", "family", "growth"],
-  ["cost", "pricing", "insurance", "cash", "rate"],
+  [
+    "cost",
+    "pricing",
+    "insurance",
+    "cash",
+    "cash pricing",
+    "cash rate",
+    "cash rates",
+    "rate",
+    "benefits",
+    "deductible",
+    "deductibles",
+    "copay",
+    "copays",
+    "patient responsibility",
+  ],
+  ["four corners", "bozeman", "big sky", "location", "locations"],
+  ["new patient exam", "new patient evaluation", "new patient", "first visit", "exam", "evaluation"],
+  ["follow-up", "follow up", "follow-up visit", "return visit", "return appointment"],
+  ["soft tissue", "dry needling", "adjustment and soft tissue", "adjustment + soft tissue"],
   ["first visit", "exam", "evaluation", "new patient", "what to expect"],
   ["pet", "pets", "dog", "dogs", "cat", "cats", "animal", "animals", "veterinary"],
   ["exercise", "exercises", "mobility", "stretch", "strength", "rehab"],
@@ -425,6 +469,20 @@ function scoreChunk(
   if (/pricing|cost|insurance|\$|price/i.test(chunk.text)) {
     if (/pricing|cost|insurance|price|cash|rate/i.test(normalizedQuery)) {
       score += 12;
+    }
+  }
+
+  if (/pricing|cost|cash|rate|how much|\$/i.test(normalizedQuery)) {
+    if (/cash pricing by location|four corners|bozeman|big sky/i.test(normalizedText)) {
+      score += 18;
+    }
+
+    if (/new patient exam|follow-up|follow up|soft tissue|dry needling|adjustment \+ soft tissue|adjustment and soft tissue/i.test(normalizedQuery)) {
+      score += /new patient exam|follow-up|follow up|soft tissue|dry needling|adjustment \+ soft tissue|adjustment and soft tissue/i.test(
+        normalizedText,
+      )
+        ? 20
+        : 0;
     }
   }
 

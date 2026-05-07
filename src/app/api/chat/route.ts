@@ -157,6 +157,7 @@ function detectIntentCategories(
   if (
     includesAny(combinedContext, [
       /\b(price|pricing|cost|cash|rate|rates|fee|fees|how much|\$)\b/,
+      /\b(new patient exam|follow-up|follow up|soft tissue|dry needling|adjustment \+ soft tissue|adjustment and soft tissue)\b/,
     ])
   ) {
     intents.add("pricing intent");
@@ -213,7 +214,7 @@ function detectTopicCategory(messages: ChatMessage[], pageContext: string) {
     return "pregnancy pediatric family care";
   }
 
-  if (/\b(price|pricing|cost|cash|rate|rates|fee|fees|\$)\b/.test(text)) {
+  if (/\b(price|pricing|cost|cash|rate|rates|fee|fees|\$|new patient exam|follow-up|follow up|soft tissue|dry needling|adjustment \+ soft tissue|adjustment and soft tissue)\b/.test(text)) {
     return "pricing";
   }
 
@@ -300,6 +301,63 @@ function getProviderRoutingGuidance(messages: ChatMessage[], pageContext: string
   return guidance;
 }
 
+function getPricingLocationGuidance(messages: ChatMessage[], pageContext: string) {
+  const text = `${getLatestUserContent(messages)}\n${pageContext}`.toLowerCase();
+  const mentionsFourCorners = /\b(four corners|bozeman|belgrade|gallatin)\b/.test(text);
+  const mentionsBigSky = /\b(big sky)\b/.test(text);
+  const mentionsNewPatient = /\b(new patient|new patient exam|first visit|exam|evaluation)\b/.test(text);
+  const mentionsFollowUp = /\b(follow-up|follow up|return visit|return appointment)\b/.test(text);
+  const mentionsSoftTissue = /\b(soft tissue|dry needling)\b/.test(text);
+  const mentionsAdjustmentSoftTissue = /\b(adjustment \+ soft tissue|adjustment and soft tissue|adjustment with soft tissue)\b/.test(text);
+  const asksGeneralVisitCost = /\b(how much|cost|price|pricing|rate|cash|visit|appointment)\b/.test(text);
+
+  const guidance = [
+    "Pricing intent: use explicit location-specific cash pricing when available. Four Corners / Bozeman cash rates: New Patient Exam $130 and Follow-Up Visit $65. Big Sky cash rates: New Patient Exam $150 and Follow-Up Visit $85. Never present one location's pricing as universal.",
+    "Clarify that listed cash rates may vary based on service type and current JaneApp listings, and recommend confirming through JaneApp or the clinic.",
+    "Insurance benefits vary by plan; final patient responsibility can depend on benefits, deductibles, copays, and services performed.",
+  ];
+
+  if (mentionsSoftTissue) {
+    guidance.push(
+      'Soft tissue or dry needling questions: Wendy may say, "Soft tissue visits are listed at $75 and include dry needling when clinically appropriate."',
+    );
+  }
+
+  if (mentionsAdjustmentSoftTissue) {
+    guidance.push(
+      "Adjustment + Soft Tissue questions: do not guess a price. Say the current listed price is available on the Windy Ridge website or JaneApp.",
+    );
+  }
+
+  if (!mentionsFourCorners && !mentionsBigSky && asksGeneralVisitCost) {
+    guidance.push(
+      "If the user asks a general visit-cost question without naming a location, briefly ask whether they mean Four Corners / Bozeman or Big Sky. You may give a cautious range if helpful: new patient exams are listed around $130 to $150 and follow-ups around $65 to $85 depending on location and service type.",
+    );
+  }
+
+  if (mentionsFourCorners && !mentionsBigSky) {
+    guidance.push(
+      "Four Corners / Bozeman pricing context is relevant. Use Four Corners rates only for that location.",
+    );
+  }
+
+  if (mentionsBigSky && !mentionsFourCorners) {
+    guidance.push(
+      "Big Sky pricing context is relevant. Use Big Sky rates only for that location.",
+    );
+  }
+
+  if (mentionsNewPatient && !mentionsFollowUp) {
+    guidance.push("The user likely means New Patient Exam pricing.");
+  }
+
+  if (mentionsFollowUp && !mentionsNewPatient) {
+    guidance.push("The user likely means Follow-Up Visit pricing.");
+  }
+
+  return guidance.join(" ");
+}
+
 function formatIntentGuidance(
   messages: ChatMessage[],
   pageContext: string,
@@ -328,9 +386,7 @@ function formatIntentGuidance(
   }
 
   if (intents.includes("pricing intent")) {
-    strategy.push(
-      "Pricing intent: use JaneApp/current listed pricing language only, say pricing can vary depending on services performed, and suggest confirming in JaneApp.",
-    );
+    strategy.push(getPricingLocationGuidance(messages, pageContext));
   }
 
   if (intents.includes("insurance intent")) {
