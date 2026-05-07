@@ -1,7 +1,91 @@
 [
   {
-    "id": "f4e8408e-47a6-451e-a1d2-ebd09973b445",
-    "timestamp": "2026-05-07T16:21:44.733Z",
+    "id": "1499fefb-cf71-44e0-ae45-96205cc750b3",
+    "timestamp": "2026-05-07T17:59:45.212Z",
+    "event": "chat_response",
+    "detectedIntent": [
+      "educational intent"
+    ],
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": true,
+    "topicCategory": "first visit",
+    "metadata": {
+      "source": "api_chat"
+    }
+  },
+  {
+    "id": "4703ef40-7802-4e3e-b698-6270b084a837",
+    "timestamp": "2026-05-07T17:59:45.225Z",
+    "event": "assistant_response_received",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "baa5e6b1-8c2a-4695-84b7-fd7a05b7478d",
+    "timestamp": "2026-05-07T17:59:49.287Z",
+    "event": "lead_form_opened",
+    "bookingLinkClicked": false,
+    "leadFormOpened": true,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "63a46325-1a00-4cda-b846-234e21a95498",
+    "timestamp": "2026-05-07T17:59:54.972Z",
+    "event": "message_sent",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "bc83ee9a-bf7c-43c3-b395-6cd01938c9ad",
+    "timestamp": "2026-05-07T17:59:56.888Z",
+    "event": "chat_response",
+    "detectedIntent": [
+      "educational intent"
+    ],
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": true,
+    "topicCategory": "general clinic question",
+    "metadata": {
+      "source": "api_chat"
+    }
+  },
+  {
+    "id": "1f620e08-f6da-46a7-8f06-50f8d3bf700a",
+    "timestamp": "2026-05-07T17:59:56.898Z",
+    "event": "assistant_response_received",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "fe8ecf04-6fc3-4f53-90a6-777adbaddff0",
+    "timestamp": "2026-05-07T18:00:13.575Z",
+    "event": "widget_closed",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {
+      "source": "header_minimize"
+    }
+  },
+  {
+    "id": "b32c0a0f-44b5-48bf-adf3-cb4334d16e72",
+    "timestamp": "2026-05-07T18:05:24.633Z",
     "event": "widget_opened",
     "bookingLinkClicked": false,
     "leadFormOpened": false,
@@ -10,499 +94,8 @@
     "metadata": {}
   },
   {
-    "id": "730c7a5b-5a05-43e3-b5db-ebf8efd79371",
-    "timestamp": "2026-05-07T16:21:53.568Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "e14efbc9-1b7b-4679-b6b1-96f451abcde6",
-    "timestamp": "2026-05-07T16:21:56.051Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "provider matching"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "topicCategory": "active lifestyle performance",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "d7ac4505-e05f-42c6-a826-871b60583ae2",
-    "timestamp": "2026-05-07T16:21:56.057Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "bc4d2f5c-7cdd-4bf3-b4b5-77c935e3551f",
-    "timestamp": "2026-05-07T16:22:22.744Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "c27bfaee-0a59-4cf9-92c3-80f5d397c297",
-    "timestamp": "2026-05-07T16:22:24.944Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "general clinic question",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "7e980461-99f3-4000-9165-d6ca46bf0c8c",
-    "timestamp": "2026-05-07T16:22:24.953Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "bb269ea3-707f-4b98-90a4-f65328bafa93",
-    "timestamp": "2026-05-07T16:22:39.392Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "20a10c9a-744b-4b39-8beb-6f1bec5c6844",
-    "timestamp": "2026-05-07T16:22:41.176Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "topicCategory": "general clinic question",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "80594bd8-cb84-488f-8d79-ce5af8f423dc",
-    "timestamp": "2026-05-07T16:22:41.184Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "efc1c4c5-3a06-451b-8188-b75cc6d85cf7",
-    "timestamp": "2026-05-07T16:22:52.384Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "2d7ee3cd-96ec-4064-9c12-f38034f07626",
-    "timestamp": "2026-05-07T16:22:54.536Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "topicCategory": "general clinic question",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "a8200588-825b-4949-9d4c-32371804b57e",
-    "timestamp": "2026-05-07T16:22:54.543Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "b5c6908a-269c-4511-8274-d33ad07a154f",
-    "timestamp": "2026-05-07T16:23:04.864Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "085161d7-4ca6-4a68-ad75-febada03e9fa",
-    "timestamp": "2026-05-07T16:23:08.370Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "general clinic question",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "7d8c7882-c77e-49a1-babe-76b9da9573a9",
-    "timestamp": "2026-05-07T16:23:08.377Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "202b3908-4f79-4c31-a297-92911b5f223b",
-    "timestamp": "2026-05-07T16:23:34.788Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "55949251-5992-4e86-bdca-e61fcee985d3",
-    "timestamp": "2026-05-07T16:23:37.302Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "topicCategory": "general clinic question",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "ccb418cf-0506-47e0-871b-ce88c2a661a8",
-    "timestamp": "2026-05-07T16:23:37.311Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "ed83f8d8-624c-4578-925a-ab64a672d988",
-    "timestamp": "2026-05-07T16:23:52.596Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "567b658d-c683-4455-a5b9-c152eb445fd4",
-    "timestamp": "2026-05-07T16:23:56.703Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "booking intent",
-      "provider matching",
-      "location intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "topicCategory": "locations",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "3b1cf7b3-7a7d-4395-941e-6c06907722ba",
-    "timestamp": "2026-05-07T16:23:56.710Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "dc5401f6-5df2-49e1-bbc0-60c2e6bbb4d9",
-    "timestamp": "2026-05-07T16:24:20.781Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "4eee85d8-726c-4989-a702-90deaaf5fa79",
-    "timestamp": "2026-05-07T16:24:23.546Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "provider matching"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "topicCategory": "small animal chiropractic",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "5d20e19e-03d1-4d00-a067-b0e74e1ea626",
-    "timestamp": "2026-05-07T16:24:23.553Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "18d197e9-e218-4438-9678-f12f5e188d3a",
-    "timestamp": "2026-05-07T17:05:00.294Z",
-    "event": "widget_opened",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "0b44a0e5-7e77-488f-ad6f-dbf156ceabaf",
-    "timestamp": "2026-05-07T17:05:11.064Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "4debfd20-673b-44a2-a756-f858d611b9fe",
-    "timestamp": "2026-05-07T17:05:15.715Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "neck pain headaches migraines",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "5187f177-30d0-4550-91ad-f3d55d3035d5",
-    "timestamp": "2026-05-07T17:05:15.735Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "b02eba48-03f6-4141-b2fc-29ad179ee433",
-    "timestamp": "2026-05-07T17:05:40.778Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "eafbeba6-e8b1-4a7e-95b0-dc27afd0f934",
-    "timestamp": "2026-05-07T17:05:43.791Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "back pain",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "ba6ed647-180f-45b3-a315-a4c6266f1149",
-    "timestamp": "2026-05-07T17:05:43.798Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "c617b7ce-c206-47e7-8314-126e5d4b6fac",
-    "timestamp": "2026-05-07T17:06:06.609Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "9e549441-f4ac-40d3-8cae-cdb5b5f067a0",
-    "timestamp": "2026-05-07T17:06:12.728Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "neck pain headaches migraines",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "51390c66-02e9-45a5-8fb6-07411a606641",
-    "timestamp": "2026-05-07T17:06:12.738Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "777f582f-859d-4469-bda3-bf97f05127c9",
-    "timestamp": "2026-05-07T17:06:32.003Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "c0af8f9d-614c-4bff-ab2a-57514124e63f",
-    "timestamp": "2026-05-07T17:06:34.744Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "pricing intent",
-      "insurance intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "pricing",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "c87ab08c-d78a-409c-a92a-f97eeffda3ce",
-    "timestamp": "2026-05-07T17:06:34.753Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "c122867e-cfb2-4790-bbd7-fdbb8c1eab34",
-    "timestamp": "2026-05-07T17:14:17.528Z",
-    "event": "widget_opened",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "e3410d5b-50b6-4204-b425-e9952989f28e",
-    "timestamp": "2026-05-07T17:14:23.837Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "d75a185f-713b-41e5-9dec-23fc363603d6",
-    "timestamp": "2026-05-07T17:14:29.128Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "neck pain headaches migraines",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "df145a13-0b7d-447d-9f18-a6afaea646f2",
-    "timestamp": "2026-05-07T17:14:29.136Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "02fe9f2d-b789-402e-bee5-a7ee9a33129e",
-    "timestamp": "2026-05-07T17:14:38.527Z",
+    "id": "f3770e54-12b4-47b9-9464-acb6255e640b",
+    "timestamp": "2026-05-07T18:05:30.304Z",
     "event": "widget_closed",
     "bookingLinkClicked": false,
     "leadFormOpened": false,

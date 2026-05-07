@@ -149,7 +149,7 @@ function renderMessageContent(content: string) {
 
     return (
       <a
-        className="font-semibold text-[#f2a36f] underline decoration-[#f2a36f]/50 underline-offset-4 transition hover:text-white"
+        className="font-semibold text-[#f4ad79] underline decoration-[#f4ad79]/50 underline-offset-4 transition hover:text-white"
         href={href}
         key={`${part}-${index}`}
         onClick={() => {
@@ -293,13 +293,13 @@ function renderResourceCards(content: string, resources: ResourceCard[] = []) {
     <div className="mt-2 grid max-w-[92%] gap-2 sm:max-w-[88%]">
       {resourceCards.map((resource) => (
         <a
-          className="group wendy-message-enter block rounded-2xl border border-[#c46a2d]/30 bg-[#2d261f]/90 p-3.5 text-left shadow-lg shadow-black/20 transition duration-200 hover:-translate-y-0.5 hover:border-[#c46a2d]/70 hover:bg-[#35291f]"
+          className="group wendy-message-enter block rounded-2xl border border-[#d77a34]/40 bg-[linear-gradient(145deg,rgba(55,39,28,0.96),rgba(38,33,29,0.94))] p-3.5 text-left shadow-lg shadow-black/20 ring-1 ring-[#f4ad79]/5 transition duration-200 hover:-translate-y-0.5 hover:border-[#d77a34]/75 hover:bg-[#3b2b20] hover:shadow-[#d77a34]/15"
           href={resource.url}
           key={resource.url}
           rel="noopener noreferrer"
           target="_blank"
         >
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#f2a36f]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#f4ad79]">
             {resource.type}
           </p>
           <p className="mt-1 break-words text-sm font-semibold leading-6 text-white">
@@ -308,7 +308,7 @@ function renderResourceCards(content: string, resources: ResourceCard[] = []) {
           <p className="mt-1 text-xs leading-5 text-[#d6d6d6]">
             {resource.summary}
           </p>
-          <span className="mt-3 inline-flex rounded-full border border-[#c46a2d]/35 px-3 py-1 text-[11px] font-semibold text-[#f2a36f] transition group-hover:border-[#c46a2d]">
+          <span className="mt-3 inline-flex rounded-full border border-[#d77a34]/35 px-3 py-1 text-[11px] font-semibold text-[#f4ad79] transition group-hover:border-[#d77a34]">
             Open resource
           </span>
         </a>
@@ -502,8 +502,12 @@ function persistSession(messages: Message[], memory: SessionMemory) {
 
 export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const latestAssistantMessageRef = useRef<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(() => loadSessionMessages());
+  const latestAssistantScrollCountRef = useRef(
+    messages.filter((message) => message.role === "assistant").length,
+  );
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState("");
@@ -524,10 +528,17 @@ export default function Home() {
   );
 
   const shouldOfferLeadCapture = useMemo(
-    () =>
-      !hasClickedBookingLink &&
-      !showLeadForm &&
-      messages.some((message) => message.role === "user" && hasBookingIntent(message.content)),
+    () => {
+      const latestUserMessage = messages.findLast(
+        (message) => message.role === "user",
+      );
+
+      return (
+        !hasClickedBookingLink &&
+        !showLeadForm &&
+        Boolean(latestUserMessage && hasBookingIntent(latestUserMessage.content))
+      );
+    },
     [hasClickedBookingLink, messages, showLeadForm],
   );
 
@@ -539,19 +550,6 @@ export default function Home() {
   }, [hasClickedBookingLink, messages, sessionMemory]);
 
   useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    window.requestAnimationFrame(() => {
-      messagesEndRef.current?.scrollIntoView({
-        behavior: isSending ? "auto" : "smooth",
-        block: "end",
-      });
-    });
-  }, [error, isOpen, isSending, messages, showLeadForm]);
-
-  useEffect(() => {
     window.parent?.postMessage(
       {
         source: "windy-wendy",
@@ -561,6 +559,42 @@ export default function Home() {
       "*",
     );
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    });
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || messages.at(-1)?.role !== "assistant") {
+      return;
+    }
+
+    const assistantMessageCount = messages.filter(
+      (message) => message.role === "assistant",
+    ).length;
+
+    if (assistantMessageCount <= latestAssistantScrollCountRef.current) {
+      return;
+    }
+
+    latestAssistantScrollCountRef.current = assistantMessageCount;
+
+    window.requestAnimationFrame(() => {
+      latestAssistantMessageRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }, [isOpen, messages]);
 
   useEffect(() => {
     function handleBookingLinkClick() {
@@ -607,7 +641,16 @@ export default function Home() {
     setSessionMemory(nextMemory);
     setInput("");
     setError("");
+    setShowLeadForm(false);
+    setLeadError("");
     setIsSending(true);
+
+    window.requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    });
 
     try {
       const response = await fetch("/api/chat", {
@@ -663,6 +706,7 @@ export default function Home() {
       setMessages((currentMessages) =>
         trimMessagesForSession([...currentMessages, assistantChatMessage]),
       );
+      setShowLeadForm(false);
     } catch {
       setError(friendlyConnectionError);
       trackAnalyticsEvent("error_shown", {
@@ -692,6 +736,7 @@ export default function Home() {
   }
 
   function clearChat() {
+    latestAssistantScrollCountRef.current = 1;
     setMessages([welcomeMessage]);
     setInput("");
     setError("");
@@ -903,7 +948,7 @@ export default function Home() {
       <div className="ml-1 mt-3 grid w-full max-w-[94%] grid-cols-1 gap-2 sm:max-w-[90%]">
         {quickActions.map((action) => {
           const className =
-            "min-h-11 rounded-2xl border border-white/12 bg-white/[0.055] px-3.5 py-2.5 text-left text-xs font-semibold leading-5 text-[#f4f4f4] shadow-lg shadow-black/15 backdrop-blur transition duration-200 hover:-translate-y-0.5 hover:border-[#c46a2d] hover:bg-[#332820]/80 hover:text-white hover:shadow-[#c46a2d]/10 focus:outline-none focus:ring-2 focus:ring-[#c46a2d]/35 active:translate-y-0 active:scale-[0.99]";
+            "wendy-orange-hover min-h-11 rounded-2xl border border-white/12 bg-[linear-gradient(145deg,rgba(255,255,255,0.065),rgba(215,122,52,0.045))] px-3.5 py-2.5 text-left text-xs font-semibold leading-5 text-[#f7f7f7] shadow-lg shadow-black/15 backdrop-blur hover:-translate-y-0.5 hover:border-[#d77a34] hover:bg-[#3a2a20]/85 hover:text-white hover:shadow-[#d77a34]/25 focus:outline-none focus:ring-2 focus:ring-[#d77a34]/50 active:translate-y-0 active:scale-[0.99]";
 
           if (action.url) {
             return (
@@ -944,13 +989,13 @@ export default function Home() {
     }
 
     return (
-      <div className="ml-1 mt-3 max-w-[92%] rounded-2xl border border-[#c46a2d]/35 bg-[#2f251f] px-4 py-3.5 shadow-lg shadow-black/20 sm:max-w-[88%]">
+      <div className="ml-1 mt-3 max-w-[92%] rounded-2xl border border-[#d77a34]/35 bg-[#2f251f] px-4 py-3.5 shadow-lg shadow-black/20 sm:max-w-[88%]">
         <p className="text-xs leading-6 text-[#f4f4f4]">
           If you would rather have the Windy Ridge team follow up, I can collect
           a few quick details. Please keep the concern general.
         </p>
         <button
-          className="mt-3 rounded-full bg-[#c46a2d] px-4 py-2 text-xs font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#a95722] focus:outline-none focus:ring-2 focus:ring-[#c46a2d]/35 active:translate-y-0"
+          className="wendy-orange-hover mt-3 rounded-full bg-[linear-gradient(135deg,#df8440,#b85f25)] px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-[#d77a34]/20 hover:-translate-y-0.5 hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-[#d77a34]/45 active:translate-y-0"
           onClick={openLeadForm}
           type="button"
         >
@@ -966,7 +1011,7 @@ export default function Home() {
     }
 
     const inputClassName =
-      "w-full rounded-xl border border-white/12 bg-[#1f1f1f] px-3 py-2.5 text-sm leading-6 text-white outline-none transition duration-200 placeholder:text-[#8f8f8f] focus:border-[#c46a2d] focus:ring-2 focus:ring-[#c46a2d]/25";
+      "wendy-input-glow w-full rounded-xl border border-white/12 bg-[#1f1f1f] px-3 py-2.5 text-sm leading-6 text-white outline-none transition duration-200 placeholder:text-[#8f8f8f] focus:border-[#df8440] focus:ring-0";
 
     return (
       <form
@@ -1021,10 +1066,10 @@ export default function Home() {
           <div className="mt-2 grid grid-cols-2 gap-2">
             {["Bozeman", "Big Sky"].map((location) => (
               <button
-                className={`rounded-xl border px-3 py-2.5 text-xs font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-[#c46a2d]/35 ${
+                className={`rounded-xl border px-3 py-2.5 text-xs font-semibold transition duration-200 focus:outline-none focus:ring-2 focus:ring-[#d77a34]/35 ${
                   leadForm.location === location
-                    ? "border-[#c46a2d] bg-[#c46a2d] text-white"
-                    : "border-white/12 bg-[#252525] text-[#d6d6d6] hover:border-[#c46a2d] hover:text-white"
+                    ? "border-[#d77a34] bg-[linear-gradient(135deg,#df8440,#b85f25)] text-white shadow-lg shadow-[#d77a34]/20"
+                    : "border-white/12 bg-[#252525] text-[#d6d6d6] hover:border-[#d77a34] hover:text-white"
                 }`}
                 key={location}
                 onClick={() => updateLeadForm("location", location)}
@@ -1059,21 +1104,21 @@ export default function Home() {
         </label>
 
         {leadError ? (
-          <p className="rounded-xl border border-[#c46a2d]/40 bg-[#3a2418] px-3 py-2 text-xs leading-5 text-[#ffd9c2]">
+          <p className="rounded-xl border border-[#d77a34]/40 bg-[#3d2618] px-3 py-2 text-xs leading-5 text-[#ffd9c2]">
             {leadError}
           </p>
         ) : null}
 
         <div className="flex flex-wrap items-center gap-2">
           <button
-            className="rounded-full bg-[#c46a2d] px-4 py-2.5 text-xs font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#a95722] focus:outline-none focus:ring-2 focus:ring-[#c46a2d]/35 disabled:cursor-not-allowed disabled:bg-[#6f513f] disabled:hover:translate-y-0"
+            className="wendy-orange-hover rounded-full bg-[#d77a34] px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-[#d77a34]/15 hover:-translate-y-0.5 hover:bg-[#b85f25] focus:outline-none focus:ring-2 focus:ring-[#d77a34]/45 disabled:cursor-not-allowed disabled:bg-[#6f513f] disabled:hover:translate-y-0"
             disabled={isSubmittingLead}
             type="submit"
           >
             {isSubmittingLead ? "Sending..." : "Send to Windy Ridge"}
           </button>
           <button
-            className="rounded-full border border-white/12 px-4 py-2.5 text-xs font-semibold text-[#d6d6d6] transition duration-200 hover:border-[#c46a2d] hover:text-white"
+            className="wendy-orange-hover rounded-full border border-white/12 px-4 py-2.5 text-xs font-semibold text-[#d6d6d6] hover:border-[#d77a34] hover:text-white"
             onClick={() => setShowLeadForm(false)}
             type="button"
           >
@@ -1084,6 +1129,10 @@ export default function Home() {
     );
   }
 
+  const latestAssistantIndex = messages.findLastIndex(
+    (message) => message.role === "assistant",
+  );
+
   return (
     <main className="min-h-dvh overflow-x-hidden bg-transparent text-white">
       <section
@@ -1092,13 +1141,13 @@ export default function Home() {
       >
         <div
           aria-hidden={!isOpen}
-          className={`flex h-[min(650px,calc(100dvh_-_7rem_-_env(safe-area-inset-bottom)))] w-full min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-white/15 bg-[#232323]/92 shadow-2xl shadow-black/55 ring-1 ring-[#c46a2d]/10 backdrop-blur-xl transition-all duration-300 ease-out will-change-transform ${
+          className={`wendy-panel-glow flex h-[min(650px,calc(100dvh_-_7rem_-_env(safe-area-inset-bottom)))] w-full min-w-0 flex-col overflow-hidden rounded-[1.75rem] border border-white/15 bg-[#232323]/92 ring-1 ring-[#d77a34]/20 backdrop-blur-xl transition-all duration-300 ease-out will-change-transform ${
             isOpen
               ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
               : "pointer-events-none translate-y-5 scale-[0.97] opacity-0"
           }`}
         >
-            <header className="shrink-0 border-b border-white/12 bg-[#1f1f1f]/88 px-4 py-3.5 shadow-lg shadow-black/15 backdrop-blur-xl sm:px-5 sm:py-4">
+            <header className="wendy-header-glow shrink-0 border-b border-white/12 bg-[radial-gradient(circle_at_top_right,rgba(215,122,52,0.2),transparent_42%),rgba(31,31,31,0.9)] px-4 py-3.5 backdrop-blur-xl sm:px-5 sm:py-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-start gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/12 bg-white p-1.5 shadow-lg shadow-black/20">
@@ -1112,12 +1161,12 @@ export default function Home() {
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f2a36f]">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f4ad79]">
                         Meet Wendy
                       </p>
                       <span
                         aria-label="Wendy is online"
-                        className="wendy-online-indicator h-2 w-2 rounded-full bg-[#f2a36f] shadow-[0_0_14px_rgba(242,163,111,0.95)]"
+                        className="wendy-online-indicator h-2 w-2 rounded-full bg-[#f4ad79] shadow-[0_0_14px_rgba(244,173,121,0.98)]"
                       />
                     </div>
                     <h1 className="mt-1 break-words text-[15px] font-semibold leading-6 text-white">
@@ -1130,7 +1179,7 @@ export default function Home() {
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <button
-                    className="h-9 rounded-full border border-white/12 bg-[#2a2a2a] px-3 text-xs font-semibold text-[#d6d6d6] transition duration-200 hover:border-[#c46a2d] hover:bg-[#332820] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#c46a2d]/35"
+                    className="wendy-orange-hover h-9 rounded-full border border-white/12 bg-[#2a2a2a] px-3 text-xs font-semibold text-[#d6d6d6] hover:border-[#d77a34] hover:bg-[#3a2a20] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#d77a34]/45"
                     onClick={clearChat}
                     type="button"
                   >
@@ -1138,7 +1187,7 @@ export default function Home() {
                   </button>
                   <button
                     aria-label="Minimize chat"
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/12 bg-[#2a2a2a] text-lg leading-none text-[#d6d6d6] transition duration-200 hover:border-[#c46a2d] hover:bg-[#332820] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#c46a2d]/35"
+                    className="wendy-orange-hover flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/12 bg-[#2a2a2a] text-lg leading-none text-[#d6d6d6] hover:border-[#d77a34] hover:bg-[#3a2a20] hover:text-white focus:outline-none focus:ring-2 focus:ring-[#d77a34]/45"
                     onClick={closeChat}
                     type="button"
                   >
@@ -1148,10 +1197,15 @@ export default function Home() {
               </div>
             </header>
 
-            <div className="wendy-scrollbar min-h-0 min-w-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto bg-[radial-gradient(circle_at_top_left,rgba(196,106,45,0.14),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent)] px-3.5 py-4 sm:px-4 sm:py-5">
+            <div className="wendy-scrollbar min-h-0 min-w-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto bg-[radial-gradient(circle_at_top_left,rgba(215,122,52,0.17),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent)] px-3.5 py-4 sm:px-4 sm:py-5">
               {messages.map((message, index) => (
                 <div className="wendy-message-enter" key={`${message.role}-${index}`}>
                   <div
+                    ref={
+                      message.role === "assistant" && index === latestAssistantIndex
+                        ? latestAssistantMessageRef
+                        : undefined
+                    }
                     className={`flex ${
                       message.role === "user" ? "justify-end" : "justify-start"
                     }`}
@@ -1159,7 +1213,7 @@ export default function Home() {
                     <div
                       className={`max-w-[92%] overflow-hidden break-words rounded-2xl px-4 py-3.5 text-sm leading-7 shadow-lg shadow-black/20 backdrop-blur sm:max-w-[88%] ${
                         message.role === "user"
-                          ? "rounded-br-md bg-[#c46a2d] text-white shadow-[#c46a2d]/10"
+                          ? "rounded-br-md bg-[linear-gradient(135deg,#df8440,#b85f25)] text-white shadow-[#d77a34]/15"
                           : "rounded-bl-md border border-white/12 bg-[#1f1f1f]/88 text-[#f4f4f4]"
                       }`}
                     >
@@ -1184,9 +1238,9 @@ export default function Home() {
                   className="inline-flex max-w-[92%] items-center gap-2 rounded-2xl rounded-bl-md border border-white/12 bg-[#1f1f1f] px-4 py-4 shadow-lg shadow-black/20 sm:max-w-[88%]"
                   role="status"
                 >
-                  <span className="wendy-typing-dot h-2.5 w-2.5 rounded-full bg-[#c46a2d]" />
-                  <span className="wendy-typing-dot h-2.5 w-2.5 rounded-full bg-[#c46a2d]" />
-                  <span className="wendy-typing-dot h-2.5 w-2.5 rounded-full bg-[#c46a2d]" />
+                  <span className="wendy-typing-dot h-2.5 w-2.5 rounded-full bg-[#d77a34]" />
+                  <span className="wendy-typing-dot h-2.5 w-2.5 rounded-full bg-[#d77a34]" />
+                  <span className="wendy-typing-dot h-2.5 w-2.5 rounded-full bg-[#d77a34]" />
                   <span className="sr-only">Wendy is typing</span>
                 </div>
               ) : null}
@@ -1198,7 +1252,7 @@ export default function Home() {
               onSubmit={handleSubmit}
             >
               {error ? (
-                <p className="mb-3 break-words rounded-xl border border-[#c46a2d]/40 bg-[#3a2418] px-3 py-2 text-xs leading-6 text-[#ffd9c2]">
+                <p className="mb-3 break-words rounded-xl border border-[#d77a34]/40 bg-[#3d2618] px-3 py-2 text-xs leading-6 text-[#ffd9c2]">
                   {error}
                 </p>
               ) : null}
@@ -1207,7 +1261,7 @@ export default function Home() {
               </label>
               <div className="flex min-w-0 items-end gap-2">
                 <textarea
-                  className="max-h-24 min-h-14 min-w-0 flex-1 resize-none rounded-2xl border border-white/12 bg-[#1f1f1f]/90 px-4 py-3 text-base leading-7 text-white outline-none transition duration-200 placeholder:text-[#9f9f9f] focus:border-[#c46a2d] focus:ring-2 focus:ring-[#c46a2d]/30 sm:max-h-28 sm:text-sm"
+                  className="wendy-input-glow max-h-24 min-h-14 min-w-0 flex-1 resize-none rounded-2xl border border-white/12 bg-[#1f1f1f]/90 px-4 py-3 text-base leading-7 text-white outline-none transition duration-200 placeholder:text-[#9f9f9f] focus:border-[#df8440] focus:ring-0 sm:max-h-28 sm:text-sm"
                   id="chat-message"
                   onKeyDown={handleMessageKeyDown}
                   onChange={(event) => setInput(event.target.value)}
@@ -1216,7 +1270,7 @@ export default function Home() {
                   value={input}
                 />
                 <button
-                  className="h-14 shrink-0 rounded-2xl bg-[#c46a2d] px-4 text-sm font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#a95722] focus:outline-none focus:ring-2 focus:ring-[#c46a2d]/35 disabled:cursor-not-allowed disabled:bg-[#6f513f] disabled:text-[#cfc7c1] disabled:hover:translate-y-0 sm:px-5"
+                  className="wendy-orange-hover h-14 shrink-0 rounded-2xl bg-[linear-gradient(135deg,#df8440,#b85f25)] px-4 text-sm font-semibold text-white shadow-lg shadow-[#d77a34]/25 hover:-translate-y-0.5 hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-[#d77a34]/50 disabled:cursor-not-allowed disabled:bg-[#6f513f] disabled:text-[#cfc7c1] disabled:hover:translate-y-0 sm:px-5"
                   disabled={!canSend}
                   type="submit"
                 >
@@ -1236,7 +1290,9 @@ export default function Home() {
         <button
           aria-expanded={isOpen}
           aria-label={isOpen ? "Chat is open" : "Open Wendy chat"}
-          className="flex min-h-16 max-w-full items-center justify-center gap-3 rounded-full border border-[#f2a36f]/30 bg-[#c46a2d] px-5 py-3.5 text-center text-sm font-bold leading-5 text-white shadow-2xl shadow-black/45 ring-1 ring-white/10 transition duration-300 hover:-translate-y-0.5 hover:bg-[#a95722] hover:shadow-[#c46a2d]/25 focus:outline-none focus:ring-4 focus:ring-[#c46a2d]/35 active:translate-y-0 active:scale-[0.98] sm:min-h-20 sm:px-6 sm:py-4"
+          className={`wendy-launcher-glow flex min-h-16 max-w-full items-center justify-center gap-3 rounded-full border border-[#f4ad79]/40 bg-[linear-gradient(135deg,#df8440,#b85f25)] px-5 py-3.5 text-center text-sm font-bold leading-5 text-white ring-1 ring-white/15 transition duration-300 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_24px_58px_rgba(0,0,0,0.5),0_0_46px_rgba(215,122,52,0.42)] focus:outline-none focus:ring-4 focus:ring-[#d77a34]/50 active:translate-y-0 active:scale-[0.98] sm:min-h-20 sm:px-6 sm:py-4 ${
+            isOpen ? "" : "wendy-launcher-breathe"
+          }`}
           onClick={openChat}
           type="button"
         >
