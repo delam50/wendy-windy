@@ -335,5 +335,75 @@
     "metadata": {
       "source": "header_minimize"
     }
+  },
+  {
+    "id": "7f5763cf-a783-41f3-9d37-562352a5c13e",
+    "timestamp": "2026-05-08T19:28:59.266Z",
+    "event": "widget_opened",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "fbea93fd-6daf-4bdd-8116-f850f7d9f965",
+    "timestamp": "2026-05-08T19:29:03.718Z",
+    "event": "message_sent",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "10c2d735-3129-42f3-b3e9-81162c20e3f5",
+    "timestamp": "2026-05-08T19:29:03.869Z",
+    "event": "assistant_response_received",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "6ccffaff-ca3c-408d-83e4-736f29d2f942",
+    "timestamp": "2026-05-08T19:49:16.549Z",
+    "event": "widget_opened",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "db3cf3ca-8064-40b1-916a-fc7dbd464e26",
+    "timestamp": "2026-05-08T19:49:20.500Z",
+    "event": "message_sent",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "ce2d7bc3-959d-4e40-a2d1-d3d75d068337",
+    "timestamp": "2026-05-08T19:49:20.767Z",
+    "event": "assistant_response_received",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
+  },
+  {
+    "id": "ad205152-0762-44a8-af96-3d9d9826f8ac",
+    "timestamp": "2026-05-08T19:50:03.191Z",
+    "event": "assistant_response_received",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {}
   }
 ]

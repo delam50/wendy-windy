@@ -30,16 +30,16 @@ const allowedEvents = new Set<ConversationInsightEvent>([
 ]);
 
 export async function POST(request: Request) {
-  const body = (await request.json().catch(() => ({}))) as InsightRequestBody;
-
-  if (!body.event || !allowedEvents.has(body.event)) {
-    return Response.json({ ok: false }, { status: 400 });
-  }
-
-  const metadata = body.metadata ?? {};
-
   try {
-    await logConversationInsight({
+    const body = (await request.json().catch(() => ({}))) as InsightRequestBody;
+
+    if (!body.event || !allowedEvents.has(body.event)) {
+      return Response.json({ ok: true, persisted: false, reason: "ignored_event" });
+    }
+
+    const metadata = body.metadata ?? {};
+
+    const result = await logConversationInsight({
       event: body.event,
       timestamp: body.timestamp,
       pageTitle: metadata.pageTitle,
@@ -55,9 +55,9 @@ export async function POST(request: Request) {
       },
     });
 
-    return Response.json({ ok: true });
+    return Response.json({ ok: true, ...result });
   } catch (error) {
     console.error("Wendy conversation insight logging failed:", error);
-    return Response.json({ ok: false }, { status: 500 });
+    return Response.json({ ok: true, persisted: false, reason: "logging_failed" });
   }
 }

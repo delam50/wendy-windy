@@ -32,6 +32,11 @@ type QuickAction = {
   url?: string;
 };
 
+type QuickActionResult = {
+  actions: QuickAction[];
+  source: "page" | "topics" | "default";
+};
+
 type LeadForm = {
   name: string;
   phone: string;
@@ -170,6 +175,79 @@ const contextualQuickActionSets: Array<{
     ],
   },
 ];
+
+const topicQuickActionSets: Record<string, QuickAction[]> = {
+  "back pain": [
+    { label: "Can chiropractic help low back pain?", prompt: "Can chiropractic help low back pain?" },
+    { label: "What causes back pain after skiing?", prompt: "What causes back pain after skiing?" },
+    { label: "Do you have back pain resources?", prompt: "Do you have articles or resources on back pain?" },
+  ],
+  "neck pain": [
+    { label: "Can desk work cause neck pain?", prompt: "Can desk work or posture cause neck pain?" },
+    { label: "Can chiropractic help neck pain?", prompt: "Can chiropractic help neck pain?" },
+    { label: "Do you have neck pain articles?", prompt: "Do you have articles or resources on neck pain?" },
+  ],
+  headaches: [
+    { label: "Can neck tension contribute to headaches?", prompt: "Can neck tension contribute to headaches?" },
+    { label: "Do you have migraine resources?", prompt: "Do you have blogs or resources on migraines?" },
+    { label: "When should headaches be urgent?", prompt: "When should headaches be urgent or need medical care?" },
+  ],
+  "dry needling": [
+    { label: "What should I expect after dry needling?", prompt: "What should I expect after dry needling?" },
+    { label: "Is soreness after dry needling normal?", prompt: "Is soreness after dry needling normal?" },
+    { label: "Do you have dry needling resources?", prompt: "Do you have articles or resources on dry needling?" },
+  ],
+  pricing: [
+    { label: "What does a first visit cost?", prompt: "What does a first visit cost at Windy Ridge?" },
+    { label: "How much is a follow-up?", prompt: "How much is a follow-up visit at Windy Ridge?" },
+    { label: "Do prices differ by location?", prompt: "Do cash prices differ between Four Corners and Big Sky?" },
+  ],
+  insurance: [
+    { label: "How does insurance work?", prompt: "How does insurance work at Windy Ridge?" },
+    { label: "What should I confirm with insurance?", prompt: "What should I confirm with my insurance before booking?" },
+    { label: "Do you offer cash pricing?", prompt: "Does Windy Ridge offer cash pricing?" },
+  ],
+  "first visit": [
+    { label: "What does a first visit look like?", prompt: "What does a first visit look like at Windy Ridge?" },
+    { label: "Will I get care the first day?", prompt: "Will I receive care at my first Windy Ridge visit?" },
+    { label: "What should I bring?", prompt: "What should I bring to my first visit?" },
+  ],
+  "Big Sky": [
+    { label: "Who practices in Big Sky?", prompt: "Who practices at Windy Ridge in Big Sky?" },
+    { label: "Can I book Thursday appointments?", prompt: "Can I book Thursday appointments in Big Sky?" },
+    { label: "Do you treat skiing injuries?", prompt: "Does Windy Ridge help with skiing injuries?" },
+  ],
+  Bozeman: [
+    { label: "Who is at Four Corners?", prompt: "Who practices at the Bozeman Four Corners location?" },
+    { label: "Which provider should I see?", prompt: "Which Windy Ridge provider should I book with?" },
+    { label: "What does Bozeman care cost?", prompt: "What does care cost at the Bozeman Four Corners location?" },
+  ],
+  pregnancy: [
+    { label: "Is chiropractic safe during pregnancy?", prompt: "Is chiropractic safe during pregnancy?" },
+    { label: "Do you offer postpartum care?", prompt: "Does Windy Ridge offer postpartum care?" },
+    { label: "Should I book with Dr. Claire?", prompt: "Should I book pregnancy or postpartum care with Dr. Claire?" },
+  ],
+  "pediatric/newborn": [
+    { label: "Can Dr. Claire see newborns?", prompt: "Can Dr. Claire see newborns?" },
+    { label: "Do you offer pediatric care?", prompt: "Does Windy Ridge offer pediatric chiropractic care?" },
+    { label: "Do you offer at-home visits?", prompt: "Does Dr. Claire offer at-home visits for moms and newborns?" },
+  ],
+  massage: [
+    { label: "Who offers massage therapy?", prompt: "Who offers massage therapy at Windy Ridge?" },
+    { label: "Is massage in Big Sky?", prompt: "Is massage therapy available in Big Sky?" },
+    { label: "Can massage help tight muscles?", prompt: "Can massage therapy help tight muscles?" },
+  ],
+  "animal chiropractic": [
+    { label: "Do you offer pet chiropractic?", prompt: "Does Windy Ridge offer small animal chiropractic care?" },
+    { label: "Who sees dogs in clinic?", prompt: "Who provides dog chiropractic care at Windy Ridge?" },
+    { label: "Where is animal care offered?", prompt: "Where is small animal chiropractic care offered?" },
+  ],
+  "provider matching": [
+    { label: "Which provider fits my goals?", prompt: "Which Windy Ridge provider best fits my goals?" },
+    { label: "Who should I book with?", prompt: "Who should I book with at Windy Ridge?" },
+    { label: "Which location should I choose?", prompt: "Which Windy Ridge location should I choose?" },
+  ],
+};
 
 const friendlyConnectionError =
   "Sorry, Wendy is having trouble connecting right now. Please try again in a moment, or book directly here: https://windyridgechiropractic.janeapp.com/";
@@ -475,13 +553,26 @@ function getPageContext(): PageContext {
   };
 }
 
-function getContextualQuickActions(pageContext: PageContext) {
+function rotateQuickActions(actions: QuickAction[], seedText: string) {
+  const rotationSeed = Array.from(seedText).reduce(
+    (total, character) => total + character.charCodeAt(0),
+    0,
+  );
+  const rotationOffset = rotationSeed % actions.length;
+
+  return [
+    ...actions.slice(rotationOffset),
+    ...actions.slice(0, rotationOffset),
+  ];
+}
+
+function getContextualQuickActions(pageContext: PageContext): QuickActionResult {
   const contextText = `${pageContext.pageTitle} ${pageContext.pageUrl} ${pageContext.pageContext}`
     .toLowerCase()
     .replace(/[-_/]+/g, " ");
 
   if (!contextText.trim()) {
-    return defaultQuickActions;
+    return { actions: defaultQuickActions, source: "default" };
   }
 
   const matchedSet = contextualQuickActionSets.find((set) =>
@@ -489,19 +580,19 @@ function getContextualQuickActions(pageContext: PageContext) {
   );
 
   if (!matchedSet) {
-    return defaultQuickActions;
+    return { actions: defaultQuickActions, source: "default" };
   }
 
-  const rotationSeed = Array.from(contextText).reduce(
-    (total, character) => total + character.charCodeAt(0),
-    0,
-  );
-  const rotationOffset = rotationSeed % matchedSet.actions.length;
+  return {
+    actions: rotateQuickActions(matchedSet.actions, contextText),
+    source: "page",
+  };
+}
 
-  return [
-    ...matchedSet.actions.slice(rotationOffset),
-    ...matchedSet.actions.slice(0, rotationOffset),
-  ];
+function getTopicQuickActions(topics: string[]) {
+  const topic = topics.find((candidate) => topicQuickActionSets[candidate]);
+
+  return topic ? rotateQuickActions(topicQuickActionSets[topic], topic) : defaultQuickActions;
 }
 
 function getAnalyticsPageMetadata() {
@@ -701,9 +792,12 @@ export default function Home() {
   const [leadForm, setLeadForm] = useState<LeadForm>(emptyLeadForm);
   const [leadError, setLeadError] = useState("");
   const [isSubmittingLead, setIsSubmittingLead] = useState(false);
-  const suggestedQuickActions = useMemo(
+  const initialQuickActionResult = useMemo(
     () => getContextualQuickActions(getPageContext()),
     [],
+  );
+  const [suggestedQuickActions, setSuggestedQuickActions] = useState(
+    initialQuickActionResult.actions,
   );
 
   const canSend = useMemo(
@@ -732,6 +826,35 @@ export default function Home() {
       bookingLinkClicked: hasClickedBookingLink,
     });
   }, [hasClickedBookingLink, messages, sessionMemory]);
+
+  useEffect(() => {
+    if (initialQuickActionResult.source !== "default") {
+      return;
+    }
+
+    let isActive = true;
+
+    fetch("/api/quick-prompts")
+      .then((response) => response.json())
+      .then((data: { topics?: Array<{ topic?: string }> }) => {
+        if (!isActive || !Array.isArray(data.topics) || data.topics.length === 0) {
+          return;
+        }
+
+        const topicNames = data.topics
+          .map((topic) => topic.topic)
+          .filter((topic): topic is string => typeof topic === "string");
+
+        setSuggestedQuickActions(getTopicQuickActions(topicNames));
+      })
+      .catch(() => {
+        // Adaptive prompts are optional; default/context prompts remain the fallback.
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [initialQuickActionResult.source]);
 
   useEffect(() => {
     if (!shouldRunLauncherKnock) {

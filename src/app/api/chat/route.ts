@@ -1,8 +1,16 @@
 import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
 
 import { formatClinicKnowledge } from "@/data/knowledge";
-import { logConversationInsight } from "@/lib/conversationInsights";
+import {
+  getConversationInsightSummary,
+  getTopQuestionTopics,
+  incrementQuestionTopicCount,
+  isProductionRuntime,
+  logConversationInsight,
+} from "@/lib/conversationInsights";
 import { retrieveKnowledge, retrieveResources } from "@/lib/retrieveKnowledge";
 import { systemPrompt } from "@/lib/systemPrompt";
 
@@ -45,6 +53,7 @@ type IntentCategory =
   | "location intent";
 
 const MAX_API_MESSAGES = 10;
+const ADMIN_DIAGNOSTIC_TERMS = /\b(status|diagnostics?|usage|report|performance|health|system\s+report)\b/i;
 
 function isChatMessage(value: unknown): value is ChatMessage {
   if (!value || typeof value !== "object") {
@@ -122,6 +131,30 @@ function userHasResourceIntent(messages: ChatMessage[]) {
 
 function getLatestUserContent(messages: ChatMessage[]) {
   return messages.findLast((message) => message.role === "user")?.content ?? "";
+}
+
+function isAdminDiagnosticsRequest(messages: ChatMessage[]) {
+  return ADMIN_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages));
+}
+
+function hasValidAdminCode(messages: ChatMessage[]) {
+  const adminCode = process.env.WENDY_ADMIN_CODE?.trim();
+  const latestUserMessage = getLatestUserContent(messages).trim();
+
+  return Boolean(adminCode && latestUserMessage.includes(adminCode));
+}
+
+function getAdminDiagnosticsFlags(messages: ChatMessage[]) {
+  const adminEnvExists = Boolean(process.env.WENDY_ADMIN_CODE?.trim());
+  const adminCodeDetected = hasValidAdminCode(messages);
+  const adminIntentDetected = isAdminDiagnosticsRequest(messages);
+
+  return {
+    adminEnvExists,
+    adminCodeDetected,
+    adminIntentDetected,
+    diagnosticsModeActivated: adminCodeDetected && adminIntentDetected,
+  };
 }
 
 function includesAny(text: string, patterns: RegExp[]) {
@@ -480,7 +513,165 @@ function formatSessionMemory(memory: SessionMemory) {
   return `Session memory for this browser session only. Use it to avoid repeating yourself, but do not treat it as a medical record or long-term stored health history:\n${memoryLines.join("\n")}`;
 }
 
+function readGeneratedFile(fileName: string) {
+  const filePath = path.join(process.cwd(), "data", "generated", fileName);
+
+  if (!existsSync(filePath)) {
+    return "";
+  }
+
+  try {
+    return readFileSync(filePath, "utf8");
+  } catch {
+    return "";
+  }
+}
+
+function getBlogIndexDiagnostics() {
+  const rawIndex = readGeneratedFile("blog-index.json");
+
+  if (!rawIndex) {
+    return {
+      exists: false,
+      articleCount: 0,
+      categoryCount: 0,
+      categories: [] as string[],
+    };
+  }
+
+  try {
+    const index = JSON.parse(rawIndex) as unknown;
+    const articles = Array.isArray(index) ? index : [];
+    const categories = Array.from(
+      new Set(
+        articles
+          .map((article) =>
+            article && typeof article === "object" && "category" in article
+              ? String(article.category)
+              : "",
+          )
+          .filter(Boolean),
+      ),
+    ).sort();
+
+    return {
+      exists: true,
+      articleCount: articles.length,
+      categoryCount: categories.length,
+      categories,
+    };
+  } catch {
+    return {
+      exists: true,
+      articleCount: 0,
+      categoryCount: 0,
+      categories: [] as string[],
+    };
+  }
+}
+
+async function getAdminDiagnosticsReport() {
+  const blogIndex = getBlogIndexDiagnostics();
+  const janeKnowledge = readGeneratedFile("jane-knowledge.md");
+  const clinicIdentity = readGeneratedFile("clinic-identity.md");
+  const insightSummary = await getConversationInsightSummary();
+  const topQuestionTopics = await getTopQuestionTopics(5);
+  const model = process.env.OPENAI_MODEL || "not configured";
+  const leadEmailConfigured = Boolean(
+    process.env.EMAIL_SERVER_HOST &&
+      process.env.EMAIL_SERVER_PORT &&
+      process.env.EMAIL_SERVER_USER &&
+      process.env.EMAIL_SERVER_PASSWORD &&
+      process.env.EMAIL_FROM &&
+      process.env.LEAD_NOTIFICATION_EMAIL,
+  );
+  const recentIntentCounts = Object.entries(insightSummary.intentCounts)
+    .sort((first, second) => second[1] - first[1])
+    .slice(0, 5)
+    .map(([intent, count]) => `${intent}: ${count}`)
+    .join(", ") || "No local intent counts available";
+  const recentTopicCounts = topQuestionTopics
+    .map(({ topic, count }) => `${topic}: ${count}`)
+    .join(", ") || "No local topic counts available";
+
+  return [
+    "Wendy admin status report",
+    "",
+    `App status: Online`,
+    `Current model: ${model}`,
+    `OpenAI API configured: ${process.env.OPENAI_API_KEY ? "Yes" : "No"}`,
+    `Blog index exists: ${blogIndex.exists ? "Yes" : "No"}`,
+    `Indexed blog resources: ${blogIndex.articleCount}`,
+    `Resource categories: ${blogIndex.categoryCount}`,
+    blogIndex.categories.length
+      ? `Category names: ${blogIndex.categories.join(", ")}`
+      : "Category names: none available",
+    `Jane/pricing knowledge exists: ${janeKnowledge ? "Yes" : "No"}`,
+    `Provider routing knowledge exists: ${
+      /dr\.?\s*(kyle|dave|josh|claire|michelle)|nichole|james/i.test(clinicIdentity)
+        ? "Yes"
+        : "No"
+    }`,
+    `Conversation-insights endpoint health: ${
+      isProductionRuntime()
+        ? "Healthy; production filesystem persistence is skipped safely"
+        : "Healthy; local JSON persistence enabled"
+    }`,
+    `Lead capture email configured: ${leadEmailConfigured ? "Yes" : "No"}`,
+    `Recent safe analytics events: ${insightSummary.totalInsights}`,
+    `Booking link click signals: ${insightSummary.bookingLinkClicks}`,
+    `Lead form opened/submitted: ${insightSummary.leadFormOpened}/${insightSummary.leadFormSubmitted}`,
+    `Resource recommendations logged: ${insightSummary.resourceRecommended}`,
+    `Common intent categories: ${recentIntentCounts}`,
+    `Recent top resource topics: ${recentTopicCounts}`,
+    "",
+    "No API keys, admin code, raw user messages, private lead details, or detailed health information are included in this report.",
+  ].join("\n");
+}
+
 export async function POST(request: Request) {
+  const body = (await request.json().catch(() => ({}))) as ChatRequestBody;
+  const messages = getMessages(body);
+  const pageContext = getPageContext(body);
+
+  if (messages.length === 0) {
+    return Response.json(
+      { error: "Please send Wendy a message to get started." },
+      { status: 400 },
+    );
+  }
+
+  const adminDiagnosticsFlags = getAdminDiagnosticsFlags(messages);
+
+  if (process.env.NODE_ENV === "development") {
+    console.log("[Wendy admin diagnostics]", adminDiagnosticsFlags);
+  }
+
+  if (adminDiagnosticsFlags.adminIntentDetected) {
+    if (!adminDiagnosticsFlags.adminCodeDetected) {
+      return Response.json({
+        message:
+          "I can help with general Windy Ridge website questions, but admin diagnostics are only available to authorized managers.",
+        resources: [],
+      });
+    }
+
+    if (adminDiagnosticsFlags.diagnosticsModeActivated) {
+      return Response.json({
+        message: await getAdminDiagnosticsReport(),
+        resources: [],
+      });
+    }
+  }
+
+  if (adminDiagnosticsFlags.adminCodeDetected) {
+    return Response.json({
+      message:
+        "I can help with Wendy diagnostics when you ask for a status, diagnostics, usage, performance, health, or system report.",
+      resources: [],
+    });
+  }
+
   const apiKey = process.env.OPENAI_API_KEY;
   const model = process.env.OPENAI_MODEL;
 
@@ -494,9 +685,6 @@ export async function POST(request: Request) {
 
   const openai = new OpenAI({ apiKey });
 
-  const body = (await request.json().catch(() => ({}))) as ChatRequestBody;
-  const messages = getMessages(body);
-  const pageContext = getPageContext(body);
   const sessionMemory = getSessionMemory(body);
   const sessionMemoryContext = formatSessionMemory(sessionMemory);
   const detectedIntents = detectIntentCategories(messages, pageContext);
@@ -543,13 +731,6 @@ export async function POST(request: Request) {
     url: resource.url,
     type: resource.type,
   }));
-
-  if (messages.length === 0) {
-    return Response.json(
-      { error: "Please send Wendy a message to get started." },
-      { status: 400 },
-    );
-  }
 
   try {
     const completion = await openai.chat.completions.create({
@@ -628,6 +809,7 @@ URL: ${resource.url}`,
           source: "api_chat",
         },
       });
+      await incrementQuestionTopicCount(topicCategory);
     } catch (error) {
       console.error("Wendy conversation insight logging failed:", error);
     }
