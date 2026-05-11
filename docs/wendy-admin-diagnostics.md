@@ -71,12 +71,22 @@ The report must not include:
 
 Vercel serverless filesystems are not reliable persistent storage. Wendy disables production filesystem writes for conversation insights and adaptive prompt topic counts.
 
+When configured, Wendy writes safe analytics, lead capture, and topic counts to Supabase using server-only environment variables:
+
+```txt
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+These must be set in Vercel only as server-side environment variables. Never expose the service role key in client-side code, WordPress snippets, or any `NEXT_PUBLIC_` variable.
+
 In production:
 
 - `/api/conversation-insights` returns `200 OK` even when persistence is skipped.
 - analytics failures do not break chat, retrieval, lead capture, resource cards, or UI behavior.
 - only safe metadata is handled.
 - raw user messages and detailed health information are not stored.
+- if Supabase variables are missing or a Supabase write fails, Wendy safely falls back without breaking the visitor experience.
 
 In local development:
 

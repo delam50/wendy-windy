@@ -506,6 +506,14 @@ function renderResourceCards(content: string, resources: ResourceCard[] = []) {
           className="group wendy-message-enter block rounded-2xl border border-[#d77a34]/40 bg-[linear-gradient(145deg,rgba(55,39,28,0.96),rgba(38,33,29,0.94))] p-3.5 text-left shadow-lg shadow-black/20 ring-1 ring-[#f4ad79]/5 transition duration-200 hover:-translate-y-0.5 hover:border-[#d77a34]/75 hover:bg-[#3b2b20] hover:shadow-[#d77a34]/15"
           href={resource.url}
           key={resource.url}
+          onClick={() => {
+            trackAnalyticsEvent("resource_link_clicked", {
+              ...getAnalyticsPageMetadata(),
+              resourceTitle: resource.title,
+              resourceUrl: resource.url,
+              source: "resource_card",
+            });
+          }}
           rel="noopener noreferrer"
           target="_blank"
         >

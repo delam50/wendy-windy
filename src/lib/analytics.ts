@@ -4,6 +4,7 @@ export type WendyAnalyticsEventName =
   | "message_sent"
   | "assistant_response_received"
   | "quick_action_clicked"
+  | "resource_link_clicked"
   | "booking_link_clicked"
   | "lead_form_opened"
   | "lead_form_submitted"
@@ -19,6 +20,8 @@ export type WendyAnalyticsMetadata = {
   assistantResponseLength?: number;
   errorType?: string;
   source?: string;
+  resourceTitle?: string;
+  resourceUrl?: string;
 };
 
 export type WendyAnalyticsEvent = {

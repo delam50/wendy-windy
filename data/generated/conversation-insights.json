@@ -1,43 +1,7 @@
 [
   {
-    "id": "d94b25d7-3bc2-41b6-b647-0525b67c5a6c",
-    "timestamp": "2026-05-07T20:31:05.343Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "first visit",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "ceaa46d4-de4f-4fc2-aa65-7cbba8af8a21",
-    "timestamp": "2026-05-07T20:31:05.351Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "bbe756e7-24b1-4ecf-b90d-0fbde9e46fa5",
-    "timestamp": "2026-05-07T20:31:16.658Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "5d886fbd-d5c0-424e-ae9a-4f721b53c1c6",
-    "timestamp": "2026-05-07T20:31:19.097Z",
+    "id": "989e7510-fa11-4d16-b20d-f743a5c70c8b",
+    "timestamp": "2026-05-11T15:56:11.372Z",
     "event": "chat_response",
     "detectedIntent": [
       "pricing intent"
@@ -48,12 +12,14 @@
     "resourceRecommended": true,
     "topicCategory": "pricing",
     "metadata": {
-      "source": "api_chat"
+      "source": "api_chat",
+      "resourceTitle": "How Much Does Chiropractic Cost in Bozeman? (And Why Prices Vary)",
+      "resourceUrl": "https://windyridgechiropractic.com/why-chiropractic-costs-vary-bozeman/"
     }
   },
   {
-    "id": "eddc07ee-0e9c-415e-bfb5-2a69d87e3622",
-    "timestamp": "2026-05-07T20:31:19.109Z",
+    "id": "d49989ed-d844-4975-b80e-f5bf3ac8430d",
+    "timestamp": "2026-05-11T15:56:11.383Z",
     "event": "assistant_response_received",
     "bookingLinkClicked": false,
     "leadFormOpened": false,
@@ -62,18 +28,8 @@
     "metadata": {}
   },
   {
-    "id": "0ea402ce-ceab-4d5f-b79a-6603b8e7d53c",
-    "timestamp": "2026-05-07T21:32:11.587Z",
-    "event": "widget_opened",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "3b76bf42-5453-485e-bd85-6b733b3d413c",
-    "timestamp": "2026-05-07T21:32:28.739Z",
+    "id": "b709ffe9-c9d7-4582-a319-eace7c6e2ff3",
+    "timestamp": "2026-05-11T15:56:26.923Z",
     "event": "message_sent",
     "bookingLinkClicked": false,
     "leadFormOpened": false,
@@ -82,82 +38,8 @@
     "metadata": {}
   },
   {
-    "id": "8c06d896-ae93-4305-ab36-c9fe2d5d8d77",
-    "timestamp": "2026-05-07T21:32:32.040Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent",
-      "pricing intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "pricing",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "d407c9aa-7cf3-43b6-93b6-aedb502d1a7d",
-    "timestamp": "2026-05-07T21:32:32.050Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "c21e0c5a-4dd3-4635-9030-6976ae3ca5bc",
-    "timestamp": "2026-05-07T21:33:17.436Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "325e9b93-f4c3-4f85-b957-7347454dfc95",
-    "timestamp": "2026-05-07T21:33:19.960Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent",
-      "pricing intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "pricing",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "45a619d1-9940-475f-888f-a8ee0915c301",
-    "timestamp": "2026-05-07T21:33:19.970Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "eee5f362-26ce-450d-9eea-55e86fb5b5a9",
-    "timestamp": "2026-05-07T21:34:51.389Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "f0486b9e-85e3-4b06-98bc-193861d49d8b",
-    "timestamp": "2026-05-07T21:34:54.655Z",
+    "id": "2744994b-81e7-479d-a4d5-cb9eb45aff66",
+    "timestamp": "2026-05-11T15:56:29.696Z",
     "event": "chat_response",
     "detectedIntent": [
       "pricing intent"
@@ -168,237 +50,14 @@
     "resourceRecommended": true,
     "topicCategory": "pricing",
     "metadata": {
-      "source": "api_chat"
+      "source": "api_chat",
+      "resourceTitle": "Chiropractor Prices in Bozeman, MT: What to Expect Per Visit",
+      "resourceUrl": "https://windyridgechiropractic.com/chiropractor-cost-bozeman-montana/"
     }
   },
   {
-    "id": "d75c71e9-5383-4434-bb9a-ab12ed0d40e9",
-    "timestamp": "2026-05-07T21:34:54.665Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "2459e962-8589-462b-8a47-1bca7fc1b626",
-    "timestamp": "2026-05-07T21:35:58.590Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "b5a193a4-64c1-4b23-b5aa-d58320933d85",
-    "timestamp": "2026-05-07T21:36:00.678Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent",
-      "pricing intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "pricing",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "fd3668d2-bd7a-4eb9-8a54-dd36009fee21",
-    "timestamp": "2026-05-07T21:36:00.687Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "7f4ee33a-0f21-475c-bcf0-91fa2d55bc26",
-    "timestamp": "2026-05-07T21:56:23.486Z",
-    "event": "widget_opened",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "9763687d-27d3-482b-9574-7b321e503df3",
-    "timestamp": "2026-05-07T21:56:25.287Z",
-    "event": "widget_closed",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {
-      "source": "header_minimize"
-    }
-  },
-  {
-    "id": "a27180ce-da0d-4783-a8bc-b6e2b5552ae7",
-    "timestamp": "2026-05-07T21:56:29.815Z",
-    "event": "widget_opened",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "63bdc093-43ac-4fd0-9aa2-b7e26e788ef9",
-    "timestamp": "2026-05-07T21:58:10.490Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "8174d9a9-66ef-47a4-8a00-4e999f5722be",
-    "timestamp": "2026-05-07T21:58:13.288Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent",
-      "pricing intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "pricing",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "ff06d122-1f4d-4a0c-b124-f52483f9d814",
-    "timestamp": "2026-05-07T21:58:13.296Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "dff6ab03-42f6-4b5e-b911-84c514b231de",
-    "timestamp": "2026-05-07T21:58:30.177Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "67ca92cd-93e7-4cd0-9f65-8d40e05ea586",
-    "timestamp": "2026-05-07T21:58:32.634Z",
-    "event": "chat_response",
-    "detectedIntent": [
-      "educational intent",
-      "pricing intent"
-    ],
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": true,
-    "topicCategory": "pricing",
-    "metadata": {
-      "source": "api_chat"
-    }
-  },
-  {
-    "id": "11f6f542-a77b-4680-9745-2bacfbb8d677",
-    "timestamp": "2026-05-07T21:58:32.641Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "2606b9cf-76ee-4b2b-b473-520df243fc46",
-    "timestamp": "2026-05-07T21:58:45.338Z",
-    "event": "widget_closed",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {
-      "source": "header_minimize"
-    }
-  },
-  {
-    "id": "7f5763cf-a783-41f3-9d37-562352a5c13e",
-    "timestamp": "2026-05-08T19:28:59.266Z",
-    "event": "widget_opened",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "fbea93fd-6daf-4bdd-8116-f850f7d9f965",
-    "timestamp": "2026-05-08T19:29:03.718Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "10c2d735-3129-42f3-b3e9-81162c20e3f5",
-    "timestamp": "2026-05-08T19:29:03.869Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "6ccffaff-ca3c-408d-83e4-736f29d2f942",
-    "timestamp": "2026-05-08T19:49:16.549Z",
-    "event": "widget_opened",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "db3cf3ca-8064-40b1-916a-fc7dbd464e26",
-    "timestamp": "2026-05-08T19:49:20.500Z",
-    "event": "message_sent",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "ce2d7bc3-959d-4e40-a2d1-d3d75d068337",
-    "timestamp": "2026-05-08T19:49:20.767Z",
-    "event": "assistant_response_received",
-    "bookingLinkClicked": false,
-    "leadFormOpened": false,
-    "leadFormSubmitted": false,
-    "resourceRecommended": false,
-    "metadata": {}
-  },
-  {
-    "id": "ad205152-0762-44a8-af96-3d9d9826f8ac",
-    "timestamp": "2026-05-08T19:50:03.191Z",
+    "id": "fb91eb45-32b1-4a2b-b6ef-20f1c3630c6e",
+    "timestamp": "2026-05-11T15:56:29.709Z",
     "event": "assistant_response_received",
     "bookingLinkClicked": false,
     "leadFormOpened": false,

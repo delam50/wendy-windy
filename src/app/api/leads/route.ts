@@ -3,7 +3,8 @@ import path from "node:path";
 
 import nodemailer from "nodemailer";
 
-import { logConversationInsight } from "@/lib/conversationInsights";
+import { isProductionRuntime, logConversationInsight } from "@/lib/conversationInsights";
+import { writeWendyLead } from "@/lib/supabaseServer";
 
 export const runtime = "nodejs";
 
@@ -16,6 +17,7 @@ type LeadRequestBody = {
   preferredTiming?: string;
   pageTitle?: string;
   pageUrl?: string;
+  suggestedProvider?: string;
 };
 
 type LeadRecord = Required<LeadRequestBody> & {
@@ -47,6 +49,7 @@ function normalizeLead(body: LeadRequestBody) {
     preferredTiming: sanitize(body.preferredTiming, 160),
     pageTitle: sanitize(body.pageTitle, 180),
     pageUrl: sanitize(body.pageUrl, 500),
+    suggestedProvider: sanitize(body.suggestedProvider, 120),
   };
 }
 
@@ -196,12 +199,41 @@ export async function POST(request: Request) {
     status: "new",
   };
 
-  await mkdir(path.dirname(leadsFilePath), { recursive: true });
+  let leadSaved = false;
 
-  const existingLeads = await readExistingLeads();
-  existingLeads.push(leadRecord);
+  const supabaseLeadResult = await writeWendyLead({
+    name: leadRecord.name,
+    email: leadRecord.email,
+    phone: leadRecord.phone,
+    preferredLocation: leadRecord.location,
+    generalConcern: leadRecord.mainConcern,
+    preferredTiming: leadRecord.preferredTiming,
+    suggestedProvider: leadRecord.suggestedProvider,
+    pageTitle: leadRecord.pageTitle,
+    pageUrl: leadRecord.pageUrl,
+    source: leadRecord.source,
+    metadata: {
+      status: leadRecord.status,
+      hasPhone: Boolean(leadRecord.phone),
+      hasEmail: Boolean(leadRecord.email),
+    },
+  });
 
-  await writeFile(leadsFilePath, `${JSON.stringify(existingLeads, null, 2)}\n`);
+  leadSaved = supabaseLeadResult.persisted;
+
+  if (!isProductionRuntime()) {
+    try {
+      await mkdir(path.dirname(leadsFilePath), { recursive: true });
+
+      const existingLeads = await readExistingLeads();
+      existingLeads.push(leadRecord);
+
+      await writeFile(leadsFilePath, `${JSON.stringify(existingLeads, null, 2)}\n`);
+      leadSaved = true;
+    } catch (error) {
+      console.error("Wendy local lead backup failed:", error);
+    }
+  }
 
   let emailSent = false;
 
@@ -219,6 +251,7 @@ export async function POST(request: Request) {
     hasPhone: Boolean(leadRecord.phone),
     hasEmail: Boolean(leadRecord.email),
     emailSent,
+    supabaseSaved: supabaseLeadResult.persisted,
   });
 
   try {
@@ -230,6 +263,7 @@ export async function POST(request: Request) {
       topicCategory: "lead follow-up request",
       metadata: {
         leadLocationPreference: leadRecord.location,
+        suggestedProvider: leadRecord.suggestedProvider,
         source: "api_leads",
       },
     });
@@ -241,13 +275,13 @@ export async function POST(request: Request) {
     return Response.json(
       {
         ok: false,
-        leadSaved: true,
+        leadSaved,
         error:
-          "Wendy saved the lead backup, but the email notification could not be sent.",
+          "Wendy saved the lead, but the email notification could not be sent.",
       },
       { status: 502 },
     );
   }
 
-  return Response.json({ ok: true, leadSaved: true, emailSent });
+  return Response.json({ ok: true, leadSaved, emailSent });
 }

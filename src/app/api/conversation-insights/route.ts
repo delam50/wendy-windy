@@ -14,6 +14,8 @@ type InsightRequestBody = {
     leadLocationPreference?: string;
     errorType?: string;
     source?: string;
+    resourceTitle?: string;
+    resourceUrl?: string;
   };
 };
 
@@ -23,6 +25,7 @@ const allowedEvents = new Set<ConversationInsightEvent>([
   "message_sent",
   "assistant_response_received",
   "quick_action_clicked",
+  "resource_link_clicked",
   "booking_link_clicked",
   "lead_form_opened",
   "lead_form_submitted",
@@ -52,6 +55,8 @@ export async function POST(request: Request) {
         leadLocationPreference: metadata.leadLocationPreference,
         source: metadata.source,
         errorType: metadata.errorType,
+        resourceTitle: metadata.resourceTitle,
+        resourceUrl: metadata.resourceUrl,
       },
     });
 

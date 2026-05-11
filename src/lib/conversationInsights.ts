@@ -1,6 +1,12 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
+import {
+  getSupabaseDiagnostics,
+  incrementWendyTopicCount,
+  writeWendyEvent,
+} from "@/lib/supabaseServer";
+
 export type ConversationInsightEvent =
   | "chat_response"
   | "widget_opened"
@@ -8,6 +14,7 @@ export type ConversationInsightEvent =
   | "message_sent"
   | "assistant_response_received"
   | "quick_action_clicked"
+  | "resource_link_clicked"
   | "booking_link_clicked"
   | "lead_form_opened"
   | "lead_form_submitted"
@@ -30,6 +37,9 @@ export type ConversationInsight = {
     leadLocationPreference?: string;
     source?: string;
     errorType?: string;
+    resourceTitle?: string;
+    resourceUrl?: string;
+    suggestedProvider?: string;
   };
 };
 
@@ -171,11 +181,37 @@ export async function logConversationInsight(
         sanitizeText(insight.metadata?.leadLocationPreference, 40) || undefined,
       source: sanitizeText(insight.metadata?.source, 80) || undefined,
       errorType: sanitizeText(insight.metadata?.errorType, 80) || undefined,
+      resourceTitle: sanitizeText(insight.metadata?.resourceTitle, 180) || undefined,
+      resourceUrl: sanitizeUrl(insight.metadata?.resourceUrl) || undefined,
+      suggestedProvider:
+        sanitizeText(insight.metadata?.suggestedProvider, 120) || undefined,
     },
   };
+  const supabaseResult = await writeWendyEvent({
+    eventName: safeInsight.event,
+    pageTitle: safeInsight.pageTitle,
+    pageUrl: safeInsight.pageUrl,
+    topicCategory: safeInsight.topicCategory,
+    intent: safeInsight.detectedIntent?.join(", "),
+    resourceTitle: safeInsight.metadata?.resourceTitle,
+    resourceUrl: safeInsight.metadata?.resourceUrl,
+    preferredLocation: safeInsight.metadata?.leadLocationPreference,
+    suggestedProvider: safeInsight.metadata?.suggestedProvider,
+    metadata: {
+      bookingLinkClicked: safeInsight.bookingLinkClicked,
+      leadFormOpened: safeInsight.leadFormOpened,
+      leadFormSubmitted: safeInsight.leadFormSubmitted,
+      resourceRecommended: safeInsight.resourceRecommended,
+      quickActionLabel: safeInsight.metadata?.quickActionLabel,
+      source: safeInsight.metadata?.source,
+      errorType: safeInsight.metadata?.errorType,
+    },
+  });
 
   if (isProductionRuntime()) {
-    return { persisted: false, reason: "filesystem_persistence_disabled" };
+    return supabaseResult.persisted
+      ? { persisted: true, destination: "supabase" }
+      : { persisted: false, reason: "persistence_unavailable" };
   }
 
   const existingInsights = await readExistingInsights();
@@ -187,7 +223,10 @@ export async function logConversationInsight(
       insightsFilePath,
       `${JSON.stringify(existingInsights.slice(-MAX_INSIGHTS), null, 2)}\n`,
     );
-    return { persisted: true };
+    return {
+      persisted: true,
+      destination: supabaseResult.persisted ? "supabase_and_local" : "local",
+    };
   } catch {
     return { persisted: false, reason: "write_failed" };
   }
@@ -230,8 +269,16 @@ export function normalizeQuestionTopicCategory(
 export async function incrementQuestionTopicCount(topic: string | undefined) {
   const normalizedTopic = normalizeQuestionTopicCategory(topic);
 
-  if (!normalizedTopic || isProductionRuntime()) {
+  if (!normalizedTopic) {
     return { persisted: false, topic: normalizedTopic };
+  }
+
+  const supabaseResult = await incrementWendyTopicCount(normalizedTopic);
+
+  if (isProductionRuntime()) {
+    return supabaseResult.persisted
+      ? { persisted: true, topic: normalizedTopic, destination: "supabase" }
+      : { persisted: false, topic: normalizedTopic };
   }
 
   try {
@@ -240,7 +287,11 @@ export async function incrementQuestionTopicCount(topic: string | undefined) {
     await mkdir(path.dirname(topicCountsFilePath), { recursive: true });
     await writeFile(topicCountsFilePath, `${JSON.stringify(counts, null, 2)}\n`);
 
-    return { persisted: true, topic: normalizedTopic };
+    return {
+      persisted: true,
+      topic: normalizedTopic,
+      destination: supabaseResult.persisted ? "supabase_and_local" : "local",
+    };
   } catch {
     return { persisted: false, topic: normalizedTopic };
   }
@@ -255,6 +306,14 @@ export async function readQuestionTopicCounts() {
 }
 
 export async function getTopQuestionTopics(limit = 4) {
+  const supabaseDiagnostics = await getSupabaseDiagnostics();
+
+  if (supabaseDiagnostics.configured && supabaseDiagnostics.topTopics.length > 0) {
+    return supabaseDiagnostics.topTopics
+      .slice(0, limit)
+      .map(({ topic, count }) => ({ topic: topic as QuestionTopicCategory, count }));
+  }
+
   const counts = await readQuestionTopicCounts();
 
   return Object.entries(counts)

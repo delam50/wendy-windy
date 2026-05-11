@@ -12,6 +12,7 @@ import {
   logConversationInsight,
 } from "@/lib/conversationInsights";
 import { retrieveKnowledge, retrieveResources } from "@/lib/retrieveKnowledge";
+import { getSupabaseDiagnostics } from "@/lib/supabaseServer";
 import { systemPrompt } from "@/lib/systemPrompt";
 
 export const runtime = "nodejs";
@@ -576,6 +577,7 @@ async function getAdminDiagnosticsReport() {
   const clinicIdentity = readGeneratedFile("clinic-identity.md");
   const insightSummary = await getConversationInsightSummary();
   const topQuestionTopics = await getTopQuestionTopics(5);
+  const supabaseDiagnostics = await getSupabaseDiagnostics();
   const model = process.env.OPENAI_MODEL || "not configured";
   const leadEmailConfigured = Boolean(
     process.env.EMAIL_SERVER_HOST &&
@@ -617,6 +619,21 @@ async function getAdminDiagnosticsReport() {
         ? "Healthy; production filesystem persistence is skipped safely"
         : "Healthy; local JSON persistence enabled"
     }`,
+    `Supabase configured: ${supabaseDiagnostics.configured ? "Yes" : "No"}`,
+    `Supabase health: ${supabaseDiagnostics.healthy ? "Healthy" : "Unavailable or not configured"}`,
+    `Supabase total events: ${supabaseDiagnostics.totalEvents}`,
+    `Supabase total leads: ${supabaseDiagnostics.totalLeads}`,
+    supabaseDiagnostics.topTopics.length
+      ? `Supabase top topics: ${supabaseDiagnostics.topTopics
+          .map(({ topic, count }) => `${topic}: ${count}`)
+          .join(", ")}`
+      : "Supabase top topics: none available",
+    supabaseDiagnostics.recentResourceClicks.length
+      ? `Recent resource clicks: ${supabaseDiagnostics.recentResourceClicks
+          .map((click) => String(click.resource_title || click.resource_url || "resource"))
+          .join(", ")}`
+      : "Recent resource clicks: none available",
+    `Recent booking clicks: ${supabaseDiagnostics.recentBookingClicks.length}`,
     `Lead capture email configured: ${leadEmailConfigured ? "Yes" : "No"}`,
     `Recent safe analytics events: ${insightSummary.totalInsights}`,
     `Booking link click signals: ${insightSummary.bookingLinkClicks}`,
@@ -806,6 +823,8 @@ URL: ${resource.url}`,
           ),
         topicCategory,
         metadata: {
+          resourceTitle: resources[0]?.title,
+          resourceUrl: resources[0]?.url,
           source: "api_chat",
         },
       });
