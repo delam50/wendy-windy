@@ -258,6 +258,9 @@ const leadSuccessMessage =
 const leadNotificationErrorMessage =
   "Thanks, I saved your details, but Wendy had trouble emailing the Windy Ridge team just now. Please try again in a moment, or book directly here for the fastest option: https://windyridgechiropractic.janeapp.com/";
 
+const leadFallbackMessage =
+  "Sorry, Wendy could not save that right now. Please try again in a moment, or book directly here: https://windyridgechiropractic.janeapp.com/";
+
 const welcomeMessage: Message = {
   role: "assistant",
   content:
@@ -618,6 +621,12 @@ function hasBookingIntent(content: string) {
   );
 }
 
+function hasLeadIntent(content: string) {
+  return /\b(have (?:the )?team follow up|can someone contact me|can the clinic call me|someone (?:to )?reach out|want someone to reach out|front desk contact me|help scheduling|want to book but need help|someone follow up with me|contact me|call me|reach out|follow up with me)\b/i.test(
+    content,
+  );
+}
+
 function includesBookingInfo(content: string) {
   return /janeapp|book|booking|appointment/i.test(content);
 }
@@ -822,7 +831,11 @@ export default function Home() {
       return (
         !hasClickedBookingLink &&
         !showLeadForm &&
-        Boolean(latestUserMessage && hasBookingIntent(latestUserMessage.content))
+        Boolean(
+          latestUserMessage &&
+            (hasBookingIntent(latestUserMessage.content) ||
+              hasLeadIntent(latestUserMessage.content)),
+        )
       );
     },
     [hasClickedBookingLink, messages, showLeadForm],
@@ -1008,11 +1021,19 @@ export default function Home() {
       role: "user",
       content: trimmedContent,
     };
+    const leadIntentDetected = hasLeadIntent(trimmedContent);
     const nextMemory = mergeSessionMemory(sessionMemory, userMessage);
     const nextMessages: Message[] = trimMessagesForSession([
       ...messages,
       userMessage,
     ]);
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("[Wendy lead capture]", {
+        leadIntentDetected,
+        action: leadIntentDetected ? "open_structured_form" : "continue_chat",
+      });
+    }
 
     setIsOpen(true);
     setMessages(nextMessages);
@@ -1022,6 +1043,33 @@ export default function Home() {
     setShowLeadForm(false);
     setLeadError("");
     setIsSending(true);
+
+    if (leadIntentDetected) {
+      const assistantMessage: Message = {
+        id: createMessageId(),
+        role: "assistant",
+        content:
+          "Absolutely. Please use this quick form so the Windy Ridge team gets the right details without anything getting lost in chat.",
+      };
+
+      setIsSending(false);
+      setShowLeadForm(true);
+      setMessages(trimMessagesForSession([...nextMessages, assistantMessage]));
+      trackAnalyticsEvent("lead_form_opened", {
+        ...getAnalyticsPageMetadata(),
+        bookingLinkClicked: hasClickedBookingLink,
+        source: "lead_intent_detected",
+      });
+
+      if (process.env.NODE_ENV === "development") {
+        console.log("[Wendy lead capture]", {
+          leadFormOpened: true,
+          source: "lead_intent_detected",
+        });
+      }
+
+      return;
+    }
 
     window.requestAnimationFrame(() => {
       messagesEndRef.current?.scrollIntoView({
@@ -1232,6 +1280,13 @@ export default function Home() {
       ...getAnalyticsPageMetadata(),
       bookingLinkClicked: hasClickedBookingLink,
     });
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("[Wendy lead capture]", {
+        leadFormOpened: true,
+        source: "cta_button",
+      });
+    }
   }
 
   function updateLeadForm(field: keyof LeadForm, value: string) {
@@ -1287,13 +1342,14 @@ export default function Home() {
           pageUrl: getPageContext().pageUrl,
         }),
       });
+      const data = (await response.json().catch(() => ({}))) as {
+        errors?: string[];
+        leadSaved?: boolean;
+        supabaseSaved?: boolean;
+        mondayCreated?: boolean;
+      };
 
       if (!response.ok) {
-        const data = (await response.json().catch(() => ({}))) as {
-          errors?: string[];
-          leadSaved?: boolean;
-        };
-
         if (data.leadSaved) {
           setMessages((currentMessages) => [
             ...currentMessages,
@@ -1319,6 +1375,14 @@ export default function Home() {
             errorType: "lead_email_notification",
             leadLocationPreference: leadForm.location || undefined,
           });
+
+          if (process.env.NODE_ENV === "development") {
+            console.log("[Wendy lead capture]", {
+              leadFormSubmitted: true,
+              supabaseSaved: true,
+              mondayCreated: Boolean(data.mondayCreated),
+            });
+          }
           return;
         }
 
@@ -1349,10 +1413,16 @@ export default function Home() {
         bookingLinkClicked: hasClickedBookingLink,
         leadLocationPreference: leadForm.location,
       });
+
+      if (process.env.NODE_ENV === "development") {
+        console.log("[Wendy lead capture]", {
+          leadFormSubmitted: true,
+          supabaseSaved: Boolean(data.supabaseSaved ?? data.leadSaved),
+          mondayCreated: Boolean(data.mondayCreated),
+        });
+      }
     } catch {
-      setLeadError(
-        "Sorry, Wendy could not save that right now. Please try again or book directly with JaneApp.",
-      );
+      setLeadError(leadFallbackMessage);
       trackAnalyticsEvent("error_shown", {
         ...getAnalyticsPageMetadata(),
         errorType: "lead_submission",
@@ -1525,7 +1595,7 @@ export default function Home() {
 
         {leadError ? (
           <p className="rounded-xl border border-[#d77a34]/40 bg-[#3d2618] px-3 py-2 text-xs leading-5 text-[#ffd9c2]">
-            {leadError}
+            {renderMessageContent(leadError)}
           </p>
         ) : null}
 

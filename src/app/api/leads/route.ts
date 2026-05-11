@@ -287,6 +287,15 @@ export async function POST(request: Request) {
     mondayCreated: Boolean(mondayItemId),
   });
 
+  if (process.env.NODE_ENV === "development") {
+    console.log("[Wendy lead persistence]", {
+      supabaseSaved: supabaseLeadResult.persisted,
+      supabaseReason: supabaseLeadResult.reason,
+      mondayCreated: Boolean(mondayItemId),
+      leadSaved,
+    });
+  }
+
   try {
     await logConversationInsight({
       event: "lead_form_submitted",
@@ -305,13 +314,15 @@ export async function POST(request: Request) {
     console.error("Wendy conversation insight logging failed:", error);
   }
 
-  if (!emailSent && !leadSaved) {
+  if (!leadSaved) {
     return Response.json(
       {
         ok: false,
         leadSaved,
+        supabaseSaved: supabaseLeadResult.persisted,
+        mondayCreated: Boolean(mondayItemId),
         error:
-          "Wendy saved the lead, but the email notification could not be sent.",
+          "Wendy could not save the lead right now.",
       },
       { status: 502 },
     );
@@ -320,6 +331,7 @@ export async function POST(request: Request) {
   return Response.json({
     ok: true,
     leadSaved,
+    supabaseSaved: supabaseLeadResult.persisted,
     emailSent,
     mondayCreated: Boolean(mondayItemId),
   });
