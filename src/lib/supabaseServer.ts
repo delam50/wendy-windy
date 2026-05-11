@@ -93,26 +93,53 @@ export async function writeWendyLead(input: WendyLeadInput) {
     return { persisted: false, reason: "supabase_not_configured" };
   }
 
-  const { error } = await supabase.from("wendy_leads").insert({
-    name: input.name,
-    email: input.email || null,
-    phone: input.phone || null,
-    preferred_location: input.preferredLocation,
-    general_concern: input.generalConcern || null,
-    preferred_timing: input.preferredTiming || null,
-    suggested_provider: input.suggestedProvider || null,
-    page_title: input.pageTitle || null,
-    page_url: input.pageUrl || null,
-    source: input.source,
-    metadata: input.metadata ?? {},
-  });
+  const { data, error } = await supabase
+    .from("wendy_leads")
+    .insert({
+      name: input.name,
+      email: input.email || null,
+      phone: input.phone || null,
+      preferred_location: input.preferredLocation,
+      general_concern: input.generalConcern || null,
+      preferred_timing: input.preferredTiming || null,
+      suggested_provider: input.suggestedProvider || null,
+      page_title: input.pageTitle || null,
+      page_url: input.pageUrl || null,
+      source: input.source,
+      metadata: input.metadata ?? {},
+    })
+    .select("id")
+    .maybeSingle<{ id: string }>();
 
   if (error) {
     console.error("Wendy Supabase lead write failed:", error.message);
     return { persisted: false, reason: "supabase_lead_write_failed" };
   }
 
-  return { persisted: true };
+  return { persisted: true, id: data?.id };
+}
+
+export async function updateWendyLeadMondayItemId(
+  leadId: string | undefined,
+  mondayItemId: string,
+) {
+  const supabase = getSupabaseAdmin();
+
+  if (!supabase || !leadId) {
+    return { updated: false, reason: "supabase_not_configured_or_missing_id" };
+  }
+
+  const { error } = await supabase
+    .from("wendy_leads")
+    .update({ monday_item_id: mondayItemId })
+    .eq("id", leadId);
+
+  if (error) {
+    console.error("Wendy Supabase Monday item update failed:", error.message);
+    return { updated: false, reason: "supabase_monday_update_failed" };
+  }
+
+  return { updated: true };
 }
 
 export async function incrementWendyTopicCount(topic: string) {

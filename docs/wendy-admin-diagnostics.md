@@ -80,6 +80,40 @@ SUPABASE_SERVICE_ROLE_KEY=
 
 These must be set in Vercel only as server-side environment variables. Never expose the service role key in client-side code, WordPress snippets, or any `NEXT_PUBLIC_` variable.
 
+## Monday.com Lead Sync
+
+Wendy can also create a new item on the Monday.com board after a lead is saved.
+
+Board:
+
+- Board ID: `18412623102`
+- Board name: `Wendy Leads`
+
+Required server-side environment variables:
+
+```txt
+MONDAY_API_KEY=
+MONDAY_BOARD_ID=18412623102
+MONDAY_COL_TIMING=text_mm38t4nz
+MONDAY_COL_PAGE_URL=link_mm38z0hc
+MONDAY_COL_PHONE=phone_mm38n1
+MONDAY_COL_EMAIL=text_mm38jnwd
+MONDAY_COL_LOCATION=color_mm38546x
+MONDAY_COL_CONCERN=long_text_mm385e6m
+MONDAY_COL_PROVIDER=color_mm382wx5
+MONDAY_COL_STATUS=color_mm387nq4
+```
+
+Expected Monday labels:
+
+- Preferred Location: `Four Corners`, `Big Sky`
+- Suggested Provider: `Dr. Josh`, `Dr. Kyle`, `Dr. Dave`, `Dr. Claire`, `Dr. Michelle`
+- Status: `New`, `Contacted`, `Closed`
+
+Wendy sets new leads to `Status = New`. Bozeman leads are mapped to the Monday `Four Corners` location label. If a label does not exactly match an existing Monday label, Wendy leaves that status/provider/location field blank rather than creating labels dynamically or failing the whole lead.
+
+Monday sync happens after Supabase lead save. If Monday fails, Wendy logs a safe server-side warning and still keeps the visitor experience friendly when the lead was saved. Wendy does not send raw conversation transcripts or detailed health history to Monday.
+
 In production:
 
 - `/api/conversation-insights` returns `200 OK` even when persistence is skipped.

@@ -4,7 +4,11 @@ import path from "node:path";
 import nodemailer from "nodemailer";
 
 import { isProductionRuntime, logConversationInsight } from "@/lib/conversationInsights";
-import { writeWendyLead } from "@/lib/supabaseServer";
+import { createMondayLeadItem } from "@/lib/mondayServer";
+import {
+  updateWendyLeadMondayItemId,
+  writeWendyLead,
+} from "@/lib/supabaseServer";
 
 export const runtime = "nodejs";
 
@@ -200,6 +204,7 @@ export async function POST(request: Request) {
   };
 
   let leadSaved = false;
+  let mondayItemId = "";
 
   const supabaseLeadResult = await writeWendyLead({
     name: leadRecord.name,
@@ -220,6 +225,33 @@ export async function POST(request: Request) {
   });
 
   leadSaved = supabaseLeadResult.persisted;
+
+  if (leadSaved) {
+    try {
+      const mondayResult = await createMondayLeadItem({
+        name: leadRecord.name,
+        email: leadRecord.email,
+        phone: leadRecord.phone,
+        preferredLocation: leadRecord.location,
+        generalConcern: leadRecord.mainConcern,
+        preferredTiming: leadRecord.preferredTiming,
+        suggestedProvider: leadRecord.suggestedProvider,
+        pageUrl: leadRecord.pageUrl,
+      });
+
+      if (mondayResult.created && mondayResult.itemId) {
+        mondayItemId = mondayResult.itemId;
+        await updateWendyLeadMondayItemId(supabaseLeadResult.id, mondayItemId);
+      } else {
+        console.warn("Wendy Monday lead creation skipped or failed:", {
+          reason: mondayResult.reason,
+          supabaseSaved: supabaseLeadResult.persisted,
+        });
+      }
+    } catch (error) {
+      console.error("Wendy Monday lead creation failed:", error);
+    }
+  }
 
   if (!isProductionRuntime()) {
     try {
@@ -252,6 +284,7 @@ export async function POST(request: Request) {
     hasEmail: Boolean(leadRecord.email),
     emailSent,
     supabaseSaved: supabaseLeadResult.persisted,
+    mondayCreated: Boolean(mondayItemId),
   });
 
   try {
@@ -265,13 +298,14 @@ export async function POST(request: Request) {
         leadLocationPreference: leadRecord.location,
         suggestedProvider: leadRecord.suggestedProvider,
         source: "api_leads",
+        resourceTitle: mondayItemId ? "Monday item created" : undefined,
       },
     });
   } catch (error) {
     console.error("Wendy conversation insight logging failed:", error);
   }
 
-  if (!emailSent) {
+  if (!emailSent && !leadSaved) {
     return Response.json(
       {
         ok: false,
@@ -283,5 +317,10 @@ export async function POST(request: Request) {
     );
   }
 
-  return Response.json({ ok: true, leadSaved, emailSent });
+  return Response.json({
+    ok: true,
+    leadSaved,
+    emailSent,
+    mondayCreated: Boolean(mondayItemId),
+  });
 }
