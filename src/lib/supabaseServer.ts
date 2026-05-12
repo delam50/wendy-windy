@@ -151,9 +151,9 @@ export async function incrementWendyTopicCount(topic: string) {
 
   const { data, error: readError } = await supabase
     .from("wendy_topic_counts")
-    .select("topic,count")
-    .eq("topic", topic)
-    .maybeSingle<{ topic: string; count: number | null }>();
+    .select("topic_category,count")
+    .eq("topic_category", topic)
+    .maybeSingle<{ topic_category: string; count: number | null }>();
 
   if (readError) {
     console.error("Wendy Supabase topic count read failed:", readError.message);
@@ -165,11 +165,11 @@ export async function incrementWendyTopicCount(topic: string) {
     .from("wendy_topic_counts")
     .upsert(
       {
-        topic,
+        topic_category: topic,
         count: nextCount,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "topic" },
+      { onConflict: "topic_category" },
     );
 
   if (writeError) {
@@ -219,7 +219,7 @@ export async function getSupabaseDiagnostics() {
       getTableCount("wendy_leads"),
       supabase
         .from("wendy_topic_counts")
-        .select("topic,count")
+        .select("topic_category,count")
         .order("count", { ascending: false })
         .limit(5),
       supabase
@@ -243,7 +243,7 @@ export async function getSupabaseDiagnostics() {
     totalLeads,
     topTopics:
       topics.data?.map((topic) => ({
-        topic: String(topic.topic),
+        topic: String(topic.topic_category),
         count: Number(topic.count ?? 0),
       })) ?? [],
     recentResourceClicks: resourceClicks.data ?? [],
