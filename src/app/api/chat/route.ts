@@ -595,6 +595,13 @@ async function getAdminDiagnosticsReport() {
   const recentTopicCounts = topQuestionTopics
     .map(({ topic, count }) => `${topic}: ${count}`)
     .join(", ") || "No local topic counts available";
+  const funnelCounts = supabaseDiagnostics.funnelCounts;
+  const topPagesByWidgetOpens = supabaseDiagnostics.topPagesByWidgetOpens
+    .map((page) => `${page.pageTitle || page.pageUrl || "Unknown page"}: ${page.count}`)
+    .join(", ") || "No widget-open page data available";
+  const topClickedResources = supabaseDiagnostics.topClickedResources
+    .map((resource) => `${resource.title || resource.url || "Unknown resource"}: ${resource.count}`)
+    .join(", ") || "No resource click data available";
 
   return [
     "Wendy admin status report",
@@ -623,11 +630,22 @@ async function getAdminDiagnosticsReport() {
     `Supabase health: ${supabaseDiagnostics.healthy ? "Healthy" : "Unavailable or not configured"}`,
     `Supabase total events: ${supabaseDiagnostics.totalEvents}`,
     `Supabase total leads: ${supabaseDiagnostics.totalLeads}`,
+    `Funnel widget loads: ${funnelCounts.widget_loaded}`,
+    `Funnel widget opens: ${funnelCounts.widget_opened}`,
+    `Funnel messages sent: ${funnelCounts.message_sent}`,
+    `Funnel assistant responses: ${funnelCounts.assistant_response_received}`,
+    `Funnel resources recommended: ${funnelCounts.resource_recommended}`,
+    `Funnel resource clicks: ${funnelCounts.resource_clicked}`,
+    `Funnel booking clicks: ${funnelCounts.booking_link_clicked}`,
+    `Funnel lead forms opened: ${funnelCounts.lead_form_opened}`,
+    `Funnel leads submitted: ${funnelCounts.lead_submitted}`,
+    `Top pages by widget opens: ${topPagesByWidgetOpens}`,
     supabaseDiagnostics.topTopics.length
       ? `Supabase top topics: ${supabaseDiagnostics.topTopics
           .map(({ topic, count }) => `${topic}: ${count}`)
           .join(", ")}`
       : "Supabase top topics: none available",
+    `Top clicked resources: ${topClickedResources}`,
     supabaseDiagnostics.recentResourceClicks.length
       ? `Recent resource clicks: ${supabaseDiagnostics.recentResourceClicks
           .map((click) => String(click.resource_title || click.resource_url || "resource"))

@@ -20,14 +20,18 @@ type InsightRequestBody = {
 };
 
 const allowedEvents = new Set<ConversationInsightEvent>([
+  "widget_loaded",
   "widget_opened",
   "widget_closed",
   "message_sent",
   "assistant_response_received",
   "quick_action_clicked",
+  "resource_recommended",
+  "resource_clicked",
   "resource_link_clicked",
   "booking_link_clicked",
   "lead_form_opened",
+  "lead_submitted",
   "lead_form_submitted",
   "error_shown",
 ]);
@@ -49,7 +53,10 @@ export async function POST(request: Request) {
       pageUrl: metadata.pageUrl,
       bookingLinkClicked: Boolean(metadata.bookingLinkClicked),
       leadFormOpened: body.event === "lead_form_opened",
-      leadFormSubmitted: body.event === "lead_form_submitted",
+      leadFormSubmitted:
+        body.event === "lead_submitted" ||
+        body.event === "lead_form_submitted",
+      resourceRecommended: body.event === "resource_recommended",
       metadata: {
         quickActionLabel: metadata.quickActionLabel,
         leadLocationPreference: metadata.leadLocationPreference,

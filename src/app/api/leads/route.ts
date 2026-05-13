@@ -298,7 +298,7 @@ export async function POST(request: Request) {
 
   try {
     await logConversationInsight({
-      event: "lead_form_submitted",
+      event: "lead_submitted",
       pageTitle: leadRecord.pageTitle,
       pageUrl: leadRecord.pageUrl,
       leadFormSubmitted: true,

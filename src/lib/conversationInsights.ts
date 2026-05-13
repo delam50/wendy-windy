@@ -9,14 +9,18 @@ import {
 
 export type ConversationInsightEvent =
   | "chat_response"
+  | "widget_loaded"
   | "widget_opened"
   | "widget_closed"
   | "message_sent"
   | "assistant_response_received"
   | "quick_action_clicked"
+  | "resource_recommended"
+  | "resource_clicked"
   | "resource_link_clicked"
   | "booking_link_clicked"
   | "lead_form_opened"
+  | "lead_submitted"
   | "lead_form_submitted"
   | "error_shown";
 
@@ -117,6 +121,18 @@ function sanitizeStringArray(value: unknown) {
   return sanitized.length > 0 ? sanitized : undefined;
 }
 
+function getSupabaseEventName(event: ConversationInsightEvent) {
+  if (event === "resource_link_clicked") {
+    return "resource_clicked";
+  }
+
+  if (event === "lead_form_submitted") {
+    return "lead_submitted";
+  }
+
+  return event;
+}
+
 async function readExistingInsights() {
   try {
     const file = await readFile(insightsFilePath, "utf8");
@@ -188,7 +204,7 @@ export async function logConversationInsight(
     },
   };
   const supabaseResult = await writeWendyEvent({
-    eventName: safeInsight.event,
+    eventName: getSupabaseEventName(safeInsight.event),
     pageTitle: safeInsight.pageTitle,
     pageUrl: safeInsight.pageUrl,
     topicCategory: safeInsight.topicCategory,
@@ -352,9 +368,22 @@ export async function getConversationInsightSummary() {
       bookingLinkClicks += 1;
     }
 
-    if (insight.leadFormOpened) leadFormOpened += 1;
-    if (insight.leadFormSubmitted) leadFormSubmitted += 1;
-    if (insight.resourceRecommended) resourceRecommended += 1;
+    if (insight.leadFormOpened || insight.event === "lead_form_opened") {
+      leadFormOpened += 1;
+    }
+    if (
+      insight.leadFormSubmitted ||
+      insight.event === "lead_submitted" ||
+      insight.event === "lead_form_submitted"
+    ) {
+      leadFormSubmitted += 1;
+    }
+    if (
+      insight.resourceRecommended ||
+      insight.event === "resource_recommended"
+    ) {
+      resourceRecommended += 1;
+    }
 
     for (const intent of insight.detectedIntent ?? []) {
       intentCounts[intent] = (intentCounts[intent] ?? 0) + 1;

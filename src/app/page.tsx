@@ -510,7 +510,7 @@ function renderResourceCards(content: string, resources: ResourceCard[] = []) {
           href={resource.url}
           key={resource.url}
           onClick={() => {
-            trackAnalyticsEvent("resource_link_clicked", {
+            trackAnalyticsEvent("resource_clicked", {
               ...getAnalyticsPageMetadata(),
               resourceTitle: resource.title,
               resourceUrl: resource.url,
@@ -786,6 +786,7 @@ export default function Home() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const latestAssistantMessageRef = useRef<HTMLDivElement | null>(null);
   const launcherButtonRef = useRef<HTMLButtonElement | null>(null);
+  const widgetLoadedTrackedRef = useRef(false);
   const [isOpen, setIsOpen] = useState(false);
   const [shouldRunLauncherKnock, setShouldRunLauncherKnock] = useState(() =>
     shouldPlayLauncherKnock(),
@@ -847,6 +848,18 @@ export default function Home() {
       bookingLinkClicked: hasClickedBookingLink,
     });
   }, [hasClickedBookingLink, messages, sessionMemory]);
+
+  useEffect(() => {
+    if (widgetLoadedTrackedRef.current) {
+      return;
+    }
+
+    widgetLoadedTrackedRef.current = true;
+    trackAnalyticsEvent("widget_loaded", {
+      ...getAnalyticsPageMetadata(),
+      bookingLinkClicked: hasClickedBookingLink,
+    });
+  }, [hasClickedBookingLink]);
 
   useEffect(() => {
     if (initialQuickActionResult.source !== "default") {
@@ -1167,6 +1180,20 @@ export default function Home() {
             : message,
         ),
       );
+
+      if (assistantResources.length > 0) {
+        const primaryResource = assistantResources[0];
+        trackAnalyticsEvent("resource_recommended", {
+          ...getAnalyticsPageMetadata(),
+          bookingLinkClicked: hasClickedBookingLink,
+          resourceTitle: primaryResource.title,
+          resourceUrl: primaryResource.url,
+          source:
+            assistantResources.length > 1
+              ? `assistant_response_${assistantResources.length}_cards`
+              : "assistant_response",
+        });
+      }
     } catch {
       setError(friendlyConnectionError);
       trackAnalyticsEvent("error_shown", {
@@ -1408,7 +1435,7 @@ export default function Home() {
         bookingInfoProvided: true,
         bookingLinkClicked: true,
       }));
-      trackAnalyticsEvent("lead_form_submitted", {
+      trackAnalyticsEvent("lead_submitted", {
         ...getAnalyticsPageMetadata(),
         bookingLinkClicked: hasClickedBookingLink,
         leadLocationPreference: leadForm.location,

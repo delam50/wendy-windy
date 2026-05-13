@@ -29,6 +29,109 @@ type WendyLeadInput = {
   metadata?: Record<string, unknown>;
 };
 
+const funnelEventNames = [
+  "widget_loaded",
+  "widget_opened",
+  "message_sent",
+  "assistant_response_received",
+  "resource_recommended",
+  "resource_clicked",
+  "booking_link_clicked",
+  "lead_form_opened",
+  "lead_submitted",
+] as const;
+
+type FunnelEventName = (typeof funnelEventNames)[number];
+type FunnelCounts = Record<FunnelEventName, number>;
+
+type WendyEventRow = {
+  event_name: string | null;
+  page_title: string | null;
+  page_url: string | null;
+  resource_title: string | null;
+  resource_url: string | null;
+  topic_category: string | null;
+};
+
+function createEmptyFunnelCounts(): FunnelCounts {
+  return Object.fromEntries(
+    funnelEventNames.map((eventName) => [eventName, 0]),
+  ) as FunnelCounts;
+}
+
+function normalizeFunnelEventName(eventName: string | null | undefined) {
+  if (eventName === "resource_link_clicked") return "resource_clicked";
+  if (eventName === "lead_form_submitted") return "lead_submitted";
+
+  return funnelEventNames.includes(eventName as FunnelEventName)
+    ? (eventName as FunnelEventName)
+    : undefined;
+}
+
+function sortCountEntries<T extends { count: number }>(items: T[]) {
+  return items.sort((first, second) => second.count - first.count);
+}
+
+function summarizeFunnelEvents(events: WendyEventRow[] = []) {
+  const funnelCounts = createEmptyFunnelCounts();
+  const pageOpenCounts = new Map<
+    string,
+    { pageTitle?: string; pageUrl?: string; count: number }
+  >();
+  const resourceClickCounts = new Map<
+    string,
+    { title?: string; url?: string; count: number }
+  >();
+  const recentResourceClicks: WendyEventRow[] = [];
+  const recentBookingClicks: WendyEventRow[] = [];
+
+  for (const event of events) {
+    const funnelEventName = normalizeFunnelEventName(event.event_name);
+
+    if (funnelEventName) {
+      funnelCounts[funnelEventName] += 1;
+    }
+
+    if (funnelEventName === "widget_opened") {
+      const key = event.page_url || event.page_title || "Unknown page";
+      const existing = pageOpenCounts.get(key);
+      pageOpenCounts.set(key, {
+        pageTitle: event.page_title || existing?.pageTitle || undefined,
+        pageUrl: event.page_url || existing?.pageUrl || undefined,
+        count: (existing?.count ?? 0) + 1,
+      });
+    }
+
+    if (funnelEventName === "resource_clicked") {
+      if (recentResourceClicks.length < 5) {
+        recentResourceClicks.push(event);
+      }
+
+      const key = event.resource_url || event.resource_title || "Unknown resource";
+      const existing = resourceClickCounts.get(key);
+      resourceClickCounts.set(key, {
+        title: event.resource_title || existing?.title || undefined,
+        url: event.resource_url || existing?.url || undefined,
+        count: (existing?.count ?? 0) + 1,
+      });
+    }
+
+    if (funnelEventName === "booking_link_clicked" && recentBookingClicks.length < 5) {
+      recentBookingClicks.push(event);
+    }
+  }
+
+  return {
+    funnelCounts,
+    topPagesByWidgetOpens: sortCountEntries(Array.from(pageOpenCounts.values()))
+      .slice(0, 5),
+    topClickedResources: sortCountEntries(Array.from(resourceClickCounts.values()))
+      .slice(0, 5),
+    recentResourceClicks,
+    recentBookingClicks,
+  };
+}
+
 export function isSupabaseConfigured() {
   return Boolean(
     process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -202,18 +305,23 @@ export async function getSupabaseDiagnostics() {
   const supabase = getSupabaseAdmin();
 
   if (!supabase) {
+    const emptyFunnel = summarizeFunnelEvents();
+
     return {
       configured: false,
       healthy: false,
       totalEvents: 0,
       totalLeads: 0,
+      funnelCounts: emptyFunnel.funnelCounts,
+      topPagesByWidgetOpens: emptyFunnel.topPagesByWidgetOpens,
       topTopics: [] as Array<{ topic: string; count: number }>,
-      recentResourceClicks: [] as Array<Record<string, unknown>>,
-      recentBookingClicks: [] as Array<Record<string, unknown>>,
+      topClickedResources: emptyFunnel.topClickedResources,
+      recentResourceClicks: emptyFunnel.recentResourceClicks,
+      recentBookingClicks: emptyFunnel.recentBookingClicks,
     };
   }
 
-  const [totalEvents, totalLeads, topics, resourceClicks, bookingClicks] =
+  const [totalEvents, totalLeads, topics, events] =
     await Promise.all([
       getTableCount("wendy_events"),
       getTableCount("wendy_leads"),
@@ -224,29 +332,26 @@ export async function getSupabaseDiagnostics() {
         .limit(5),
       supabase
         .from("wendy_events")
-        .select("event_name,resource_title,resource_url,topic_category,page_url")
-        .in("event_name", ["resource_clicked", "resource_link_clicked"])
+        .select("event_name,page_title,page_url,resource_title,resource_url,topic_category")
         .order("created_at", { ascending: false })
-        .limit(5),
-      supabase
-        .from("wendy_events")
-        .select("event_name,page_url,topic_category,preferred_location")
-        .eq("event_name", "booking_link_clicked")
-        .order("created_at", { ascending: false })
-        .limit(5),
+        .limit(2000),
     ]);
+  const eventSummary = summarizeFunnelEvents((events.data ?? []) as WendyEventRow[]);
 
   return {
     configured: true,
-    healthy: !topics.error && !resourceClicks.error && !bookingClicks.error,
+    healthy: !topics.error && !events.error,
     totalEvents,
     totalLeads,
+    funnelCounts: eventSummary.funnelCounts,
+    topPagesByWidgetOpens: eventSummary.topPagesByWidgetOpens,
     topTopics:
       topics.data?.map((topic) => ({
         topic: String(topic.topic_category),
         count: Number(topic.count ?? 0),
       })) ?? [],
-    recentResourceClicks: resourceClicks.data ?? [],
-    recentBookingClicks: bookingClicks.data ?? [],
+    topClickedResources: eventSummary.topClickedResources,
+    recentResourceClicks: eventSummary.recentResourceClicks,
+    recentBookingClicks: eventSummary.recentBookingClicks,
   };
 }
