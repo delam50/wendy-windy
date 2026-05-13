@@ -63,6 +63,7 @@ type PageContext = {
 
 const SESSION_MESSAGES_KEY = "wendy.session.messages";
 const SESSION_MEMORY_KEY = "wendy.session.memory";
+const SESSION_ID_KEY = "wendy.session.id";
 const SESSION_LAUNCHER_KNOCK_KEY = "wendy.session.launcherKnockPlayed";
 const MAX_SESSION_MESSAGES = 12;
 
@@ -612,7 +613,28 @@ function getAnalyticsPageMetadata() {
   return {
     pageTitle: pageContext.pageTitle || undefined,
     pageUrl: pageContext.pageUrl || undefined,
+    sessionId: getWendySessionId() || undefined,
   };
+}
+
+function getWendySessionId() {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  const existingSessionId = window.sessionStorage.getItem(SESSION_ID_KEY);
+
+  if (existingSessionId) {
+    return existingSessionId;
+  }
+
+  const nextSessionId =
+    typeof window.crypto?.randomUUID === "function"
+      ? window.crypto.randomUUID()
+      : `wendy-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+  window.sessionStorage.setItem(SESSION_ID_KEY, nextSessionId);
+  return nextSessionId;
 }
 
 function hasBookingIntent(content: string) {
@@ -1100,6 +1122,7 @@ export default function Home() {
         body: JSON.stringify({
           messages: nextMessages,
           sessionMemory: nextMemory,
+          sessionId: getWendySessionId(),
           ...getPageContext(),
         }),
       });
@@ -1365,6 +1388,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           ...leadForm,
+          sessionId: getWendySessionId(),
           pageTitle: getPageContext().pageTitle,
           pageUrl: getPageContext().pageUrl,
         }),

@@ -21,6 +21,7 @@ type LeadRequestBody = {
   preferredTiming?: string;
   pageTitle?: string;
   pageUrl?: string;
+  sessionId?: string;
   suggestedProvider?: string;
 };
 
@@ -53,6 +54,7 @@ function normalizeLead(body: LeadRequestBody) {
     preferredTiming: sanitize(body.preferredTiming, 160),
     pageTitle: sanitize(body.pageTitle, 180),
     pageUrl: sanitize(body.pageUrl, 500),
+    sessionId: sanitize(body.sessionId, 120),
     suggestedProvider: sanitize(body.suggestedProvider, 120),
   };
 }
@@ -221,6 +223,7 @@ export async function POST(request: Request) {
       status: leadRecord.status,
       hasPhone: Boolean(leadRecord.phone),
       hasEmail: Boolean(leadRecord.email),
+      sessionId: leadRecord.sessionId,
     },
   });
 
@@ -307,6 +310,7 @@ export async function POST(request: Request) {
         leadLocationPreference: leadRecord.location,
         suggestedProvider: leadRecord.suggestedProvider,
         source: "api_leads",
+        sessionId: leadRecord.sessionId,
         resourceTitle: mondayItemId ? "Monday item created" : undefined,
       },
     });

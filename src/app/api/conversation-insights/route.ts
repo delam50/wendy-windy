@@ -16,6 +16,8 @@ type InsightRequestBody = {
     source?: string;
     resourceTitle?: string;
     resourceUrl?: string;
+    sessionId?: string;
+    conversationId?: string;
   };
 };
 
@@ -64,6 +66,8 @@ export async function POST(request: Request) {
         errorType: metadata.errorType,
         resourceTitle: metadata.resourceTitle,
         resourceUrl: metadata.resourceUrl,
+        sessionId: metadata.sessionId,
+        conversationId: metadata.conversationId,
       },
     });
 

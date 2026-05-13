@@ -5,6 +5,11 @@ import path from "node:path";
 
 import { formatClinicKnowledge } from "@/data/knowledge";
 import {
+  archiveWendyMessage,
+  getRecentWendyConversationSummaries,
+  WENDY_CONVERSATION_RETENTION_DAYS,
+} from "@/lib/conversationArchive";
+import {
   getConversationInsightSummary,
   getTopQuestionTopics,
   incrementQuestionTopicCount,
@@ -41,6 +46,7 @@ type ChatRequestBody = {
   pageContext?: string;
   pageTitle?: string;
   pageUrl?: string;
+  sessionId?: string;
   sessionMemory?: SessionMemory;
 };
 
@@ -55,6 +61,8 @@ type IntentCategory =
 
 const MAX_API_MESSAGES = 10;
 const ADMIN_DIAGNOSTIC_TERMS = /\b(status|diagnostics?|usage|report|performance|health|system\s+report)\b/i;
+const ADMIN_CONVERSATION_REVIEW_TERMS =
+  /\b(show|review|summarize|list|recent|conversations?|chats?)\b.*\b(wendy|conversations?|chats?|dry needling|leads?|resources?)\b|\b(conversations?|chats?)\s+(about|that became|where)\b/i;
 
 function isChatMessage(value: unknown): value is ChatMessage {
   if (!value || typeof value !== "object") {
@@ -138,6 +146,10 @@ function isAdminDiagnosticsRequest(messages: ChatMessage[]) {
   return ADMIN_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages));
 }
 
+function isAdminConversationReviewRequest(messages: ChatMessage[]) {
+  return ADMIN_CONVERSATION_REVIEW_TERMS.test(getLatestUserContent(messages));
+}
+
 function hasValidAdminCode(messages: ChatMessage[]) {
   const adminCode = process.env.WENDY_ADMIN_CODE?.trim();
   const latestUserMessage = getLatestUserContent(messages).trim();
@@ -149,12 +161,15 @@ function getAdminDiagnosticsFlags(messages: ChatMessage[]) {
   const adminEnvExists = Boolean(process.env.WENDY_ADMIN_CODE?.trim());
   const adminCodeDetected = hasValidAdminCode(messages);
   const adminIntentDetected = isAdminDiagnosticsRequest(messages);
+  const adminReviewDetected = isAdminConversationReviewRequest(messages);
 
   return {
     adminEnvExists,
     adminCodeDetected,
     adminIntentDetected,
+    adminReviewDetected,
     diagnosticsModeActivated: adminCodeDetected && adminIntentDetected,
+    conversationReviewModeActivated: adminCodeDetected && adminReviewDetected,
   };
 }
 
@@ -333,6 +348,47 @@ function getProviderRoutingGuidance(messages: ChatMessage[], pageContext: string
   }
 
   return guidance;
+}
+
+function inferSuggestedProvider(messages: ChatMessage[], pageContext: string) {
+  const text = `${getLatestUserContent(messages)}\n${pageContext}`.toLowerCase();
+
+  if (/\b(pet|pets|dog|dogs|cat|cats|animal|animals|small animal|veterinary)\b/.test(text)) {
+    return "Dr. Josh";
+  }
+
+  if (/\b(pregnan|postpartum|newborn|baby|infant|pediatric|child|kids|mom|moms)\b/.test(text)) {
+    return "Dr. Claire";
+  }
+
+  if (/\b(active|outdoor|ski|skiing|hiking|athlete|performance|training|rehab|mobility|movement|sport)\b/.test(text)) {
+    return "Dr. Kyle";
+  }
+
+  if (/\b(massage|massage therapy|bodywork)\b/.test(text) && /\bbig sky\b/.test(text)) {
+    return "Nichole";
+  }
+
+  if (/\b(massage|massage therapy|bodywork)\b/.test(text) && /\b(bozeman|four corners|belgrade|gallatin)\b/.test(text)) {
+    return "James";
+  }
+
+  if (/\b(kyle|dave|josh|claire|michelle|nichole|james)\b/.test(text)) {
+    const match = text.match(/\b(dr\.?\s*)?(kyle|dave|josh|claire|michelle|nichole|james)\b/);
+    const name = match?.[2];
+
+    if (!name) {
+      return undefined;
+    }
+
+    if (name === "nichole" || name === "james") {
+      return name[0].toUpperCase() + name.slice(1);
+    }
+
+    return `Dr. ${name[0].toUpperCase()}${name.slice(1)}`;
+  }
+
+  return undefined;
 }
 
 function getPricingLocationGuidance(messages: ChatMessage[], pageContext: string) {
@@ -571,6 +627,71 @@ function getBlogIndexDiagnostics() {
   }
 }
 
+function getConversationReviewFilters(messages: ChatMessage[]) {
+  const latest = getLatestUserContent(messages).toLowerCase();
+  const aboutMatch = latest.match(/\b(?:about|on)\s+([a-z0-9\s/-]{2,60})/i);
+  const topic = aboutMatch?.[1]
+    ?.replace(/\b(manager code|show|recent|wendy|conversations?|chats?)\b/gi, "")
+    .trim();
+
+  return {
+    topic: topic || undefined,
+    leadOnly: /\b(became leads?|lead submitted|submitted leads?|converted)\b/i.test(latest),
+    resourcesOnly: /\b(recommended resources?|resources recommended|resource cards?|articles recommended)\b/i.test(latest),
+  };
+}
+
+async function getAdminConversationReviewReport(messages: ChatMessage[]) {
+  const filters = getConversationReviewFilters(messages);
+  const result = await getRecentWendyConversationSummaries({
+    ...filters,
+    limit: 8,
+  });
+
+  if (!result.available) {
+    return [
+      "Wendy conversation review",
+      "",
+      "Conversation archive is not available right now. Supabase may be unconfigured locally, or the archive tables may not exist yet.",
+      "This does not affect Wendy's normal chat, lead capture, or analytics behavior.",
+    ].join("\n");
+  }
+
+  if (result.conversations.length === 0) {
+    return [
+      "Wendy conversation review",
+      "",
+      "No matching recent conversations found.",
+      `Archive retention target: ${WENDY_CONVERSATION_RETENTION_DAYS} days.`,
+    ].join("\n");
+  }
+
+  return [
+    "Wendy conversation review",
+    "",
+    `Showing up to ${result.conversations.length} recent short-term QA conversations.`,
+    `Filters: ${[
+      filters.topic ? `topic "${filters.topic}"` : "",
+      filters.leadOnly ? "became leads" : "",
+      filters.resourcesOnly ? "recommended resources" : "",
+    ].filter(Boolean).join(", ") || "recent conversations"}`,
+    "",
+    ...result.conversations.map((conversation, index) =>
+      [
+        `${index + 1}. ${new Date(conversation.updatedAt).toLocaleString("en-US", { timeZone: "America/Denver" })}`,
+        `Topic: ${conversation.inferredTopic || "unknown"}`,
+        `Intent: ${conversation.detectedIntent || "unknown"}`,
+        `Page: ${conversation.pageTitle || conversation.pageUrl || "unknown"}`,
+        `Lead submitted: ${conversation.leadSubmitted ? "yes" : "no"} | Resources: ${conversation.resourceCount} | Booking clicked: ${conversation.bookingClicked ? "yes" : "no"}`,
+        conversation.suggestedProvider ? `Suggested provider: ${conversation.suggestedProvider}` : "",
+        `Excerpt: ${conversation.excerpt}`,
+      ].filter(Boolean).join("\n"),
+    ),
+    "",
+    "These excerpts are redacted and intended for short-term QA review only, not medical records or lead-detail review.",
+  ].join("\n\n");
+}
+
 async function getAdminDiagnosticsReport() {
   const blogIndex = getBlogIndexDiagnostics();
   const janeKnowledge = readGeneratedFile("jane-knowledge.md");
@@ -626,6 +747,7 @@ async function getAdminDiagnosticsReport() {
         ? "Healthy; production filesystem persistence is skipped safely"
         : "Healthy; local JSON persistence enabled"
     }`,
+    `Conversation archive retention target: ${WENDY_CONVERSATION_RETENTION_DAYS} days`,
     `Supabase configured: ${supabaseDiagnostics.configured ? "Yes" : "No"}`,
     `Supabase health: ${supabaseDiagnostics.healthy ? "Healthy" : "Unavailable or not configured"}`,
     `Supabase total events: ${supabaseDiagnostics.totalEvents}`,
@@ -668,6 +790,9 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as ChatRequestBody;
   const messages = getMessages(body);
   const pageContext = getPageContext(body);
+  const sessionId = sanitizeContextValue(body.sessionId, 120);
+  const pageTitle = sanitizeContextValue(body.pageTitle, 180);
+  const pageUrl = sanitizeContextValue(body.pageUrl, 500);
 
   if (messages.length === 0) {
     return Response.json(
@@ -682,11 +807,21 @@ export async function POST(request: Request) {
     console.log("[Wendy admin diagnostics]", adminDiagnosticsFlags);
   }
 
-  if (adminDiagnosticsFlags.adminIntentDetected) {
+  if (
+    adminDiagnosticsFlags.adminIntentDetected ||
+    adminDiagnosticsFlags.adminReviewDetected
+  ) {
     if (!adminDiagnosticsFlags.adminCodeDetected) {
       return Response.json({
         message:
-          "I can help with general Windy Ridge website questions, but admin diagnostics are only available to authorized managers.",
+          "I can help with general Windy Ridge website questions, but admin diagnostics and conversation review are only available to authorized managers.",
+        resources: [],
+      });
+    }
+
+    if (adminDiagnosticsFlags.conversationReviewModeActivated) {
+      return Response.json({
+        message: await getAdminConversationReviewReport(messages),
         resources: [],
       });
     }
@@ -702,7 +837,7 @@ export async function POST(request: Request) {
   if (adminDiagnosticsFlags.adminCodeDetected) {
     return Response.json({
       message:
-        "I can help with Wendy diagnostics when you ask for a status, diagnostics, usage, performance, health, or system report.",
+        "I can help with Wendy diagnostics when you ask for a status report, or I can show recent Wendy conversations for QA review.",
       resources: [],
     });
   }
@@ -724,6 +859,7 @@ export async function POST(request: Request) {
   const sessionMemoryContext = formatSessionMemory(sessionMemory);
   const detectedIntents = detectIntentCategories(messages, pageContext);
   const topicCategory = detectTopicCategory(messages, pageContext);
+  const suggestedProvider = inferSuggestedProvider(messages, pageContext);
   const intentGuidance = formatIntentGuidance(messages, pageContext, sessionMemory);
   const hasResourceIntent = userHasResourceIntent(messages);
   const wantsMoreResources = userWantsMoreResources(messages);
@@ -766,6 +902,30 @@ export async function POST(request: Request) {
     url: resource.url,
     type: resource.type,
   }));
+  let conversationId: string | undefined;
+
+  if (sessionId) {
+    const userArchiveResult = await archiveWendyMessage({
+      sessionId,
+      pageTitle,
+      pageUrl,
+      inferredTopic: topicCategory,
+      detectedIntent: detectedIntents.join(", "),
+      preferredLocation: sessionMemory.preferredLocation,
+      suggestedProvider,
+      resourceCount: publicResources.length,
+      bookingClicked: Boolean(sessionMemory.bookingLinkClicked),
+      role: "user",
+      content: getLatestUserContent(messages),
+      metadata: {
+        source: "api_chat",
+        hasResourceIntent,
+        wantsMoreResources,
+      },
+    });
+
+    conversationId = userArchiveResult.conversationId;
+  }
 
   try {
     const completion = await openai.chat.completions.create({
@@ -828,10 +988,32 @@ URL: ${resource.url}`,
     }
 
     try {
+      if (sessionId) {
+        const assistantArchiveResult = await archiveWendyMessage({
+          sessionId,
+          conversationId,
+          pageTitle,
+          pageUrl,
+          inferredTopic: topicCategory,
+          detectedIntent: detectedIntents.join(", "),
+          preferredLocation: sessionMemory.preferredLocation,
+          suggestedProvider,
+          resourceCount: publicResources.length,
+          bookingClicked: Boolean(sessionMemory.bookingLinkClicked),
+          role: "assistant",
+          content: message,
+          metadata: {
+            source: "api_chat",
+            resourceTitles: publicResources.map((resource) => resource.title).slice(0, 4),
+          },
+        });
+        conversationId = assistantArchiveResult.conversationId ?? conversationId;
+      }
+
       await logConversationInsight({
         event: "chat_response",
-        pageTitle: sanitizeContextValue(body.pageTitle, 180),
-        pageUrl: sanitizeContextValue(body.pageUrl, 500),
+        pageTitle,
+        pageUrl,
         detectedIntent: detectedIntents,
         bookingLinkClicked: Boolean(sessionMemory.bookingLinkClicked),
         resourceRecommended:
@@ -843,6 +1025,9 @@ URL: ${resource.url}`,
         metadata: {
           resourceTitle: resources[0]?.title,
           resourceUrl: resources[0]?.url,
+          sessionId,
+          conversationId,
+          suggestedProvider,
           source: "api_chat",
         },
       });

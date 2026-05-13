@@ -22,10 +22,12 @@ export type WendyAnalyticsMetadata = {
   leadLocationPreference?: string;
   messageLength?: number;
   assistantResponseLength?: number;
+  conversationId?: string;
   errorType?: string;
   source?: string;
   resourceTitle?: string;
   resourceUrl?: string;
+  sessionId?: string;
 };
 
 export type WendyAnalyticsEvent = {

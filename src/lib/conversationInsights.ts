@@ -6,6 +6,7 @@ import {
   incrementWendyTopicCount,
   writeWendyEvent,
 } from "@/lib/supabaseServer";
+import { updateWendyConversationFromInsight } from "@/lib/conversationArchive";
 
 export type ConversationInsightEvent =
   | "chat_response"
@@ -43,6 +44,8 @@ export type ConversationInsight = {
     errorType?: string;
     resourceTitle?: string;
     resourceUrl?: string;
+    sessionId?: string;
+    conversationId?: string;
     suggestedProvider?: string;
   };
 };
@@ -199,6 +202,8 @@ export async function logConversationInsight(
       errorType: sanitizeText(insight.metadata?.errorType, 80) || undefined,
       resourceTitle: sanitizeText(insight.metadata?.resourceTitle, 180) || undefined,
       resourceUrl: sanitizeUrl(insight.metadata?.resourceUrl) || undefined,
+      sessionId: sanitizeText(insight.metadata?.sessionId, 120) || undefined,
+      conversationId: sanitizeText(insight.metadata?.conversationId, 120) || undefined,
       suggestedProvider:
         sanitizeText(insight.metadata?.suggestedProvider, 120) || undefined,
     },
@@ -221,8 +226,43 @@ export async function logConversationInsight(
       quickActionLabel: safeInsight.metadata?.quickActionLabel,
       source: safeInsight.metadata?.source,
       errorType: safeInsight.metadata?.errorType,
+      sessionId: safeInsight.metadata?.sessionId,
+      conversationId: safeInsight.metadata?.conversationId,
     },
   });
+
+  if (
+    [
+      "chat_response",
+      "message_sent",
+      "resource_recommended",
+      "resource_clicked",
+      "resource_link_clicked",
+      "booking_link_clicked",
+      "lead_form_opened",
+      "lead_submitted",
+      "lead_form_submitted",
+    ].includes(safeInsight.event)
+  ) {
+    await updateWendyConversationFromInsight({
+      sessionId: safeInsight.metadata?.sessionId,
+      conversationId: safeInsight.metadata?.conversationId,
+      pageTitle: safeInsight.pageTitle,
+      pageUrl: safeInsight.pageUrl,
+      inferredTopic: safeInsight.topicCategory,
+      detectedIntent: safeInsight.detectedIntent?.join(", "),
+      preferredLocation: safeInsight.metadata?.leadLocationPreference,
+      suggestedProvider: safeInsight.metadata?.suggestedProvider,
+      leadSubmitted: safeInsight.leadFormSubmitted,
+      resourceCount: safeInsight.resourceRecommended ? 1 : undefined,
+      bookingClicked: safeInsight.bookingLinkClicked,
+      metadata: {
+        event: getSupabaseEventName(safeInsight.event),
+        resourceTitle: safeInsight.metadata?.resourceTitle,
+        resourceUrl: safeInsight.metadata?.resourceUrl,
+      },
+    });
+  }
 
   if (isProductionRuntime()) {
     return supabaseResult.persisted
