@@ -739,6 +739,21 @@ function getBlogArticleSearchText(article: BlogIndexArticle) {
   );
 }
 
+function getBlogArticleStrongFields(article: BlogIndexArticle) {
+  return normalize(
+    [
+      article.title,
+      article.url,
+      article.category,
+      article.tags?.join(" "),
+      article.relevantKeywords?.join(" "),
+      article.headings?.join(" "),
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+}
+
 const RESOURCE_TOPIC_GROUPS = [
   {
     label: "dry needling",
@@ -866,6 +881,7 @@ function scoreBlogArticle(
   const normalizedHeadings = normalize(article.headings?.join(" ") ?? "");
   const normalizedExcerpt = normalize(`${article.summary ?? ""} ${article.excerpt ?? ""}`);
   const searchText = getBlogArticleSearchText(article);
+  const strongFieldText = getBlogArticleStrongFields(article);
   const contextText = `${normalizedQuery} ${normalizedConversationContext} ${normalizedPageContext}`;
   const reasons: string[] = [];
   let score = 0;
@@ -888,6 +904,32 @@ function scoreBlogArticle(
       score += fieldScore;
     } else {
       score -= 24;
+    }
+  }
+
+  if (/\b(pediatric|pediatrics|kids?|child|children|toddler|baby|newborn|growing pains?)\b/.test(contextText)) {
+    if (!/\b(pediatric|pediatrics|kids?|child|children|toddler|baby|newborn|growing pains?)\b/.test(strongFieldText)) {
+      score -= 180;
+      reasons.push("penalty: pediatric intent without pediatric title/slug/tag/category/heading match");
+    }
+  }
+
+  if (/\bgrowing pains?\b/.test(contextText) && !/\bgrowing pains?\b/.test(strongFieldText)) {
+    score -= 220;
+    reasons.push("penalty: growing-pains intent without direct growing-pains match");
+  }
+
+  if (/\b(pregnan|prenatal|postpartum|perinatal|women'?s health)\b/.test(contextText)) {
+    if (!/\b(pregnan|prenatal|postpartum|perinatal|women'?s health)\b/.test(strongFieldText)) {
+      score -= 160;
+      reasons.push("penalty: pregnancy/perinatal intent without strong field match");
+    }
+  }
+
+  if (/\b(dr\.?|doctor|provider|who should|which provider|which doctor)\b/.test(contextText)) {
+    if (!/\b(provider|doctor|dr\.?|kyle|david|dave|josh|claire|michelle|nichole|james|staff|location|service)\b/.test(strongFieldText)) {
+      score -= 120;
+      reasons.push("penalty: provider intent without provider/location/service match");
     }
   }
 
@@ -994,7 +1036,7 @@ function retrieveBlogResources(
 ) {
   const queryKeywords = extractKeywords(input.query);
   const pageKeywords = extractKeywords(input.pageContext);
-  const fallbackMinimumScore = input.wantsMoreResources ? 6 : 10;
+  const fallbackMinimumScore = input.wantsMoreResources ? 48 : 58;
   const seenUrls = new Set<string>();
   const scoredArticles = loadBlogIndex()
     .filter((article) => !excludedUrls.has(article.url.toLowerCase()))
@@ -1029,19 +1071,6 @@ function retrieveBlogResources(
       score,
     }));
 
-  const selectedResources = resources.length > 0
-    ? resources
-    : scoredArticles
-      .filter(({ article }) => !seenUrls.has(article.url.toLowerCase()))
-      .slice(0, limit)
-      .map<RetrievedResource>(({ article, score }) => ({
-        title: article.title,
-        summary: getBlogArticleSummary(article),
-        url: article.url,
-        type: article.category ? `Blog • ${article.category}` : "Blog",
-        score,
-      }));
-
   if (process.env.NODE_ENV !== "production" && input.query.trim()) {
     console.log("[Wendy blog retrieval]", {
       query: input.query,
@@ -1055,7 +1084,7 @@ function retrieveBlogResources(
     });
   }
 
-  return selectedResources;
+  return resources;
 }
 
 function isJaneBookingChunk(chunk: KnowledgeChunk) {
@@ -1078,12 +1107,13 @@ export function retrieveResources(
     /\b(blogs?|articles?|resources?|more reading|additional reading|send me a link|send a link|link|more info|anything on this|read more|reading)\b/i.test(
       retrievalInput.query,
     );
+  const asksForBlogOrArticle = /\b(blogs?|articles?)\b/i.test(retrievalInput.query);
 
   if (limit <= 0) {
     return [];
   }
 
-  const fallbackMinimumScore = retrievalInput.wantsMoreResources ? 8 : 12;
+  const fallbackMinimumScore = retrievalInput.wantsMoreResources ? 42 : 56;
   const seenUrls = new Set<string>();
   const blogResources = retrieveBlogResources(retrievalInput, limit, excludedUrls);
 
@@ -1091,7 +1121,9 @@ export function retrieveResources(
     seenUrls.add(resource.url.toLowerCase());
   }
 
-  const resources = loadKnowledgeChunks()
+  const resources = asksForBlogOrArticle
+    ? []
+    : loadKnowledgeChunks()
     .filter((chunk) => chunk.url)
     .filter((chunk) => {
       const url = chunk.url?.toLowerCase() ?? "";
@@ -1148,29 +1180,14 @@ export function retrieveResources(
     return combinedResources;
   }
 
-  if (!hasExplicitResourceIntent) {
-    return [];
+  if (process.env.NODE_ENV !== "production" && hasExplicitResourceIntent) {
+    console.log("[Wendy resource retrieval]", {
+      message: "No high-confidence resource cards returned.",
+      query: retrievalInput.query,
+    });
   }
 
-  return loadKnowledgeChunks()
-    .filter((chunk) => chunk.url && !excludedUrls.has(chunk.url.toLowerCase()))
-    .filter((chunk) => isResourceCandidate(chunk))
-    .sort((a, b) => {
-      const aType = getResourceType(a);
-      const bType = getResourceType(b);
-      const typeWeight = (type: string) =>
-        type === "First Visit Guide" ? 4 : type === "Service Page" ? 3 : type === "Blog" ? 2 : 1;
-
-      return typeWeight(bType) - typeWeight(aType);
-    })
-    .slice(0, limit)
-    .map((chunk) => ({
-      title: chunk.title,
-      summary: getResourceSummary(chunk),
-      url: chunk.url ?? "",
-      type: getResourceType(chunk),
-      score: 0,
-    }));
+  return [];
 }
 
 export function retrieveKnowledge(

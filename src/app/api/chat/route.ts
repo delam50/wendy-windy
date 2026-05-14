@@ -11,6 +11,10 @@ import {
   WENDY_CONVERSATION_RETENTION_DAYS,
 } from "@/lib/conversationArchive";
 import {
+  formatProviderRankingContext,
+  rankWendyProviders,
+} from "@/lib/providers";
+import {
   getConversationInsightSummary,
   getTopQuestionTopics,
   incrementQuestionTopicCount,
@@ -369,7 +373,7 @@ function getProviderRoutingGuidance(messages: ChatMessage[], pageContext: string
 
   if (/\b(active|outdoor|ski|skiing|hiking|athlete|performance|training|trail|runner|rehab|mobility|movement|sport)\b/.test(text)) {
     guidance.push(
-      "Active, outdoor, performance, skiing, hiking, rehab, or movement restoration goals: conversationally mention Dr. Kyle; he practices at both locations, with Big Sky on Thursdays only.",
+      "Active, outdoor, sports, performance, skiing, hiking, lower limb, ankle mobility, rehab, or movement restoration goals: Dr. Kyle is a strong option; he practices at both locations, with Big Sky on Thursdays only.",
     );
   }
 
@@ -401,52 +405,27 @@ function getProviderRoutingGuidance(messages: ChatMessage[], pageContext: string
     !/\b(pregnan|postpartum|newborn|baby|pediatric|massage|ski|skiing|athlete|performance|rehab|pet|dog|cat|animal|veterinary)\b/.test(text)
   ) {
     guidance.push(
-      "General Four Corners chiropractic care: conversationally mention Dr. Josh or Dr. Dave. Dr. Dave is the senior provider and clinic owner; Dr. Josh practices at Four Corners only.",
+      "General Four Corners chiropractic care, including broad neck or back pain: conversationally mention Dr. David or Dr. Josh as strong general options. Do not default to Dr. Kyle unless the user mentions sports, performance, ankle/lower limb, mobility, skiing, hiking, dry needling, or soft tissue care.",
     );
   }
+
+  guidance.push(
+    "Provider language: avoid saying 'best option', 'best provider', 'your best choice', or 'definitely the provider to see.' Use softer language like 'a strong option,' 'a good fit,' 'well aligned,' 'most directly aligned,' or 'I'd start by checking availability with.'",
+  );
 
   return guidance;
 }
 
 function inferSuggestedProvider(messages: ChatMessage[], pageContext: string) {
-  const text = `${getLatestUserContent(messages)}\n${pageContext}`.toLowerCase();
+  const rankedProviders = rankWendyProviders({
+    query: getRetrievalQuery(messages),
+    pageContext,
+    max: 3,
+  });
 
-  if (/\b(pet|pets|dog|dogs|cat|cats|animal|animals|small animal|veterinary)\b/.test(text)) {
-    return "Dr. Josh";
-  }
-
-  if (/\b(pregnan|postpartum|newborn|baby|infant|pediatric|child|kids|mom|moms)\b/.test(text)) {
-    return "Dr. Claire / Dr. Michelle";
-  }
-
-  if (/\b(active|outdoor|ski|skiing|hiking|athlete|performance|training|rehab|mobility|movement|sport)\b/.test(text)) {
-    return "Dr. Kyle";
-  }
-
-  if (/\b(massage|massage therapy|bodywork)\b/.test(text) && /\bbig sky\b/.test(text)) {
-    return "Nichole";
-  }
-
-  if (/\b(massage|massage therapy|bodywork)\b/.test(text) && /\b(bozeman|four corners|belgrade|gallatin)\b/.test(text)) {
-    return "James";
-  }
-
-  if (/\b(kyle|dave|josh|claire|michelle|nichole|james)\b/.test(text)) {
-    const match = text.match(/\b(dr\.?\s*)?(kyle|dave|josh|claire|michelle|nichole|james)\b/);
-    const name = match?.[2];
-
-    if (!name) {
-      return undefined;
-    }
-
-    if (name === "nichole" || name === "james") {
-      return name[0].toUpperCase() + name.slice(1);
-    }
-
-    return `Dr. ${name[0].toUpperCase()}${name.slice(1)}`;
-  }
-
-  return undefined;
+  return rankedProviders.length > 0
+    ? rankedProviders.map((provider) => provider.name).join(" / ")
+    : undefined;
 }
 
 function getPricingLocationGuidance(messages: ChatMessage[], pageContext: string) {
@@ -566,6 +545,8 @@ function getNextStepDecision(
     ? 0
     : explicitResourceRequest
       ? 4
+      : providerMatching
+        ? 0
       : nervousNewPatient || intents.includes("educational intent")
         ? 1
         : 0;
@@ -589,6 +570,7 @@ function formatIntentGuidance(
   messages: ChatMessage[],
   pageContext: string,
   sessionMemory: SessionMemory,
+  providerRankingContext: string,
 ) {
   const intents = detectIntentCategories(messages, pageContext);
   const providerGuidance = getProviderRoutingGuidance(messages, pageContext);
@@ -677,6 +659,7 @@ function formatIntentGuidance(
       ? `Provider routing guidance:\n${providerGuidance.join("\n")}`
       : "",
     `Response strategy:\n${strategy.join("\n")}`,
+    providerRankingContext,
     `Resource/CTA decision: resourceLimit=${nextStepDecision.resourceLimit}; bookingCTA=${nextStepDecision.shouldOfferBooking ? "yes" : "no"}; leadForm=${nextStepDecision.followUpRequest ? "yes" : "no"}; urgent=${nextStepDecision.urgent ? "yes" : "no"}.`,
     "Keep the answer concise, locally specific to Bozeman/Big Sky when relevant, and grounded in retrieved knowledge.",
   ]
@@ -1141,9 +1124,22 @@ export async function POST(request: Request) {
   const sessionMemoryContext = formatSessionMemory(sessionMemory);
   const detectedIntents = detectIntentCategories(messages, pageContext);
   const topicCategory = detectTopicCategory(messages, pageContext);
-  const suggestedProvider = inferSuggestedProvider(messages, pageContext);
+  const rankedProviders = rankWendyProviders({
+    query: getRetrievalQuery(messages),
+    pageContext,
+    max: 3,
+  });
+  const providerRankingContext = formatProviderRankingContext(rankedProviders);
+  const suggestedProvider = rankedProviders.length > 0
+    ? rankedProviders.map((provider) => provider.name).join(" / ")
+    : inferSuggestedProvider(messages, pageContext);
   const nextStepDecision = getNextStepDecision(detectedIntents, sessionMemory);
-  const intentGuidance = formatIntentGuidance(messages, pageContext, sessionMemory);
+  const intentGuidance = formatIntentGuidance(
+    messages,
+    pageContext,
+    sessionMemory,
+    providerRankingContext,
+  );
   const hasResourceIntent = userHasResourceIntent(messages);
   const wantsMoreResources = userWantsMoreResources(messages);
   const includeBookingResource = nextStepDecision.includeBookingResource;
