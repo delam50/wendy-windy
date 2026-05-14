@@ -131,6 +131,17 @@ const PRIORITY_TERMS = [
   "booking",
   "book",
   "appointment",
+  "hours",
+  "clinic hours",
+  "office hours",
+  "open today",
+  "open",
+  "closed",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
   "provider",
   "providers",
   "dr.",
@@ -541,6 +552,12 @@ function scoreChunk(
   if (/booking url|online bookable|providers?:/i.test(chunk.text)) {
     if (/book|booking|appointment|provider|doctor|dr\.?/i.test(normalizedQuery)) {
       score += 12;
+    }
+  }
+
+  if (/hours|open|closed|clinic hours|office hours|monday|tuesday|wednesday|thursday|friday|saturday|sunday/i.test(normalizedQuery)) {
+    if (/clinic hours|confirmed.*hours|bozeman \/ four corners hours|big sky hours|dr\. kyle.*thursday|dr\. michelle.*wednesday/i.test(normalizedText)) {
+      score += 36;
     }
   }
 
@@ -1056,6 +1073,16 @@ export function retrieveResources(
     retrievalInput.excludedUrls.map((url) => url.toLowerCase()),
   );
   const limit = maxResources ?? (retrievalInput.wantsMoreResources ? 4 : 1);
+  const hasExplicitResourceIntent =
+    retrievalInput.wantsMoreResources ||
+    /\b(blogs?|articles?|resources?|more reading|additional reading|send me a link|send a link|link|more info|anything on this|read more|reading)\b/i.test(
+      retrievalInput.query,
+    );
+
+  if (limit <= 0) {
+    return [];
+  }
+
   const fallbackMinimumScore = retrievalInput.wantsMoreResources ? 8 : 12;
   const seenUrls = new Set<string>();
   const blogResources = retrieveBlogResources(retrievalInput, limit, excludedUrls);
@@ -1119,6 +1146,10 @@ export function retrieveResources(
 
   if (combinedResources.length > 0 || retrievalInput.includeBookingResource) {
     return combinedResources;
+  }
+
+  if (!hasExplicitResourceIntent) {
+    return [];
   }
 
   return loadKnowledgeChunks()

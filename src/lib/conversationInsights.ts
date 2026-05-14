@@ -71,6 +71,7 @@ const TOPIC_CATEGORIES = [
   "pricing",
   "insurance",
   "first visit",
+  "clinic hours",
   "Big Sky",
   "Bozeman",
   "pregnancy",
@@ -313,6 +314,7 @@ export function normalizeQuestionTopicCategory(
   if (/insurance/.test(normalized)) return "insurance";
   if (/pricing|cost|cash|rate/.test(normalized)) return "pricing";
   if (/first visit|new patient/.test(normalized)) return "first visit";
+  if (/hours|open|closed|schedule|availability|available|today|friday|monday|tuesday|wednesday|thursday|saturday|sunday/.test(normalized)) return "clinic hours";
   if (/big sky/.test(normalized)) return "Big Sky";
   if (/bozeman|four corners|location/.test(normalized)) return "Bozeman";
   if (/neck/.test(normalized)) return "neck pain";

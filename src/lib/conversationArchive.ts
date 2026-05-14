@@ -40,6 +40,14 @@ export type WendyConversationSummary = {
   excerpt: string;
 };
 
+export type WendyArchivedMessage = {
+  id: string;
+  createdAt: string;
+  role: "user" | "assistant" | "system";
+  content: string;
+  redacted: boolean;
+};
+
 function cleanText(value: unknown, maxLength: number) {
   if (typeof value !== "string") {
     return "";
@@ -326,6 +334,96 @@ export async function getRecentWendyConversationSummaries(input: {
   );
 
   return { available: true, conversations };
+}
+
+export async function getConversationMessages(conversationId: string) {
+  const supabase = getSupabaseAdmin();
+  const normalizedConversationId = cleanText(conversationId, 80);
+
+  if (!supabase || !normalizedConversationId) {
+    return {
+      available: false,
+      found: false,
+      conversation: null,
+      messages: [] as WendyArchivedMessage[],
+    };
+  }
+
+  const { data: conversation, error: conversationError } = await supabase
+    .from("wendy_conversations")
+    .select(
+      "id,created_at,updated_at,session_id,page_title,page_url,inferred_topic,detected_intent,preferred_location,suggested_provider,lead_submitted,resource_count,booking_clicked",
+    )
+    .eq("id", normalizedConversationId)
+    .maybeSingle();
+
+  if (conversationError) {
+    console.error("Wendy conversation detail query failed:", conversationError.message);
+    return {
+      available: false,
+      found: false,
+      conversation: null,
+      messages: [] as WendyArchivedMessage[],
+    };
+  }
+
+  if (!conversation) {
+    return {
+      available: true,
+      found: false,
+      conversation: null,
+      messages: [] as WendyArchivedMessage[],
+    };
+  }
+
+  const { data: messages, error: messagesError } = await supabase
+    .from("wendy_messages")
+    .select("id,created_at,role,content,redacted")
+    .eq("conversation_id", normalizedConversationId)
+    .order("created_at", { ascending: true })
+    .limit(60);
+
+  if (messagesError) {
+    console.error("Wendy conversation messages query failed:", messagesError.message);
+    return {
+      available: false,
+      found: true,
+      conversation: null,
+      messages: [] as WendyArchivedMessage[],
+    };
+  }
+
+  return {
+    available: true,
+    found: true,
+    conversation: {
+      id: String(conversation.id),
+      createdAt: String(conversation.created_at),
+      updatedAt: String(conversation.updated_at),
+      sessionId: cleanText(conversation.session_id, 120) || undefined,
+      pageTitle: cleanText(conversation.page_title, 180) || undefined,
+      pageUrl: cleanText(conversation.page_url, 500) || undefined,
+      inferredTopic: cleanText(conversation.inferred_topic, 120) || undefined,
+      detectedIntent: cleanText(conversation.detected_intent, 220) || undefined,
+      preferredLocation: cleanText(conversation.preferred_location, 80) || undefined,
+      suggestedProvider: cleanText(conversation.suggested_provider, 120) || undefined,
+      leadSubmitted: Boolean(conversation.lead_submitted),
+      resourceCount: Number(conversation.resource_count ?? 0),
+      bookingClicked: Boolean(conversation.booking_clicked),
+      excerpt: "",
+    } satisfies WendyConversationSummary,
+    messages:
+      messages?.map((message) => ({
+        id: String(message.id),
+        createdAt: String(message.created_at),
+        role:
+          message.role === "assistant" || message.role === "system"
+            ? message.role
+            : "user",
+        content: cleanText(message.content, 1800),
+        redacted: Boolean(message.redacted),
+      })) ?? [],
+  };
 }
 
 export async function deleteExpiredWendyConversations(

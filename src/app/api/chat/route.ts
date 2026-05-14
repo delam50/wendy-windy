@@ -6,6 +6,7 @@ import path from "node:path";
 import { formatClinicKnowledge } from "@/data/knowledge";
 import {
   archiveWendyMessage,
+  getConversationMessages,
   getRecentWendyConversationSummaries,
   WENDY_CONVERSATION_RETENTION_DAYS,
 } from "@/lib/conversationArchive";
@@ -57,12 +58,17 @@ type IntentCategory =
   | "insurance intent"
   | "provider matching"
   | "urgent/red-flag symptoms"
-  | "location intent";
+  | "location intent"
+  | "clinic hours intent"
+  | "service intent"
+  | "article/resource intent"
+  | "aftercare intent"
+  | "follow-up/contact intent";
 
 const MAX_API_MESSAGES = 10;
 const ADMIN_DIAGNOSTIC_TERMS = /\b(status|diagnostics?|usage|report|performance|health|system\s+report)\b/i;
 const ADMIN_CONVERSATION_REVIEW_TERMS =
-  /\b(show|review|summarize|list|recent|conversations?|chats?)\b.*\b(wendy|conversations?|chats?|dry needling|leads?|resources?)\b|\b(conversations?|chats?)\s+(about|that became|where)\b/i;
+  /\b(show|review|summarize|list|recent|open|details?|messages?)\b.*\b(wendy|conversations?|chats?|dry needling|leads?|resources?|recent-\d+|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{6,})\b|\b(conversations?|chats?)\s+(about|that became|where|for)\b/i;
 
 function isChatMessage(value: unknown): value is ChatMessage {
   if (!value || typeof value !== "object") {
@@ -138,6 +144,12 @@ function userHasResourceIntent(messages: ChatMessage[]) {
   );
 }
 
+function userHasFollowUpContactIntent(messages: ChatMessage[]) {
+  return /\b(have (?:the )?team follow up|can someone contact me|can the clinic call me|someone (?:to )?reach out|want someone to reach out|front desk contact me|help scheduling|want to book but need help|someone follow up with me|contact me|call me|reach out|follow up with me)\b/i.test(
+    getLatestUserContent(messages),
+  );
+}
+
 function getLatestUserContent(messages: ChatMessage[]) {
   return messages.findLast((message) => message.role === "user")?.content ?? "";
 }
@@ -196,11 +208,32 @@ function detectIntentCategories(
 
   if (
     includesAny(combinedContext, [
+      /\b(hours?|open|closed|closing|today|tomorrow|weekday|weekend|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/,
+      /\b(when is|when are|what time|clinic hours|office hours|business hours)\b/,
+    ])
+  ) {
+    intents.add("clinic hours intent");
+  }
+
+  if (
+    includesAny(combinedContext, [
       /\b(learn|explain|what is|what does|how does|why|article|resource|blog|read|details|information|info)\b/,
       /\b(can chiropractic help|is chiropractic|what should i expect)\b/,
     ])
   ) {
     intents.add("educational intent");
+  }
+
+  if (userHasResourceIntent(messages)) {
+    intents.add("article/resource intent");
+  }
+
+  if (
+    includesAny(combinedContext, [
+      /\b(aftercare|what to expect|soreness|normal after|recovery|side effects|after treatment|after dry needling)\b/,
+    ])
+  ) {
+    intents.add("aftercare intent");
   }
 
   if (
@@ -214,6 +247,18 @@ function detectIntentCategories(
 
   if (includesAny(combinedContext, [/\b(insurance|insured|coverage|covered|copay|deductible|benefits)\b/])) {
     intents.add("insurance intent");
+  }
+
+  if (
+    includesAny(combinedContext, [
+      /\b(service|services|adjustment|dry needling|soft tissue|massage|cupping|animal chiropractic|small animal|first visit|new patient exam|follow-up|follow up)\b/,
+    ])
+  ) {
+    intents.add("service intent");
+  }
+
+  if (userHasFollowUpContactIntent(messages)) {
+    intents.add("follow-up/contact intent");
   }
 
   if (
@@ -267,6 +312,10 @@ function detectTopicCategory(messages: ChatMessage[], pageContext: string) {
     return "pricing";
   }
 
+  if (/\b(hours?|open|closed|closing|today|tomorrow|weekday|weekend|monday|tuesday|wednesday|thursday|friday|saturday|sunday|schedule|availability|available)\b/.test(text)) {
+    return "clinic hours";
+  }
+
   if (/\b(insurance|coverage|copay|deductible|benefits)\b/.test(text)) {
     return "insurance";
   }
@@ -314,7 +363,7 @@ function getProviderRoutingGuidance(messages: ChatMessage[], pageContext: string
 
   if (/\b(pregnan|postpartum|newborn|baby|infant|pediatric|child|kids|mom|moms)\b/.test(text)) {
     guidance.push(
-      "Pregnancy, postpartum, newborn, pediatric, or family care: conversationally mention Dr. Claire at Four Corners; she also provides at-home visits for moms and newborns.",
+      "Pregnancy, postpartum, newborn, pediatric, or family care: conversationally mention Dr. Claire and Dr. Michelle. Dr. Claire is primarily Four Corners and also offers at-home mom/newborn visits; Dr. Michelle has limited hours at both locations, so users should check JaneApp or the website for current availability.",
     );
   }
 
@@ -328,14 +377,23 @@ function getProviderRoutingGuidance(messages: ChatMessage[], pageContext: string
     /\b(massage|massage therapy|bodywork)\b/.test(text) &&
     /\b(big sky)\b/.test(text)
   ) {
-    guidance.push("Massage therapy in Big Sky: route to Nichole.");
+    guidance.push("Massage therapy in Big Sky: route to Nichole. Keep this distinct from chiropractic soft tissue work or dry needling.");
   }
 
   if (
     /\b(massage|massage therapy|bodywork)\b/.test(text) &&
     /\b(bozeman|four corners|belgrade|gallatin)\b/.test(text)
   ) {
-    guidance.push("Massage therapy at Bozeman Four Corners: route to James.");
+    guidance.push("Massage therapy at Bozeman Four Corners: route to James. Keep this distinct from chiropractic soft tissue work or dry needling.");
+  }
+
+  if (
+    /\b(massage|massage therapy|soft tissue massage|massage therapist)\b/.test(text) &&
+    !/\b(big sky|bozeman|four corners|belgrade|gallatin)\b/.test(text)
+  ) {
+    guidance.push(
+      "General massage therapy questions: mention both therapists and ask location preference if needed. Nichole is Big Sky only; James is Bozeman Four Corners only. Do not confuse massage therapy with chiropractic soft tissue treatment or dry needling.",
+    );
   }
 
   if (
@@ -358,7 +416,7 @@ function inferSuggestedProvider(messages: ChatMessage[], pageContext: string) {
   }
 
   if (/\b(pregnan|postpartum|newborn|baby|infant|pediatric|child|kids|mom|moms)\b/.test(text)) {
-    return "Dr. Claire";
+    return "Dr. Claire / Dr. Michelle";
   }
 
   if (/\b(active|outdoor|ski|skiing|hiking|athlete|performance|training|rehab|mobility|movement|sport)\b/.test(text)) {
@@ -448,6 +506,85 @@ function getPricingLocationGuidance(messages: ChatMessage[], pageContext: string
   return guidance.join(" ");
 }
 
+function getHoursGuidance(messages: ChatMessage[], pageContext: string) {
+  const text = `${getLatestUserContent(messages)}\n${pageContext}`.toLowerCase();
+  const mentionsFourCorners = /\b(four corners|bozeman|belgrade|gallatin|mill town)\b/.test(text);
+  const mentionsBigSky = /\b(big sky|ousel falls)\b/.test(text);
+  const asksOpenToday = /\b(open today|are you open|open right now|hours today|today's hours|today)\b/.test(text);
+  const asksFridayBigSky = /\b(friday|fri)\b/.test(text) && mentionsBigSky;
+  const asksKyleBigSky = /\b(kyle|dr\.?\s*kyle)\b/.test(text) && mentionsBigSky;
+  const asksMichelleBigSky = /\b(michelle|dr\.?\s*michelle)\b/.test(text) && mentionsBigSky;
+
+  const guidance = [
+    "Clinic hours intent: answer by location and distinguish clinic hours from live appointment openings or provider availability.",
+    "Bozeman / Four Corners address: 43 Mill Town Loop, Bozeman, MT 59718. Hours: Monday 7:30 AM-5:00 PM, Tuesday 8:00 AM-5:00 PM, Wednesday 7:30 AM-5:00 PM, Thursday 8:00 AM-5:00 PM, Friday 8:00 AM-2:00 PM, Saturday closed, Sunday closed.",
+    "Big Sky address: 116 Ousel Falls Road, Big Sky, MT 59716. Hours/availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Michelle 9:00 AM-4:00 PM, Thursday Dr. Kyle 8:00 AM-5:00 PM, Friday seasonal or at Dr. Dave's discretion, Saturday closed, Sunday closed.",
+    "Do not guarantee same-day appointment availability. For live openings, provider schedule changes, or booking details, direct users to JaneApp or the clinic.",
+  ];
+
+  if (asksOpenToday && !mentionsFourCorners && !mentionsBigSky) {
+    guidance.push(
+      "If the user asks whether Windy Ridge is open today and no location is clear, ask whether they mean Bozeman / Four Corners or Big Sky before giving one location's hours.",
+    );
+  }
+
+  if (asksFridayBigSky) {
+    guidance.push(
+      "For Big Sky Friday availability, say it may be seasonal and at Dr. Dave's discretion, so users should confirm online or by calling.",
+    );
+  }
+
+  if (asksKyleBigSky) {
+    guidance.push("Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM.");
+  }
+
+  if (asksMichelleBigSky) {
+    guidance.push("Dr. Michelle is in Big Sky Wednesdays 9:00 AM-4:00 PM.");
+  }
+
+  return guidance.join(" ");
+}
+
+function getNextStepDecision(
+  intents: IntentCategory[],
+  sessionMemory: SessionMemory,
+) {
+  const urgent = intents.includes("urgent/red-flag symptoms");
+  const explicitResourceRequest = intents.includes("article/resource intent");
+  const followUpRequest = intents.includes("follow-up/contact intent");
+  const bookingReady = intents.includes("booking intent") && !urgent;
+  const pricingQuestion = intents.includes("pricing intent") && !urgent;
+  const providerMatching = intents.includes("provider matching") && !urgent;
+  const nervousNewPatient =
+    intents.includes("aftercare intent") ||
+    intents.includes("educational intent") && intents.includes("service intent");
+  const shouldOfferBooking =
+    (bookingReady || pricingQuestion) &&
+    !sessionMemory.bookingInfoProvided &&
+    !sessionMemory.bookingLinkClicked;
+  const resourceLimit = urgent
+    ? 0
+    : explicitResourceRequest
+      ? 4
+      : nervousNewPatient || intents.includes("educational intent")
+        ? 1
+        : 0;
+
+  return {
+    urgent,
+    explicitResourceRequest,
+    followUpRequest,
+    bookingReady,
+    pricingQuestion,
+    providerMatching,
+    nervousNewPatient,
+    shouldOfferBooking,
+    resourceLimit,
+    includeBookingResource: shouldOfferBooking,
+    wantsMoreResources: explicitResourceRequest,
+  };
+}
+
 function formatIntentGuidance(
   messages: ChatMessage[],
   pageContext: string,
@@ -455,12 +592,21 @@ function formatIntentGuidance(
 ) {
   const intents = detectIntentCategories(messages, pageContext);
   const providerGuidance = getProviderRoutingGuidance(messages, pageContext);
+  const nextStepDecision = getNextStepDecision(intents, sessionMemory);
   const strategy: string[] = [];
+
+  strategy.push(
+    "Next-step priority framework: Safety > Direct answer > Relevant clinic-specific info > Resource card > Booking CTA > Lead form.",
+  );
 
   if (intents.includes("urgent/red-flag symptoms")) {
     strategy.push(
-      "Urgent/red-flag symptoms: be direct and brief. Tell the user to seek urgent or emergency medical care right away before discussing booking or resources.",
+      "Urgent/red-flag symptoms: be direct and brief. Tell the user to seek urgent or emergency medical care right away. Do not include booking CTAs, sales language, lead capture, or resource cards.",
     );
+  }
+
+  if (intents.includes("clinic hours intent")) {
+    strategy.push(getHoursGuidance(messages, pageContext));
   }
 
   if (intents.includes("booking intent")) {
@@ -471,7 +617,19 @@ function formatIntentGuidance(
 
   if (intents.includes("educational intent")) {
     strategy.push(
-      "Educational intent: answer first in plain language, then offer one highly relevant article/resource when retrieved knowledge provides one.",
+      "Educational intent: answer first in plain language, then offer one highly relevant article/resource only when it genuinely helps.",
+    );
+  }
+
+  if (intents.includes("article/resource intent")) {
+    strategy.push(
+      "Explicit resource intent: the user asked for blogs, articles, resources, more reading, or a link. Return 2 to 4 relevant resource cards when available, ordered by the best match first.",
+    );
+  }
+
+  if (intents.includes("aftercare intent")) {
+    strategy.push(
+      "Aftercare intent: prioritize exact aftercare, what-to-expect, soreness, recovery, or side-effect resources over broad chiropractic pages.",
     );
   }
 
@@ -497,6 +655,12 @@ function formatIntentGuidance(
     );
   }
 
+  if (intents.includes("follow-up/contact intent")) {
+    strategy.push(
+      "Follow-up/contact intent: the UI should open the structured lead form. If answering in chat, direct the visitor to use the form rather than collecting details in free text.",
+    );
+  }
+
   if (!sessionMemory.bookingInfoProvided && !sessionMemory.bookingLinkClicked) {
     strategy.push(
       "CTA behavior: educational users get resources first; ready-to-book users get JaneApp; nervous or new users get a short first-visit explanation.",
@@ -513,6 +677,7 @@ function formatIntentGuidance(
       ? `Provider routing guidance:\n${providerGuidance.join("\n")}`
       : "",
     `Response strategy:\n${strategy.join("\n")}`,
+    `Resource/CTA decision: resourceLimit=${nextStepDecision.resourceLimit}; bookingCTA=${nextStepDecision.shouldOfferBooking ? "yes" : "no"}; leadForm=${nextStepDecision.followUpRequest ? "yes" : "no"}; urgent=${nextStepDecision.urgent ? "yes" : "no"}.`,
     "Keep the answer concise, locally specific to Bozeman/Big Sky when relevant, and grounded in retrieved knowledge.",
   ]
     .filter(Boolean)
@@ -641,7 +806,116 @@ function getConversationReviewFilters(messages: ChatMessage[]) {
   };
 }
 
+function getConversationDetailRequest(messages: ChatMessage[]) {
+  const latest = getLatestUserContent(messages);
+  const detailIntent =
+    /\b(show|open|view|details?|messages?)\b.*\b(conversation|chat|messages?)\b/i.test(latest) ||
+    /\b(conversation|chat)\s+(details?|messages?)\b/i.test(latest);
+
+  if (!detailIntent) {
+    return undefined;
+  }
+
+  const uuidMatch = latest.match(
+    /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i,
+  );
+
+  if (uuidMatch) {
+    return uuidMatch[0];
+  }
+
+  const shortMatch = latest.match(/\b(?:conversation\s+id|id|conversation|open conversation|show messages for conversation)\s*:?\s*([0-9a-f]{6,})\b/i);
+
+  return shortMatch?.[1];
+}
+
+async function resolveConversationId(reference: string) {
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(reference)) {
+    return reference;
+  }
+
+  const recent = await getRecentWendyConversationSummaries({ limit: 12 });
+
+  if (!recent.available) {
+    return undefined;
+  }
+
+  return recent.conversations.find((conversation) =>
+    conversation.id.toLowerCase().startsWith(reference.toLowerCase()),
+  )?.id;
+}
+
+async function getAdminConversationDetailReport(messages: ChatMessage[]) {
+  const requestedReference = getConversationDetailRequest(messages);
+
+  if (!requestedReference) {
+    return undefined;
+  }
+
+  const conversationId = await resolveConversationId(requestedReference);
+
+  if (!conversationId) {
+    return [
+      "Wendy conversation details",
+      "",
+      `I could not find a recent conversation matching "${requestedReference}". Try copying the full Conversation ID from "Show recent Wendy conversations."`,
+    ].join("\n");
+  }
+
+  const result = await getConversationMessages(conversationId);
+
+  if (!result.available) {
+    return [
+      "Wendy conversation details",
+      "",
+      "Conversation archive is not available right now. Supabase may be unconfigured locally, or the archive tables may not exist yet.",
+    ].join("\n");
+  }
+
+  if (!result.found || !result.conversation) {
+    return [
+      "Wendy conversation details",
+      "",
+      `I could not find conversation ${conversationId}.`,
+    ].join("\n");
+  }
+
+  return [
+    "Wendy conversation details",
+    "",
+    `Conversation ID: ${result.conversation.id}`,
+    `Updated: ${new Date(result.conversation.updatedAt).toLocaleString("en-US", { timeZone: "America/Denver" })}`,
+    `Topic: ${result.conversation.inferredTopic || "unknown"}`,
+    `Intent: ${result.conversation.detectedIntent || "unknown"}`,
+    `Page: ${result.conversation.pageTitle || result.conversation.pageUrl || "unknown"}`,
+    `Lead submitted: ${result.conversation.leadSubmitted ? "yes" : "no"} | Resources: ${result.conversation.resourceCount} | Booking clicked: ${result.conversation.bookingClicked ? "yes" : "no"}`,
+    "",
+    result.messages.length
+      ? result.messages
+          .map((message) => {
+            const label =
+              message.role === "assistant"
+                ? "Assistant"
+                : message.role === "system"
+                  ? "System"
+                  : "User";
+
+            return `${label}:\n${message.content}${message.redacted ? "\n[Redacted]" : ""}`;
+          })
+          .join("\n\n")
+      : "No archived messages found for this conversation.",
+    "",
+    "Only stored redacted QA archive messages are shown. Hidden prompts, retrieval chunks, secrets, and API keys are not included.",
+  ].join("\n");
+}
+
 async function getAdminConversationReviewReport(messages: ChatMessage[]) {
+  const detailReport = await getAdminConversationDetailReport(messages);
+
+  if (detailReport) {
+    return detailReport;
+  }
+
   const filters = getConversationReviewFilters(messages);
   const result = await getRecentWendyConversationSummaries({
     ...filters,
@@ -678,7 +952,10 @@ async function getAdminConversationReviewReport(messages: ChatMessage[]) {
     "",
     ...result.conversations.map((conversation, index) =>
       [
-        `${index + 1}. ${new Date(conversation.updatedAt).toLocaleString("en-US", { timeZone: "America/Denver" })}`,
+        `${index + 1}. Ref: recent-${index + 1}`,
+        `Conversation ID: ${conversation.id}`,
+        `Short ID: ${conversation.id.slice(0, 8)}`,
+        `Updated: ${new Date(conversation.updatedAt).toLocaleString("en-US", { timeZone: "America/Denver" })}`,
         `Topic: ${conversation.inferredTopic || "unknown"}`,
         `Intent: ${conversation.detectedIntent || "unknown"}`,
         `Page: ${conversation.pageTitle || conversation.pageUrl || "unknown"}`,
@@ -737,6 +1014,11 @@ async function getAdminDiagnosticsReport() {
       ? `Category names: ${blogIndex.categories.join(", ")}`
       : "Category names: none available",
     `Jane/pricing knowledge exists: ${janeKnowledge ? "Yes" : "No"}`,
+    `Clinic hours knowledge exists: ${
+      /43 Mill Town Loop|116 Ousel Falls Road|Dr\. Kyle[\s\S]*8:00 AM-5:00 PM|Dr\. Michelle[\s\S]*9:00 AM-4:00 PM/.test(clinicIdentity)
+        ? "Yes"
+        : "No"
+    }`,
     `Provider routing knowledge exists: ${
       /dr\.?\s*(kyle|dave|josh|claire|michelle)|nichole|james/i.test(clinicIdentity)
         ? "Yes"
@@ -860,10 +1142,11 @@ export async function POST(request: Request) {
   const detectedIntents = detectIntentCategories(messages, pageContext);
   const topicCategory = detectTopicCategory(messages, pageContext);
   const suggestedProvider = inferSuggestedProvider(messages, pageContext);
+  const nextStepDecision = getNextStepDecision(detectedIntents, sessionMemory);
   const intentGuidance = formatIntentGuidance(messages, pageContext, sessionMemory);
   const hasResourceIntent = userHasResourceIntent(messages);
   const wantsMoreResources = userWantsMoreResources(messages);
-  const includeBookingResource = detectedIntents.includes("booking intent");
+  const includeBookingResource = nextStepDecision.includeBookingResource;
   const retrievedKnowledge = retrieveKnowledge({
     query: [getRetrievalQuery(messages), intentGuidance].join("\n"),
     conversationContext: sessionMemoryContext,
@@ -878,10 +1161,10 @@ export async function POST(request: Request) {
       conversationContext: sessionMemoryContext,
       pageContext,
       excludedUrls: sessionMemory.recommendedResourceUrls ?? [],
-      wantsMoreResources,
+      wantsMoreResources: nextStepDecision.wantsMoreResources || wantsMoreResources,
       includeBookingResource,
     },
-    wantsMoreResources || hasResourceIntent ? 4 : 1,
+    nextStepDecision.resourceLimit,
   );
 
   if (process.env.NODE_ENV === "development") {

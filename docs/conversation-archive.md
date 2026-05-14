@@ -82,6 +82,9 @@ Example prompts:
 - `Manager code: [your admin code]. Show recent chats about dry needling.`
 - `Manager code: [your admin code]. Show conversations that became leads.`
 - `Manager code: [your admin code]. Show conversations where Wendy recommended resources.`
+- `Manager code: [your admin code]. Show conversation details for [conversation id].`
+- `Manager code: [your admin code]. Open conversation [conversation id].`
+- `Manager code: [your admin code]. Show messages for conversation [conversation id].`
 
 Admin review returns:
 
@@ -91,8 +94,14 @@ Admin review returns:
 - page
 - lead/resource/booking flags
 - short redacted excerpt
+- copyable `Conversation ID`
+- short ID for quick follow-up
 
-It does not expose full private lead records, raw secrets, system prompts, or detailed medical histories.
+To review one conversation, copy the `Conversation ID` from the recent list and ask Wendy to show the details. Wendy will display stored QA archive messages in order, grouped by `User:` and `Assistant:`.
+
+The Supabase Table Editor is useful for raw table checks, but it is awkward for conversation review because `wendy_conversations` and `wendy_messages` are separate tables. Wendy admin review is the preferred quick workflow for managers because it joins the summary and messages safely without exposing hidden prompts or secrets.
+
+It does not expose full private lead records, raw secrets, system prompts, retrieval chunks, or detailed medical histories.
 
 ## Production Safety
 
