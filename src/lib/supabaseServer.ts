@@ -29,6 +29,17 @@ type WendyLeadInput = {
   metadata?: Record<string, unknown>;
 };
 
+type RetrievalTestRunInput = {
+  testId: string;
+  question: string;
+  expectedTerms: string[];
+  expectedUrlIncludes?: string;
+  retrievedResults: unknown[];
+  passed: boolean;
+  failureType: string;
+  notes?: string;
+};
+
 const funnelEventNames = [
   "widget_loaded",
   "widget_opened",
@@ -281,6 +292,32 @@ export async function incrementWendyTopicCount(topic: string) {
   }
 
   return { persisted: true, count: nextCount };
+}
+
+export async function writeRetrievalTestRun(input: RetrievalTestRunInput) {
+  const supabase = getSupabaseAdmin();
+
+  if (!supabase) {
+    return { persisted: false, reason: "supabase_not_configured" };
+  }
+
+  const { error } = await supabase.from("retrieval_test_runs").insert({
+    test_id: input.testId,
+    question: input.question,
+    expected_terms: input.expectedTerms,
+    expected_url_includes: input.expectedUrlIncludes || null,
+    retrieved_results: input.retrievedResults,
+    passed: input.passed,
+    failure_type: input.failureType,
+    notes: input.notes || null,
+  });
+
+  if (error) {
+    console.error("Wendy retrieval test run write failed:", error.message);
+    return { persisted: false, reason: "supabase_retrieval_test_write_failed" };
+  }
+
+  return { persisted: true };
 }
 
 async function getTableCount(tableName: string) {

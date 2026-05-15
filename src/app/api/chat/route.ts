@@ -21,7 +21,13 @@ import {
   isProductionRuntime,
   logConversationInsight,
 } from "@/lib/conversationInsights";
-import { retrieveKnowledge, retrieveResources } from "@/lib/retrieveKnowledge";
+import {
+  getKnowledgeSourceDiagnostics,
+  getProviderKnowledgeDiagnostics,
+  getResourceRetrievalDiagnostics,
+  retrieveKnowledge,
+  retrieveResources,
+} from "@/lib/retrieveKnowledge";
 import { getSupabaseDiagnostics } from "@/lib/supabaseServer";
 import { systemPrompt } from "@/lib/systemPrompt";
 
@@ -71,6 +77,9 @@ type IntentCategory =
 
 const MAX_API_MESSAGES = 10;
 const ADMIN_DIAGNOSTIC_TERMS = /\b(status|diagnostics?|usage|report|performance|health|system\s+report)\b/i;
+const ADMIN_RETRIEVAL_DIAGNOSTIC_TERMS = /\b(retrieval matches|resource matches|why was no resource returned|why no resource|show retrieval|debug retrieval)\b/i;
+const ADMIN_KNOWLEDGE_DIAGNOSTIC_TERMS =
+  /\b(active knowledge sources|knowledge manifest|canonical for blogs|canonical blog|knowledge sources|knowledge index|provider knowledge)\b/i;
 const ADMIN_CONVERSATION_REVIEW_TERMS =
   /\b(show|review|summarize|list|recent|open|details?|messages?)\b.*\b(wendy|conversations?|chats?|dry needling|leads?|resources?|recent-\d+|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{6,})\b|\b(conversations?|chats?)\s+(about|that became|where|for)\b/i;
 
@@ -143,7 +152,7 @@ function userWantsMoreResources(messages: ChatMessage[]) {
 function userHasResourceIntent(messages: ChatMessage[]) {
   const latestUserMessage = getLatestUserContent(messages);
 
-  return /\b(blogs?|articles?|resources?|more reading|additional reading|send me a link|send a link|link|more info|anything on this|read more|reading)\b/i.test(
+  return /\b(blogs?|articles?|resources?|posts?|more reading|additional reading|send me a link|send a link|link|more info|anything on this|read more|reading)\b|\b(do you have|any|show me|do you cover)\b.*\b(blogs?|articles?|resources?|posts?)\b/i.test(
     latestUserMessage,
   );
 }
@@ -159,7 +168,11 @@ function getLatestUserContent(messages: ChatMessage[]) {
 }
 
 function isAdminDiagnosticsRequest(messages: ChatMessage[]) {
-  return ADMIN_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages));
+  return (
+    ADMIN_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages)) ||
+    ADMIN_RETRIEVAL_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages)) ||
+    ADMIN_KNOWLEDGE_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages))
+  );
 }
 
 function isAdminConversationReviewRequest(messages: ChatMessage[]) {
@@ -187,6 +200,29 @@ function getAdminDiagnosticsFlags(messages: ChatMessage[]) {
     diagnosticsModeActivated: adminCodeDetected && adminIntentDetected,
     conversationReviewModeActivated: adminCodeDetected && adminReviewDetected,
   };
+}
+
+function isAdminRetrievalDiagnosticsRequest(messages: ChatMessage[]) {
+  return ADMIN_RETRIEVAL_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages));
+}
+
+function isAdminKnowledgeDiagnosticsRequest(messages: ChatMessage[]) {
+  return ADMIN_KNOWLEDGE_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages));
+}
+
+function getRetrievalDiagnosticQuery(messages: ChatMessage[]) {
+  const latest = getLatestUserContent(messages);
+  const forMatch = latest.match(/\b(?:for|about|on)\s+(.+)$/i);
+
+  if (forMatch?.[1]) {
+    return forMatch[1]
+      .replace(/\b(manager code|show retrieval matches|why was no resource returned|why no resource|debug retrieval)\b/gi, "")
+      .trim();
+  }
+
+  return latest
+    .replace(/\b(manager code|show retrieval matches|why was no resource returned|why no resource|debug retrieval)\b/gi, "")
+    .trim();
 }
 
 function includesAny(text: string, patterns: RegExp[]) {
@@ -954,6 +990,7 @@ async function getAdminConversationReviewReport(messages: ChatMessage[]) {
 
 async function getAdminDiagnosticsReport() {
   const blogIndex = getBlogIndexDiagnostics();
+  const knowledgeDiagnostics = getKnowledgeSourceDiagnostics();
   const janeKnowledge = readGeneratedFile("jane-knowledge.md");
   const clinicIdentity = readGeneratedFile("clinic-identity.md");
   const insightSummary = await getConversationInsightSummary();
@@ -992,6 +1029,10 @@ async function getAdminDiagnosticsReport() {
     `OpenAI API configured: ${process.env.OPENAI_API_KEY ? "Yes" : "No"}`,
     `Blog index exists: ${blogIndex.exists ? "Yes" : "No"}`,
     `Indexed blog resources: ${blogIndex.articleCount}`,
+    `Knowledge manifest exists: ${knowledgeDiagnostics.manifestExists ? "Yes" : "No"}`,
+    `Knowledge index chunks: ${knowledgeDiagnostics.knowledgeIndexChunkCount}`,
+    `Canonical blog file: ${knowledgeDiagnostics.canonicalBlogFile}`,
+    `Canonical clinic file: ${knowledgeDiagnostics.canonicalClinicFile}`,
     `Resource categories: ${blogIndex.categoryCount}`,
     blogIndex.categories.length
       ? `Category names: ${blogIndex.categories.join(", ")}`
@@ -1051,6 +1092,127 @@ async function getAdminDiagnosticsReport() {
   ].join("\n");
 }
 
+function getAdminRetrievalDiagnosticsReport(messages: ChatMessage[], pageContext: string) {
+  const query = getRetrievalDiagnosticQuery(messages) || "dry needling";
+  const diagnostics = getResourceRetrievalDiagnostics(
+    {
+      query,
+      pageContext,
+      conversationContext: "",
+      excludedUrls: [],
+      wantsMoreResources: true,
+      includeBookingResource: false,
+      retrievalMode: "explicit",
+    },
+    5,
+  );
+
+  return [
+    "Wendy retrieval diagnostics",
+    "",
+    `Query: ${query}`,
+    `Retrieval mode used: ${diagnostics.mode}`,
+    `Fallback used: ${diagnostics.fallbackUsed ? "Yes" : "No"}`,
+    "",
+    diagnostics.returnedResources.length
+      ? `Returned resources:\n${diagnostics.returnedResources
+          .map(
+            (resource, index) =>
+              `${index + 1}. ${resource.title}\nScore: ${resource.score}\nType: ${resource.type}\nURL: ${resource.url}`,
+          )
+          .join("\n\n")}`
+      : "Returned resources: none",
+    "",
+    diagnostics.topCandidates.length
+      ? `Top candidates:\n${diagnostics.topCandidates
+          .map(
+            (candidate, index) =>
+              `${index + 1}. ${candidate.title}\nScore: ${candidate.score}\nCategory: ${candidate.category}\nURL: ${candidate.url}\nWhy: ${candidate.reasons.join("; ") || "keyword/category fallback only"}`,
+          )
+          .join("\n\n")}`
+      : "Top candidates: none",
+    "",
+    "Admin-only diagnostic output. No user messages, secrets, system prompts, or retrieval chunks are exposed.",
+  ].join("\n");
+}
+
+function getProviderKnowledgeQuery(messages: ChatMessage[]) {
+  const latest = getLatestUserContent(messages);
+  const providerMatch = latest.match(/\b(dr\.?\s*(?:dave|david|josh|kyle|claire|michelle)|nichole|james)\b/i);
+
+  return providerMatch?.[1] ?? "";
+}
+
+function getAdminKnowledgeDiagnosticsReport(messages: ChatMessage[]) {
+  const latest = getLatestUserContent(messages);
+  const providerQuery = getProviderKnowledgeQuery(messages);
+
+  if (/\bprovider knowledge\b/i.test(latest) && providerQuery) {
+    const providerChunks = getProviderKnowledgeDiagnostics(providerQuery);
+
+    return [
+      "Wendy provider knowledge diagnostics",
+      "",
+      `Provider query: ${providerQuery}`,
+      providerChunks.length
+        ? providerChunks
+            .map((chunk, index) =>
+              [
+                `${index + 1}. ${chunk.title}`,
+                `Source type: ${chunk.sourceType}`,
+                `Chunk type: ${chunk.chunkType}`,
+                `Priority: ${chunk.priority}`,
+                `Canonical source: ${chunk.canonicalSource}`,
+                `Tags: ${chunk.tags.join(", ") || "none"}`,
+                `Text: ${chunk.text}`,
+              ].join("\n"),
+            )
+            .join("\n\n")
+        : "No provider chunk found for that provider query.",
+      "",
+      "Admin-only diagnostic output. No secrets, system prompts, API keys, or raw private lead details are included.",
+    ].join("\n");
+  }
+
+  const diagnostics = getKnowledgeSourceDiagnostics();
+  const activeSourceLines = diagnostics.activeSources.length
+    ? diagnostics.activeSources
+        .map(
+          (source) =>
+            `- ${source.source_id}: ${source.file_path} (${source.source_type}, priority ${source.priority}, canonical ${source.canonical ? "yes" : "no"}, exists ${source.exists ? "yes" : "no"})`,
+        )
+        .join("\n")
+    : "No manifest active sources found; Wendy is using generated Markdown fallback.";
+  const sourceTypeCounts = Object.entries(diagnostics.countsBySourceType)
+    .map(([sourceType, count]) => `${sourceType}: ${count}`)
+    .join(", ") || "none";
+  const chunkTypeCounts = Object.entries(diagnostics.countsByChunkType)
+    .map(([chunkType, count]) => `${chunkType}: ${count}`)
+    .join(", ") || "none";
+
+  return [
+    "Wendy knowledge diagnostics",
+    "",
+    `Manifest exists: ${diagnostics.manifestExists ? "Yes" : "No"}`,
+    `Architecture: ${diagnostics.architecture}`,
+    `Manifest generated at: ${diagnostics.generatedAt ?? "unknown"}`,
+    `Canonical blog file: ${diagnostics.canonicalBlogFile}`,
+    `Canonical clinic file: ${diagnostics.canonicalClinicFile}`,
+    `Blog index resources: ${diagnostics.blogIndexCount}`,
+    `Knowledge index chunks: ${diagnostics.knowledgeIndexChunkCount}`,
+    `Counts by source type: ${sourceTypeCounts}`,
+    `Counts by chunk type: ${chunkTypeCounts}`,
+    diagnostics.duplicateWarnings.length
+      ? `Duplicate/stale warnings: ${diagnostics.duplicateWarnings.join(" ")}`
+      : "Duplicate/stale warnings: none",
+    "",
+    "Active retrieval sources:",
+    activeSourceLines,
+    "",
+    "Clinic facts, provider routing, pricing, hours, safety, booking, massage, and animal chiropractic are designed to outrank blog content. Blog/resource cards use data/generated/blog-index.json as canonical.",
+  ].join("\n");
+}
+
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as ChatRequestBody;
   const messages = getMessages(body);
@@ -1092,6 +1254,20 @@ export async function POST(request: Request) {
     }
 
     if (adminDiagnosticsFlags.diagnosticsModeActivated) {
+      if (isAdminRetrievalDiagnosticsRequest(messages)) {
+        return Response.json({
+          message: getAdminRetrievalDiagnosticsReport(messages, pageContext),
+          resources: [],
+        });
+      }
+
+      if (isAdminKnowledgeDiagnosticsRequest(messages)) {
+        return Response.json({
+          message: getAdminKnowledgeDiagnosticsReport(messages),
+          resources: [],
+        });
+      }
+
       return Response.json({
         message: await getAdminDiagnosticsReport(),
         resources: [],
@@ -1142,6 +1318,7 @@ export async function POST(request: Request) {
   );
   const hasResourceIntent = userHasResourceIntent(messages);
   const wantsMoreResources = userWantsMoreResources(messages);
+  const resourceRetrievalMode = hasResourceIntent ? "explicit" : "contextual";
   const includeBookingResource = nextStepDecision.includeBookingResource;
   const retrievedKnowledge = retrieveKnowledge({
     query: [getRetrievalQuery(messages), intentGuidance].join("\n"),
@@ -1153,12 +1330,13 @@ export async function POST(request: Request) {
   });
   const resources = retrieveResources(
     {
-      query: [getRetrievalQuery(messages), intentGuidance].join("\n"),
+      query: getRetrievalQuery(messages),
       conversationContext: sessionMemoryContext,
       pageContext,
       excludedUrls: sessionMemory.recommendedResourceUrls ?? [],
       wantsMoreResources: nextStepDecision.wantsMoreResources || wantsMoreResources,
       includeBookingResource,
+      retrievalMode: resourceRetrievalMode,
     },
     nextStepDecision.resourceLimit,
   );

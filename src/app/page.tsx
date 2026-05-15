@@ -11,6 +11,7 @@ import {
 } from "react";
 
 import { trackAnalyticsEvent } from "@/lib/analytics";
+import { getQuickPromptsForContext, type UsageTopic } from "@/lib/quickPrompts";
 
 type Message = {
   id?: string;
@@ -34,7 +35,7 @@ type QuickAction = {
 
 type QuickActionResult = {
   actions: QuickAction[];
-  source: "page" | "topics" | "default";
+  source: "page" | "usage" | "curated";
 };
 
 type LeadForm = {
@@ -244,7 +245,7 @@ const topicQuickActionSets: Record<string, QuickAction[]> = {
     { label: "Where is animal care offered?", prompt: "Where is small animal chiropractic care offered?" },
   ],
   "provider matching": [
-    { label: "Which provider fits my goals?", prompt: "Which Windy Ridge provider best fits my goals?" },
+    { label: "Which provider fits my goals?", prompt: "Which Windy Ridge provider is well aligned with my goals?" },
     { label: "Who should I book with?", prompt: "Who should I book with at Windy Ridge?" },
     { label: "Which location should I choose?", prompt: "Which Windy Ridge location should I choose?" },
   ],
@@ -579,32 +580,17 @@ function rotateQuickActions(actions: QuickAction[], seedText: string) {
 }
 
 function getContextualQuickActions(pageContext: PageContext): QuickActionResult {
-  const contextText = `${pageContext.pageTitle} ${pageContext.pageUrl} ${pageContext.pageContext}`
-    .toLowerCase()
-    .replace(/[-_/]+/g, " ");
-
-  if (!contextText.trim()) {
-    return { actions: defaultQuickActions, source: "default" };
-  }
-
-  const matchedSet = contextualQuickActionSets.find((set) =>
-    set.patterns.some((pattern) => pattern.test(contextText)),
-  );
-
-  if (!matchedSet) {
-    return { actions: defaultQuickActions, source: "default" };
-  }
-
-  return {
-    actions: rotateQuickActions(matchedSet.actions, contextText),
-    source: "page",
-  };
+  return getQuickPromptsForContext(pageContext);
 }
 
-function getTopicQuickActions(topics: string[]) {
-  const topic = topics.find((candidate) => topicQuickActionSets[candidate]);
-
-  return topic ? rotateQuickActions(topicQuickActionSets[topic], topic) : defaultQuickActions;
+function getTopicQuickActions(
+  topics: UsageTopic[],
+  pageContext: PageContext,
+) {
+  return getQuickPromptsForContext({
+    ...pageContext,
+    usageTopics: topics,
+  }).actions;
 }
 
 function getAnalyticsPageMetadata() {
@@ -884,33 +870,41 @@ export default function Home() {
   }, [hasClickedBookingLink]);
 
   useEffect(() => {
-    if (initialQuickActionResult.source !== "default") {
-      return;
-    }
-
     let isActive = true;
+    const pageContext = getPageContext();
+    const params = new URLSearchParams();
 
-    fetch("/api/quick-prompts")
+    if (pageContext.pageTitle) params.set("pageTitle", pageContext.pageTitle);
+    if (pageContext.pageUrl) params.set("pageUrl", pageContext.pageUrl);
+    if (pageContext.pageContext) params.set("pageContext", pageContext.pageContext);
+
+    fetch(`/api/quick-prompts?${params.toString()}`)
       .then((response) => response.json())
-      .then((data: { topics?: Array<{ topic?: string }> }) => {
-        if (!isActive || !Array.isArray(data.topics) || data.topics.length === 0) {
+      .then((data: { prompts?: QuickAction[]; topics?: UsageTopic[] }) => {
+        if (!isActive) {
           return;
         }
 
-        const topicNames = data.topics
-          .map((topic) => topic.topic)
-          .filter((topic): topic is string => typeof topic === "string");
+        if (Array.isArray(data.prompts) && data.prompts.length > 0) {
+          setSuggestedQuickActions(data.prompts.slice(0, 3));
+          return;
+        }
 
-        setSuggestedQuickActions(getTopicQuickActions(topicNames));
+        setSuggestedQuickActions(
+          getTopicQuickActions(
+            Array.isArray(data.topics) ? data.topics : [],
+            pageContext,
+          ),
+        );
       })
       .catch(() => {
-        // Adaptive prompts are optional; default/context prompts remain the fallback.
+        // Adaptive prompts are optional; curated/page prompts remain the fallback.
       });
 
     return () => {
       isActive = false;
     };
-  }, [initialQuickActionResult.source]);
+  }, []);
 
   useEffect(() => {
     if (!shouldRunLauncherKnock) {

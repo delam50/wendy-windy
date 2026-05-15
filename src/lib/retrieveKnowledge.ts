@@ -11,18 +11,29 @@ type KnowledgeChunk = {
   source: string;
   url?: string;
   text: string;
+  sourceType?: string;
+  chunkType?: string;
+  category?: string;
+  tags?: string[];
+  priority?: number;
+  canonicalSource?: string;
 };
 
 type BlogIndexArticle = {
   title: string;
   url: string;
+  canonical_url?: string;
+  slug?: string;
   summary?: string;
   category?: string;
   tags?: string[];
+  keywords?: string[];
   relevantKeywords?: string[];
   excerpt?: string;
   sourceType?: string;
+  source_type?: string;
   headings?: string[];
+  searchable_text?: string;
 };
 
 type BlogMatchResult = {
@@ -36,6 +47,17 @@ export type RetrievedResource = {
   url: string;
   type: string;
   score: number;
+};
+
+export type RetrievedDiagnosticDocument = {
+  title: string;
+  url?: string;
+  sourceType: string;
+  chunkType: string;
+  sourceBucket: string;
+  score: number;
+  preview: string;
+  canonicalSource: string;
 };
 
 type ScoredKnowledgeChunk = KnowledgeChunk & {
@@ -52,40 +74,25 @@ type RetrievalInput = {
   excludedUrls?: string[];
   wantsMoreResources?: boolean;
   includeBookingResource?: boolean;
+  retrievalMode?: "explicit" | "contextual";
 };
 
 const KNOWLEDGE_FILES: KnowledgeFile[] = [
   {
-    label: "Generated clinic identity knowledge",
+    label: "Generated clinic identity knowledge fallback",
     path: path.join(process.cwd(), "data", "generated", "clinic-identity.md"),
   },
   {
-    label: "Generated website knowledge",
-    path: path.join(process.cwd(), "data", "generated", "website-knowledge.md"),
-  },
-  {
-    label: "Generated Jane booking knowledge",
+    label: "Generated Jane booking knowledge fallback",
     path: path.join(process.cwd(), "data", "generated", "jane-knowledge.md"),
   },
   {
-    label: "Generated sitemap knowledge",
+    label: "Generated website knowledge fallback",
+    path: path.join(process.cwd(), "data", "generated", "website-knowledge.md"),
+  },
+  {
+    label: "Generated sitemap knowledge fallback",
     path: path.join(process.cwd(), "data", "generated", "sitemap-knowledge.md"),
-  },
-  {
-    label: "Generated blog knowledge",
-    path: path.join(process.cwd(), "data", "generated", "blog-knowledge.md"),
-  },
-  {
-    label: "Website knowledge",
-    path: path.join(process.cwd(), "data", "website-knowledge.md"),
-  },
-  {
-    label: "Jane booking knowledge",
-    path: path.join(process.cwd(), "data", "jane-knowledge.md"),
-  },
-  {
-    label: "Blog knowledge",
-    path: path.join(process.cwd(), "data", "blog-knowledge.md"),
   },
 ];
 
@@ -299,6 +306,42 @@ const MIN_CHUNK_COUNT = 5;
 let cachedChunks: KnowledgeChunk[] | undefined;
 let cachedBlogIndex: BlogIndexArticle[] | undefined;
 
+type KnowledgeIndexFile = {
+  generated_at?: string;
+  chunks?: Array<{
+    id?: string;
+    source_type?: string;
+    chunk_type?: string;
+    title?: string;
+    url?: string;
+    category?: string;
+    tags?: string[];
+    priority?: number;
+    text?: string;
+    searchable_text?: string;
+    canonical_source?: string;
+    metadata?: Record<string, unknown>;
+  }>;
+};
+
+type KnowledgeManifestFile = {
+  generated_at?: string;
+  architecture?: string;
+  notes?: string[];
+  sources?: Array<{
+    source_id?: string;
+    source_type?: string;
+    file_path?: string;
+    generated_at?: string | null;
+    priority?: number;
+    freshness?: string;
+    canonical?: boolean;
+    used_by_retrieval?: boolean;
+    exists?: boolean;
+    bytes?: number;
+  }>;
+};
+
 function normalize(value: string) {
   return value.toLowerCase().replace(/&amp;/g, "&");
 }
@@ -421,6 +464,43 @@ function loadKnowledgeChunks() {
     return cachedChunks;
   }
 
+  try {
+    const index = JSON.parse(
+      readFileSync(
+        path.join(process.cwd(), "data", "generated", "knowledge-index.json"),
+        "utf8",
+      ),
+    ) as KnowledgeIndexFile;
+
+    const indexChunks = Array.isArray(index.chunks)
+      ? index.chunks
+          .filter((chunk) => chunk.title && (chunk.text || chunk.searchable_text))
+          .map<KnowledgeChunk>((chunk) => ({
+            title: chunk.title ?? "Windy Ridge knowledge",
+            source: chunk.canonical_source ?? "data/generated/knowledge-index.json",
+            url: chunk.url,
+            text: compactText(
+              [chunk.title, chunk.category, chunk.tags?.join(" "), chunk.text, chunk.searchable_text]
+                .filter(Boolean)
+                .join("\n"),
+            ),
+            sourceType: chunk.source_type,
+            chunkType: chunk.chunk_type,
+            category: chunk.category,
+            tags: chunk.tags ?? [],
+            priority: chunk.priority ?? 0,
+            canonicalSource: chunk.canonical_source,
+          }))
+      : [];
+
+    if (indexChunks.length > 0) {
+      cachedChunks = indexChunks;
+      return cachedChunks;
+    }
+  } catch {
+    // Fall through to generated Markdown fallback below.
+  }
+
   cachedChunks = KNOWLEDGE_FILES.flatMap((file) => {
     try {
       return parseMarkdownIntoChunks(readFileSync(file.path, "utf8"), file.label);
@@ -430,6 +510,19 @@ function loadKnowledgeChunks() {
   });
 
   return cachedChunks;
+}
+
+function loadKnowledgeManifest() {
+  try {
+    return JSON.parse(
+      readFileSync(
+        path.join(process.cwd(), "data", "generated", "knowledge-manifest.json"),
+        "utf8",
+      ),
+    ) as KnowledgeManifestFile;
+  } catch {
+    return undefined;
+  }
 }
 
 function loadBlogIndex() {
@@ -488,7 +581,40 @@ function scoreChunk(
   const normalizedPageContext = normalize(input.pageContext);
   const normalizedText = normalize(`${chunk.title} ${chunk.text} ${chunk.url ?? ""}`);
   const normalizedTitle = normalize(chunk.title);
-  let score = 0;
+  let score = Math.min(chunk.priority ?? 0, 120) / 2;
+
+  if (
+    chunk.sourceType &&
+    /clinic_fact|provider|pricing|hours|service|location|safety|booking|massage|animal_chiropractic/.test(
+      chunk.sourceType,
+    )
+  ) {
+    score += 18;
+  }
+
+  if (/urgent|emergency|red flag|severe/.test(normalizedQuery) && chunk.sourceType === "safety") {
+    score += 80;
+  }
+
+  if (/pricing|cost|cash|rate|insurance|\$|how much/.test(normalizedQuery) && chunk.sourceType === "pricing") {
+    score += 70;
+  }
+
+  if (/hours|open|closed|today|monday|tuesday|wednesday|thursday|friday|saturday|sunday/.test(normalizedQuery) && chunk.sourceType === "hours") {
+    score += 70;
+  }
+
+  if (/provider|doctor|dr\.?|who should|which provider|which doctor|kyle|dave|david|josh|claire|michelle|nichole|james/.test(normalizedQuery) && chunk.sourceType === "provider") {
+    score += 65;
+  }
+
+  if (/massage|massage therapy|massage therapist/.test(normalizedQuery) && chunk.sourceType === "massage") {
+    score += 65;
+  }
+
+  if (/pet|dog|cat|animal|veterinary/.test(normalizedQuery) && chunk.sourceType === "animal_chiropractic") {
+    score += 70;
+  }
 
   for (const term of PRIORITY_TERMS) {
     if (normalizedQuery.includes(term) && normalizedText.includes(term)) {
@@ -660,6 +786,7 @@ function normalizeRetrievalInput(input: string | RetrievalInput): Required<Retri
       excludedUrls: [],
       wantsMoreResources: false,
       includeBookingResource: false,
+      retrievalMode: "contextual",
     };
   }
 
@@ -670,6 +797,7 @@ function normalizeRetrievalInput(input: string | RetrievalInput): Required<Retri
     excludedUrls: input.excludedUrls ?? [],
     wantsMoreResources: Boolean(input.wantsMoreResources),
     includeBookingResource: Boolean(input.includeBookingResource),
+    retrievalMode: input.retrievalMode ?? "contextual",
   };
 }
 
@@ -727,12 +855,16 @@ function getBlogArticleSearchText(article: BlogIndexArticle) {
     [
       article.title,
       article.url,
+      article.canonical_url,
+      article.slug,
       article.summary,
       article.category,
       article.tags?.join(" "),
+      article.keywords?.join(" "),
       article.relevantKeywords?.join(" "),
       article.headings?.join(" "),
       article.excerpt,
+      article.searchable_text,
     ]
       .filter(Boolean)
       .join(" "),
@@ -744,8 +876,11 @@ function getBlogArticleStrongFields(article: BlogIndexArticle) {
     [
       article.title,
       article.url,
+      article.canonical_url,
+      article.slug,
       article.category,
       article.tags?.join(" "),
+      article.keywords?.join(" "),
       article.relevantKeywords?.join(" "),
       article.headings?.join(" "),
     ]
@@ -830,6 +965,17 @@ const AFTERCARE_INTENT_PHRASES = [
   "after dry needling",
 ];
 
+const EXPLICIT_RESOURCE_REQUEST_PATTERN =
+  /\b(do you have|any|show me|send me|find|share|recommend)\s+(?:a\s+|an\s+|any\s+|some\s+)?(?:blogs?|articles?|resources?|posts?|links?)\b|\b(?:blogs?|articles?|resources?|posts?)\s+(?:about|on|for)\b|\bdo you cover\b/i;
+
+const DRY_NEEDLING_TERMS = [
+  "dry needling",
+  "dry needle",
+  "needling",
+  "soft tissue work",
+  "muscle needling",
+];
+
 function getSlugText(url: string) {
   try {
     const pathname = new URL(url).pathname;
@@ -839,6 +985,10 @@ function getSlugText(url: string) {
   } catch {
     return normalize(url.replace(/[-_]+/g, " "));
   }
+}
+
+function getBlogArticleUrl(article: BlogIndexArticle) {
+  return article.canonical_url || article.url;
 }
 
 function includesPhrase(text: string, phrases: string[]) {
@@ -874,8 +1024,8 @@ function scoreBlogArticle(
   const normalizedConversationContext = normalize(input.conversationContext);
   const normalizedPageContext = normalize(input.pageContext);
   const normalizedTitle = normalize(article.title);
-  const normalizedUrl = normalize(article.url);
-  const normalizedSlug = getSlugText(article.url);
+  const normalizedUrl = normalize(getBlogArticleUrl(article));
+  const normalizedSlug = normalize(article.slug ?? getSlugText(getBlogArticleUrl(article)));
   const normalizedTags = normalize(article.tags?.join(" ") ?? "");
   const normalizedCategory = normalize(article.category ?? "");
   const normalizedHeadings = normalize(article.headings?.join(" ") ?? "");
@@ -884,7 +1034,24 @@ function scoreBlogArticle(
   const strongFieldText = getBlogArticleStrongFields(article);
   const contextText = `${normalizedQuery} ${normalizedConversationContext} ${normalizedPageContext}`;
   const reasons: string[] = [];
+  const explicitMode = input.retrievalMode === "explicit";
   let score = 0;
+
+  if (DRY_NEEDLING_TERMS.some((term) => contextText.includes(term))) {
+    const dryNeedlingScore =
+      scoreFieldMatches("dry needling title", normalizedTitle, DRY_NEEDLING_TERMS, explicitMode ? 150 : 120, reasons) +
+      scoreFieldMatches("dry needling slug", normalizedSlug, DRY_NEEDLING_TERMS, explicitMode ? 130 : 100, reasons) +
+      scoreFieldMatches("dry needling tags", normalizedTags, DRY_NEEDLING_TERMS, explicitMode ? 100 : 78, reasons) +
+      scoreFieldMatches("dry needling category", normalizedCategory, DRY_NEEDLING_TERMS, explicitMode ? 78 : 56, reasons) +
+      scoreFieldMatches("dry needling headings", normalizedHeadings, DRY_NEEDLING_TERMS, explicitMode ? 55 : 42, reasons) +
+      scoreFieldMatches("dry needling excerpt", normalizedExcerpt, DRY_NEEDLING_TERMS, explicitMode ? 24 : 18, reasons);
+
+    score += dryNeedlingScore;
+
+    if (dryNeedlingScore > 0) {
+      reasons.push("normalized dry needling match");
+    }
+  }
 
   for (const topic of RESOURCE_TOPIC_GROUPS) {
     if (!includesPhrase(contextText, topic.queryPhrases)) {
@@ -907,7 +1074,7 @@ function scoreBlogArticle(
     }
   }
 
-  if (/\b(pediatric|pediatrics|kids?|child|children|toddler|baby|newborn|growing pains?)\b/.test(contextText)) {
+  if (!explicitMode && /\b(pediatric|pediatrics|kids?|child|children|toddler|baby|newborn|growing pains?)\b/.test(contextText)) {
     if (!/\b(pediatric|pediatrics|kids?|child|children|toddler|baby|newborn|growing pains?)\b/.test(strongFieldText)) {
       score -= 180;
       reasons.push("penalty: pediatric intent without pediatric title/slug/tag/category/heading match");
@@ -919,14 +1086,14 @@ function scoreBlogArticle(
     reasons.push("penalty: growing-pains intent without direct growing-pains match");
   }
 
-  if (/\b(pregnan|prenatal|postpartum|perinatal|women'?s health)\b/.test(contextText)) {
+  if (!explicitMode && /\b(pregnan|prenatal|postpartum|perinatal|women'?s health)\b/.test(contextText)) {
     if (!/\b(pregnan|prenatal|postpartum|perinatal|women'?s health)\b/.test(strongFieldText)) {
       score -= 160;
       reasons.push("penalty: pregnancy/perinatal intent without strong field match");
     }
   }
 
-  if (/\b(dr\.?|doctor|provider|who should|which provider|which doctor)\b/.test(contextText)) {
+  if (!explicitMode && /\b(dr\.?|doctor|provider|who should|which provider|which doctor)\b/.test(contextText)) {
     if (!/\b(provider|doctor|dr\.?|kyle|david|dave|josh|claire|michelle|nichole|james|staff|location|service)\b/.test(strongFieldText)) {
       score -= 120;
       reasons.push("penalty: provider intent without provider/location/service match");
@@ -1036,10 +1203,15 @@ function retrieveBlogResources(
 ) {
   const queryKeywords = extractKeywords(input.query);
   const pageKeywords = extractKeywords(input.pageContext);
-  const fallbackMinimumScore = input.wantsMoreResources ? 48 : 58;
+  const explicitMode = input.retrievalMode === "explicit";
+  const fallbackMinimumScore = explicitMode
+    ? 28
+    : input.wantsMoreResources
+      ? 48
+      : 58;
   const seenUrls = new Set<string>();
   const scoredArticles = loadBlogIndex()
-    .filter((article) => !excludedUrls.has(article.url.toLowerCase()))
+    .filter((article) => !excludedUrls.has(getBlogArticleUrl(article).toLowerCase()))
     .map((article) => {
       const match = scoreBlogArticle(article, input, queryKeywords, pageKeywords);
 
@@ -1053,7 +1225,7 @@ function retrieveBlogResources(
   const resources = scoredArticles
     .filter(({ score }) => score >= fallbackMinimumScore)
     .filter(({ article }) => {
-      const url = article.url.toLowerCase();
+      const url = getBlogArticleUrl(article).toLowerCase();
 
       if (seenUrls.has(url)) {
         return false;
@@ -1066,10 +1238,32 @@ function retrieveBlogResources(
     .map<RetrievedResource>(({ article, score }) => ({
       title: article.title,
       summary: getBlogArticleSummary(article),
-      url: article.url,
+      url: getBlogArticleUrl(article),
       type: article.category ? `Blog • ${article.category}` : "Blog",
       score,
     }));
+  const fallbackResources = explicitMode && resources.length === 0
+    ? scoredArticles
+        .filter(({ score }) => score >= 14)
+        .filter(({ article }) => {
+          const url = getBlogArticleUrl(article).toLowerCase();
+
+          if (seenUrls.has(url)) {
+            return false;
+          }
+
+          seenUrls.add(url);
+          return true;
+        })
+        .slice(0, limit)
+        .map<RetrievedResource>(({ article, score }) => ({
+          title: article.title,
+          summary: getBlogArticleSummary(article),
+          url: getBlogArticleUrl(article),
+          type: article.category ? `Blog • ${article.category}` : "Blog",
+          score,
+        }))
+    : [];
 
   if (process.env.NODE_ENV !== "production" && input.query.trim()) {
     console.log("[Wendy blog retrieval]", {
@@ -1084,7 +1278,7 @@ function retrieveBlogResources(
     });
   }
 
-  return resources;
+  return resources.length > 0 ? resources : fallbackResources;
 }
 
 function isJaneBookingChunk(chunk: KnowledgeChunk) {
@@ -1102,7 +1296,11 @@ export function retrieveResources(
     retrievalInput.excludedUrls.map((url) => url.toLowerCase()),
   );
   const limit = maxResources ?? (retrievalInput.wantsMoreResources ? 4 : 1);
+  const explicitMode =
+    retrievalInput.retrievalMode === "explicit" ||
+    EXPLICIT_RESOURCE_REQUEST_PATTERN.test(retrievalInput.query);
   const hasExplicitResourceIntent =
+    explicitMode ||
     retrievalInput.wantsMoreResources ||
     /\b(blogs?|articles?|resources?|more reading|additional reading|send me a link|send a link|link|more info|anything on this|read more|reading)\b/i.test(
       retrievalInput.query,
@@ -1113,7 +1311,11 @@ export function retrieveResources(
     return [];
   }
 
-  const fallbackMinimumScore = retrievalInput.wantsMoreResources ? 42 : 56;
+  const fallbackMinimumScore = explicitMode
+    ? 28
+    : retrievalInput.wantsMoreResources
+      ? 42
+      : 56;
   const seenUrls = new Set<string>();
   const blogResources = retrieveBlogResources(retrievalInput, limit, excludedUrls);
 
@@ -1188,6 +1390,173 @@ export function retrieveResources(
   }
 
   return [];
+}
+
+export function retrieveDiagnosticDocuments(
+  input: string | RetrievalInput,
+  maxDocuments = 5,
+): RetrievedDiagnosticDocument[] {
+  const retrievalInput = normalizeRetrievalInput(input);
+  const queryKeywords = extractKeywords(retrievalInput.query);
+  const contextKeywords = extractKeywords(retrievalInput.conversationContext);
+  const pageKeywords = extractKeywords(retrievalInput.pageContext);
+
+  return loadKnowledgeChunks()
+    .map((chunk) => {
+      const score =
+        scoreChunk(
+          chunk,
+          retrievalInput,
+          queryKeywords,
+          contextKeywords,
+          pageKeywords,
+        ) +
+        scoreResourceCandidate(chunk, retrievalInput, queryKeywords, pageKeywords);
+
+      return { chunk, score };
+    })
+    .filter(({ score }) => score > 0)
+    .sort((first, second) => second.score - first.score)
+    .slice(0, maxDocuments)
+    .map<RetrievedDiagnosticDocument>(({ chunk, score }) => ({
+      title: chunk.title,
+      url: chunk.url,
+      sourceType: chunk.sourceType ?? "markdown_fallback",
+      chunkType: chunk.chunkType ?? "markdown_section",
+      sourceBucket: chunk.category ?? chunk.sourceType ?? "knowledge",
+      score,
+      preview: compactText(chunk.text).slice(0, 280),
+      canonicalSource: chunk.canonicalSource ?? chunk.source,
+    }));
+}
+
+export function getResourceRetrievalDiagnostics(
+  input: string | RetrievalInput,
+  maxResources = 5,
+) {
+  const retrievalInput = normalizeRetrievalInput(input);
+  const diagnosticInput: Required<RetrievalInput> = {
+    ...retrievalInput,
+    retrievalMode:
+      retrievalInput.retrievalMode === "explicit" ||
+      EXPLICIT_RESOURCE_REQUEST_PATTERN.test(retrievalInput.query)
+        ? "explicit"
+        : "contextual",
+  };
+  const queryKeywords = extractKeywords(diagnosticInput.query);
+  const pageKeywords = extractKeywords(diagnosticInput.pageContext);
+  const scoredArticles = loadBlogIndex()
+    .map((article) => {
+      const match = scoreBlogArticle(
+        article,
+        diagnosticInput,
+        queryKeywords,
+        pageKeywords,
+      );
+
+      return {
+        title: article.title,
+        url: getBlogArticleUrl(article),
+        category: article.category ?? "Blog",
+        tags: article.tags ?? [],
+        score: match.score,
+        reasons: match.reasons.slice(0, 8),
+      };
+    })
+    .sort((first, second) => second.score - first.score)
+    .slice(0, maxResources);
+  const resources = retrieveResources(diagnosticInput, maxResources);
+
+  return {
+    mode: diagnosticInput.retrievalMode,
+    fallbackUsed: resources.length > 0 && scoredArticles[0]?.score < (diagnosticInput.retrievalMode === "explicit" ? 28 : 58),
+    returnedResources: resources.map((resource) => ({
+      title: resource.title,
+      url: resource.url,
+      type: resource.type,
+      score: resource.score,
+    })),
+    topCandidates: scoredArticles,
+  };
+}
+
+export function getKnowledgeSourceDiagnostics() {
+  const manifest = loadKnowledgeManifest();
+  const chunks = loadKnowledgeChunks();
+  const blogIndex = loadBlogIndex();
+  const activeSources = manifest?.sources?.filter((source) => source.used_by_retrieval) ?? [];
+  const duplicateWarnings = [
+    manifest?.sources?.some((source) => source.file_path === "data/blog-knowledge.md")
+      ? "data/blog-knowledge.md is legacy/non-canonical and should not be used for active retrieval."
+      : "",
+    manifest?.sources?.some((source) => source.file_path === "data/generated/blog-knowledge.md")
+      ? "data/generated/blog-knowledge.md is regenerated from blog-index.json and is documentation/fallback, not the canonical resource-card index."
+      : "",
+  ].filter(Boolean);
+  const countsBySourceType = chunks.reduce<Record<string, number>>((counts, chunk) => {
+    const key = chunk.sourceType ?? "markdown_fallback";
+    counts[key] = (counts[key] ?? 0) + 1;
+    return counts;
+  }, {});
+  const countsByChunkType = chunks.reduce<Record<string, number>>((counts, chunk) => {
+    const key = chunk.chunkType ?? "markdown_section";
+    counts[key] = (counts[key] ?? 0) + 1;
+    return counts;
+  }, {});
+
+  return {
+    manifestExists: Boolean(manifest),
+    architecture: manifest?.architecture ?? "fallback-generated-markdown",
+    generatedAt: manifest?.generated_at ?? null,
+    activeSources,
+    allSources: manifest?.sources ?? [],
+    duplicateWarnings,
+    blogIndexCount: blogIndex.length,
+    knowledgeIndexChunkCount: chunks.length,
+    countsBySourceType,
+    countsByChunkType,
+    canonicalBlogFile: "data/generated/blog-index.json",
+    canonicalClinicFile: "data/generated/clinic-knowledge.json",
+  };
+}
+
+export function getProviderKnowledgeDiagnostics(providerName: string) {
+  const normalizedProviderName = normalize(providerName);
+  const providerWords = normalizedProviderName
+    .split(/\s+/)
+    .map((word) => word.replace(/[^a-z]/g, ""))
+    .filter((word) => word.length > 2 && !["doctor"].includes(word));
+  const chunks = loadKnowledgeChunks()
+    .map((chunk) => {
+      const normalizedText = normalize(`${chunk.title} ${chunk.text}`);
+      const normalizedTitle = normalize(chunk.title);
+      const score =
+        (normalizedTitle.includes(normalizedProviderName) ? 100 : 0) +
+        (normalizedText.includes(normalizedProviderName) ? 50 : 0) +
+        providerWords.reduce(
+          (total, word) =>
+            total +
+            (normalizedTitle.includes(word) ? 20 : normalizedText.includes(word) ? 8 : 0),
+          0,
+        );
+
+      return { chunk, score };
+    })
+    .filter(({ chunk, score }) => chunk.chunkType === "provider_profile" && score > 0)
+    .sort((first, second) => second.score - first.score)
+    .map(({ chunk }) => chunk)
+    .slice(0, 5);
+
+  return chunks.map((chunk) => ({
+    title: chunk.title,
+    sourceType: chunk.sourceType,
+    chunkType: chunk.chunkType,
+    category: chunk.category,
+    tags: chunk.tags ?? [],
+    priority: chunk.priority ?? 0,
+    canonicalSource: chunk.canonicalSource ?? chunk.source,
+    text: chunk.text.slice(0, 900),
+  }));
 }
 
 export function retrieveKnowledge(

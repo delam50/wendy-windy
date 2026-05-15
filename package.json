@@ -7,8 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "sync:sitemap": "tsx scripts/syncSitemapKnowledge.ts && tsx scripts/syncBlogIndex.ts",
-    "sync:blogs": "tsx scripts/syncBlogIndex.ts"
+    "sync:sitemap": "tsx scripts/syncSitemapKnowledge.ts && tsx scripts/syncBlogIndex.ts && tsx scripts/buildKnowledgeIndex.ts",
+    "sync:blogs": "tsx scripts/syncBlogIndex.ts && tsx scripts/buildKnowledgeIndex.ts",
+    "build:knowledge": "tsx scripts/buildKnowledgeIndex.ts",
+    "sync:knowledge": "tsx scripts/syncSitemapKnowledge.ts && tsx scripts/syncBlogIndex.ts && tsx scripts/buildKnowledgeIndex.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.4",
