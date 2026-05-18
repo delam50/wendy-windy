@@ -203,19 +203,22 @@ html {
 
 .wendy-panel-glow {
   box-shadow:
-    0 28px 70px rgba(0, 0, 0, 0.58),
-    0 0 0 1px rgba(255, 255, 255, 0.08),
-    0 0 48px rgba(215, 122, 52, 0.19),
-    0 0 84px rgba(215, 122, 52, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 34px 86px rgba(0, 0, 0, 0.68),
+    0 18px 42px rgba(0, 0, 0, 0.36),
+    0 0 0 1px rgba(255, 255, 255, 0.11),
+    0 0 0 2px rgba(0, 0, 0, 0.22),
+    0 0 54px rgba(215, 122, 52, 0.2),
+    0 0 96px rgba(215, 122, 52, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -18px 34px rgba(0, 0, 0, 0.18);
 }
 
 .wendy-header-glow {
   box-shadow:
-    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 12px 30px rgba(0, 0, 0, 0.2),
-    0 0 40px rgba(215, 122, 52, 0.15);
+    inset 0 -1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 16px 34px rgba(0, 0, 0, 0.3),
+    0 0 46px rgba(215, 122, 52, 0.16);
 }
 
 .wendy-launcher-glow {

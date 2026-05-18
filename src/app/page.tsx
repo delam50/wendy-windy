@@ -966,6 +966,15 @@ export default function Home() {
   }, [isOpen, shouldRunLauncherKnock]);
 
   useEffect(() => {
+    const widgetMessageType = isOpen ? "WENDY_OPEN" : "WENDY_CLOSED";
+
+    window.parent?.postMessage(
+      {
+        type: widgetMessageType,
+      },
+      "*",
+    );
+
     window.parent?.postMessage(
       {
         source: "windy-wendy",
@@ -974,6 +983,10 @@ export default function Home() {
       },
       "*",
     );
+
+    if (process.env.NODE_ENV === "development") {
+      console.log(`Wendy sent ${widgetMessageType}`);
+    }
   }, [isOpen]);
 
   useEffect(() => {

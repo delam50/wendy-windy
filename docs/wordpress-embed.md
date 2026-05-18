@@ -98,8 +98,23 @@ with the deployed Wendy Vercel app URL.
         return;
       }
 
+      if (!event.data) {
+        return;
+      }
+
+      if (event.data.type === "WENDY_OPEN") {
+        isOpen = true;
+        applyOpenSize(iframe);
+        return;
+      }
+
+      if (event.data.type === "WENDY_CLOSED") {
+        isOpen = false;
+        applyClosedSize(iframe);
+        return;
+      }
+
       if (
-        event.data &&
         event.data.source === "windy-wendy" &&
         event.data.type === "wendy_widget_state"
       ) {
