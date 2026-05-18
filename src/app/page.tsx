@@ -1672,7 +1672,11 @@ export default function Home() {
     <main className="min-h-dvh overflow-visible bg-transparent text-white">
       <section
         aria-label="Windy Ridge Chiropractic chat widget"
-        className="wendy-widget-arrive fixed inset-x-4 bottom-[max(1.25rem,calc(env(safe-area-inset-bottom)_+_0.75rem))] z-50 flex max-h-[100dvh] min-w-0 flex-col items-end gap-3 overflow-visible sm:inset-x-auto sm:bottom-9 sm:right-9 sm:w-[380px] sm:gap-4"
+        className={`wendy-widget-arrive fixed z-50 flex max-h-[100dvh] min-w-0 flex-col items-end overflow-visible ${
+          isOpen
+            ? "inset-x-4 bottom-[max(1.25rem,calc(env(safe-area-inset-bottom)_+_0.75rem))] gap-3 sm:inset-x-auto sm:bottom-9 sm:right-9 sm:w-[380px] sm:gap-4"
+            : "bottom-2 right-2 gap-0"
+        }`}
       >
         <div
           aria-hidden={!isOpen}
@@ -1831,12 +1835,14 @@ export default function Home() {
           ref={launcherButtonRef}
           aria-expanded={isOpen}
           aria-label={isOpen ? "Chat is open" : "Open Wendy chat"}
-          className={`wendy-launcher-glow flex min-h-16 max-w-full items-center justify-center gap-3 rounded-full border border-[#f4ad79]/40 bg-[linear-gradient(135deg,#df8440,#b85f25)] px-5 py-3.5 text-center text-sm font-bold leading-5 text-white ring-1 ring-white/15 transition duration-300 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_24px_58px_rgba(0,0,0,0.5),0_0_46px_rgba(215,122,52,0.42)] focus:outline-none focus:ring-4 focus:ring-[#d77a34]/50 active:translate-y-0 active:scale-[0.98] sm:min-h-20 sm:px-6 sm:py-4 ${
+          className={`wendy-launcher-glow flex items-center justify-center border border-[#f4ad79]/40 bg-[linear-gradient(135deg,#df8440,#b85f25)] text-center text-sm font-bold leading-5 text-white ring-1 ring-white/15 transition duration-300 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-[0_24px_58px_rgba(0,0,0,0.5),0_0_46px_rgba(215,122,52,0.42)] focus:outline-none focus:ring-4 focus:ring-[#d77a34]/50 active:translate-y-0 active:scale-[0.98] ${
             isOpen
-              ? ""
-              : playLauncherKnock
+              ? "min-h-16 max-w-full gap-3 rounded-full px-5 py-3.5 sm:min-h-20 sm:px-6 sm:py-4"
+              : `h-20 w-20 rounded-full p-3 ${
+                  playLauncherKnock
                 ? "wendy-launcher-knock"
                 : "wendy-launcher-breathe"
+                }`
           }`}
           onAnimationEnd={(event) => {
             if (event.animationName === "wendy-launcher-knock") {
@@ -1856,7 +1862,7 @@ export default function Home() {
               width={80}
             />
           </span>
-          <span className="text-left">
+          <span className={isOpen ? "text-left" : "sr-only"}>
             <span className="block">Meet Wendy</span>
             <span className="block text-xs font-semibold text-white/80">
               Windy Ridge AI

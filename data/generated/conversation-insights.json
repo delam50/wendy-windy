@@ -64,5 +64,54 @@
     "leadFormSubmitted": false,
     "resourceRecommended": false,
     "metadata": {}
+  },
+  {
+    "id": "ecdc88ec-5bda-43b8-8aa6-61c617fa690a",
+    "timestamp": "2026-05-18T20:48:21.392Z",
+    "event": "widget_loaded",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {
+      "sessionId": "67c3b2c2-b4cd-420f-bd23-23c27f1b3352"
+    }
+  },
+  {
+    "id": "a5ce799c-d7e6-4564-8f2b-dae229c96363",
+    "timestamp": "2026-05-18T20:48:39.922Z",
+    "event": "widget_loaded",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {
+      "sessionId": "67c3b2c2-b4cd-420f-bd23-23c27f1b3352"
+    }
+  },
+  {
+    "id": "b73ed9df-0a29-474c-a497-e0e0dc4a8e60",
+    "timestamp": "2026-05-18T20:49:05.616Z",
+    "event": "widget_opened",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {
+      "sessionId": "67c3b2c2-b4cd-420f-bd23-23c27f1b3352"
+    }
+  },
+  {
+    "id": "4b86a6f9-9ecc-4427-951d-9478afbf7966",
+    "timestamp": "2026-05-18T20:49:11.153Z",
+    "event": "widget_closed",
+    "bookingLinkClicked": false,
+    "leadFormOpened": false,
+    "leadFormSubmitted": false,
+    "resourceRecommended": false,
+    "metadata": {
+      "source": "header_minimize",
+      "sessionId": "67c3b2c2-b4cd-420f-bd23-23c27f1b3352"
+    }
   }
 ]
