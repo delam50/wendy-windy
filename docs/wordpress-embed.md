@@ -16,8 +16,8 @@ with the deployed Wendy Vercel app URL.
 <script>
   (function () {
     var WENDY_APP_URL = "https://YOUR-VERCEL-URL.vercel.app";
-    var COLLAPSED_WIDTH = 96;
-    var COLLAPSED_HEIGHT = 96;
+    var COLLAPSED_WIDTH = 260;
+    var COLLAPSED_HEIGHT = 128;
     var DESKTOP_WIDTH = 420;
     var DESKTOP_HEIGHT = 760;
     var MOBILE_BREAKPOINT = 640;
@@ -143,7 +143,7 @@ with the deployed Wendy Vercel app URL.
 
 Notes:
 
-- The iframe shrinks to the launcher footprint while Wendy is collapsed, so hidden iframe regions do not block page links or buttons.
+- The iframe shrinks to the pill launcher footprint while Wendy is collapsed, so hidden iframe regions do not block page links or buttons.
 - On desktop, Wendy opens as a bottom-right floating panel.
 - On mobile, Wendy opens full screen for easier typing and reading.
 - The script passes `pageTitle` and `pageUrl` to Wendy so she can tailor answers subtly to the current WordPress page.
