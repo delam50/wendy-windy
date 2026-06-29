@@ -34,8 +34,8 @@ import { getSupabaseDiagnostics } from "@/lib/supabaseServer";
 import { systemPrompt } from "@/lib/systemPrompt";
 import {
   looksLikeAdminCommand,
+  normalizeAuthenticatedAdminCommand,
   parseAdminCommand,
-  removeAdminCode,
   type AdminCommand,
 } from "@/lib/adminCommandRouter";
 import {
@@ -1385,6 +1385,9 @@ async function runAuthorizedAdminCommand(
 ) {
   switch (command.type) {
     case "retrieval_diagnostics":
+      if (!command.query) {
+        return "Wendy retrieval diagnostics\n\nWhat topic should I inspect? For example: Show retrieval matches for dry needling.";
+      }
       return getAdminRetrievalDiagnosticsReport(command.query, pageContext);
     case "knowledge_sources":
       return getAdminKnowledgeDiagnosticsReport();
@@ -1421,9 +1424,23 @@ export async function POST(request: Request) {
   const adminCode = process.env.WENDY_ADMIN_CODE?.trim() ?? "";
   const adminCodeDetected = hasValidAdminCode(messages);
   const unauthenticatedAdminCommand = looksLikeAdminCommand(latestUserMessage);
+  const normalizedAdminCommand = adminCodeDetected
+    ? normalizeAuthenticatedAdminCommand(latestUserMessage, adminCode)
+    : "";
   const adminCommand = adminCodeDetected
-    ? parseAdminCommand(removeAdminCode(latestUserMessage, adminCode))
+    ? parseAdminCommand(normalizedAdminCommand)
     : undefined;
+
+  if (process.env.NODE_ENV === "development" && adminCodeDetected) {
+    console.log("[Wendy admin command normalization]", {
+      normalizedCommand: normalizedAdminCommand,
+      matchedType: adminCommand?.type ?? "unrecognized",
+      extractedQuery:
+        adminCommand?.type === "retrieval_diagnostics"
+          ? adminCommand.query || "missing"
+          : undefined,
+    });
+  }
 
   if (unauthenticatedAdminCommand && !adminCodeDetected) {
     return Response.json({
@@ -1434,10 +1451,6 @@ export async function POST(request: Request) {
   }
 
   if (adminCommand) {
-    if (process.env.NODE_ENV === "development") {
-      console.log("[Wendy admin command]", { type: adminCommand.type });
-    }
-
     return Response.json({
       message: await runAuthorizedAdminCommand(adminCommand, messages, pageContext),
       resources: [],

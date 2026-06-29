@@ -8,16 +8,38 @@ export type AdminCommand =
   | { type: "analytics_summary"; topTopicsOnly?: boolean };
 
 const ADMIN_COMMAND_START =
-  /^(?:show|run|why|which|who|check|open|give me)\b/i;
+  /\b(?:show|run|why|which|who|check|open|give me)\b/i;
 
-export function looksLikeAdminCommand(message: string) {
-  const text = message.trim();
+const EXPLICIT_ADMIN_COMMAND_START =
+  /\b(?:show retrieval matches|show retrieval diagnostics|run rag diagnostics|why did wendy not return|why did wendy not show (?:a )?resource|show active knowledge sources|show knowledge manifest|which file is canonical for blogs|show knowledge index summary|show provider knowledge|show dr\.?\s*claire availability|check for stale dr\.?\s*michelle references|who is in big sky today|show recent wendy conversations|show conversation review|open conversation|show messages for conversation|open recent-\d+|show system health|give me wendy status report|show analytics summary|show top topics)\b/i;
 
-  return ADMIN_COMMAND_START.test(text) && /\b(?:retrieval|rag|resource|knowledge|canonical|provider|availability|stale|conversation|messages|recent-\d+|system health|status report|analytics|top topics)\b/i.test(text);
+export function normalizeAdminText(message: string) {
+  return message
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^["']+|["']+$/g, "")
+    .replace(/[.!?;:,]+$/, "")
+    .trim()
+    .toLowerCase();
 }
 
-export function removeAdminCode(message: string, adminCode: string) {
-  return message.split(adminCode).join(" ").replace(/\s+/g, " ").trim();
+export function looksLikeAdminCommand(message: string) {
+  const text = normalizeAdminText(message);
+
+  return ADMIN_COMMAND_START.test(text) && EXPLICIT_ADMIN_COMMAND_START.test(text);
+}
+
+export function normalizeAuthenticatedAdminCommand(message: string, adminCode: string) {
+  const withoutCode = message
+    .split(adminCode)
+    .join(" ")
+    .replace(/\bmanager\s+code\s*:\s*/gi, " ");
+  const normalized = normalizeAdminText(withoutCode);
+  const commandStart = normalized.search(EXPLICIT_ADMIN_COMMAND_START);
+
+  return commandStart >= 0 ? normalized.slice(commandStart).trim() : normalized;
 }
 
 function cleanQuery(value: string) {
@@ -25,22 +47,26 @@ function cleanQuery(value: string) {
 }
 
 export function parseAdminCommand(message: string): AdminCommand | undefined {
-  const text = message.trim().replace(/[.!?]+$/, "").trim();
+  const text = normalizeAdminText(message);
 
   // 1. Retrieval diagnostics
   const retrievalPatterns = [
-    /^show retrieval matches for\s+(.+)$/i,
-    /^show retrieval diagnostics for\s+(.+)$/i,
-    /^run rag diagnostics for\s+(.+)$/i,
-    /^why did wendy not return\s+(.+)$/i,
-    /^why did wendy not show (?:a )?resource for\s+(.+)$/i,
+    /^show retrieval matches(?:\s+(?:for|about|on))?(?:\s+(.+))?$/i,
+    /^show retrieval diagnostics(?:\s+(?:for|about|on))?(?:\s+(.+))?$/i,
+    /^run rag diagnostics(?:\s+(?:for|about|on))?(?:\s+(.+))?$/i,
+    /^why did wendy not return(?:\s+(?:for|about|on))?(?:\s+(.+))?$/i,
+    /^why did wendy not show (?:a )?resource(?:\s+(?:for|about|on))?(?:\s+(.+))?$/i,
   ];
 
   for (const pattern of retrievalPatterns) {
     const match = text.match(pattern);
-    const query = match?.[1] ? cleanQuery(match[1]) : "";
 
-    if (query) return { type: "retrieval_diagnostics", query };
+    if (match) {
+      return {
+        type: "retrieval_diagnostics",
+        query: match[1] ? cleanQuery(match[1]) : "",
+      };
+    }
   }
 
   // 2. Knowledge source diagnostics

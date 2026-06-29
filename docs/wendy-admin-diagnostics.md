@@ -40,6 +40,45 @@ Supported command families include retrieval diagnostics, knowledge sources, pro
 
 Wendy parses an admin command only after the correct code is present. Without authorization, it returns no diagnostic data.
 
+## Manager Dashboard
+
+Authorized managers can open `/admin` directly. The dashboard is intentionally
+not linked from the public Wendy widget and is marked `noindex` for search
+engines.
+
+Enter the value configured in the server-side `WENDY_ADMIN_CODE` environment
+variable. The code is verified by a server API route and retained only in that
+browser tab's `sessionStorage`; it is cleared when the manager signs out or the
+tab session ends. The dashboard never returns environment values, Supabase
+service-role credentials, OpenAI keys, Monday credentials, or hidden prompts.
+
+Dashboard sections:
+
+- **System Health:** configuration and safe health signals for the app,
+  Mountain Time context, Supabase, OpenAI, Monday, blog index, knowledge
+  manifest, provider directory, and recent server functions.
+- **Analytics Summary:** aggregate Wendy funnel counts, top topics, top pages,
+  clicked resources, and lead totals.
+- **Conversation Archive:** recent short-term QA conversations and their stored
+  redacted user/assistant messages in chronological order.
+- **RAG Inspector:** query classification, sources searched, ranked knowledge
+  matches, scores, acceptance decisions, and final resource cards.
+- **Knowledge Sources:** canonical and supplemental files, source freshness,
+  index counts, pricing/hours status, and stale knowledge warnings.
+- **Provider Routing Inspector:** deterministic location/category detection,
+  provider ranking scores and reasons, and current recommendation rules.
+- **Leads / Monday:** recent masked lead summaries and available Monday push
+  status. Contact details and health-history fields are not returned.
+
+### Privacy and retention
+
+The conversation archive is a short-term QA tool with a target retention period
+of 30 days. Email addresses, phone numbers, and street addresses are redacted at
+archive time. The dashboard omits system messages and shows only stored user and
+assistant messages. Lead names are masked, and contact information is excluded.
+This dashboard is not a medical record or a substitute for the clinic's approved
+patient-record systems.
+
 ## What The Report Includes
 
 The report may include safe operational metrics:

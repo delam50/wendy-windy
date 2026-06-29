@@ -64,6 +64,17 @@ type WendyEventRow = {
   topic_category: string | null;
 };
 
+export type WendyManagerLeadSummary = {
+  id: string;
+  createdAt: string;
+  displayName: string;
+  preferredLocation?: string;
+  suggestedProvider?: string;
+  leadSubmitted: boolean;
+  mondayItemId?: string;
+  mondayPushStatus: "pushed" | "not_pushed" | "unknown";
+};
+
 function createEmptyFunnelCounts(): FunnelCounts {
   return Object.fromEntries(
     funnelEventNames.map((eventName) => [eventName, 0]),
@@ -390,5 +401,73 @@ export async function getSupabaseDiagnostics() {
     topClickedResources: eventSummary.topClickedResources,
     recentResourceClicks: eventSummary.recentResourceClicks,
     recentBookingClicks: eventSummary.recentBookingClicks,
+  };
+}
+
+function redactLeadName(value: unknown) {
+  const name = typeof value === "string" ? value.trim() : "";
+  if (!name) return "Redacted lead";
+
+  return name
+    .split(/\s+/)
+    .map((part) => `${part.charAt(0).toUpperCase()}•••`)
+    .join(" ");
+}
+
+export async function getRecentWendyLeads(limit = 20) {
+  const supabase = getSupabaseAdmin();
+
+  if (!supabase) {
+    return { available: false, leads: [] as WendyManagerLeadSummary[] };
+  }
+
+  const safeLimit = Math.min(Math.max(limit, 1), 50);
+  const primary = await supabase
+    .from("wendy_leads")
+    .select("id,created_at,name,preferred_location,suggested_provider,monday_item_id,metadata")
+    .order("created_at", { ascending: false })
+    .limit(safeLimit);
+  let rows = (primary.data ?? []) as Array<Record<string, unknown>>;
+  let error = primary.error;
+
+  if (error) {
+    const fallback = await supabase
+      .from("wendy_leads")
+      .select("id,created_at,name,preferred_location,suggested_provider,metadata")
+      .order("created_at", { ascending: false })
+      .limit(safeLimit);
+    rows = (fallback.data ?? []) as Array<Record<string, unknown>>;
+    error = fallback.error;
+  }
+
+  if (error) {
+    console.error("Wendy manager lead query failed:", error.message);
+    return { available: false, leads: [] as WendyManagerLeadSummary[] };
+  }
+
+  return {
+    available: true,
+    leads: rows.map((row) => {
+      const mondayItemId = typeof row.monday_item_id === "string"
+        ? row.monday_item_id
+        : undefined;
+
+      return {
+        id: String(row.id),
+        createdAt: String(row.created_at),
+        displayName: redactLeadName(row.name),
+        preferredLocation:
+          typeof row.preferred_location === "string"
+            ? row.preferred_location
+            : undefined,
+        suggestedProvider:
+          typeof row.suggested_provider === "string"
+            ? row.suggested_provider
+            : undefined,
+        leadSubmitted: true,
+        mondayItemId,
+        mondayPushStatus: mondayItemId ? "pushed" : "not_pushed",
+      } satisfies WendyManagerLeadSummary;
+    }),
   };
 }
