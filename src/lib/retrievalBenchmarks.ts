@@ -171,6 +171,8 @@ function toDiagnosticResource(resource: {
     sourceType: "blog",
     chunkType: "blog_article",
     sourceBucket: resource.type,
+    category: resource.type,
+    tags: [],
     score: resource.score,
     preview: resource.summary,
     canonicalSource: "data/generated/blog-index.json",

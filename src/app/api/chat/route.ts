@@ -13,6 +13,7 @@ import {
 import {
   formatProviderRankingContext,
   rankWendyProviders,
+  wendyProviders,
 } from "@/lib/providers";
 import {
   getConversationInsightSummary,
@@ -25,11 +26,18 @@ import {
   getKnowledgeSourceDiagnostics,
   getProviderKnowledgeDiagnostics,
   getResourceRetrievalDiagnostics,
+  retrieveDiagnosticDocuments,
   retrieveKnowledge,
   retrieveResources,
 } from "@/lib/retrieveKnowledge";
 import { getSupabaseDiagnostics } from "@/lib/supabaseServer";
 import { systemPrompt } from "@/lib/systemPrompt";
+import {
+  looksLikeAdminCommand,
+  parseAdminCommand,
+  removeAdminCode,
+  type AdminCommand,
+} from "@/lib/adminCommandRouter";
 import {
   formatWendyDateTimePrompt,
   getWendyDateTimeContext,
@@ -81,12 +89,6 @@ type IntentCategory =
   | "follow-up/contact intent";
 
 const MAX_API_MESSAGES = 10;
-const ADMIN_DIAGNOSTIC_TERMS = /\b(status|diagnostics?|usage|report|performance|health|system\s+report)\b/i;
-const ADMIN_RETRIEVAL_DIAGNOSTIC_TERMS = /\b(retrieval matches|resource matches|why was no resource returned|why no resource|show retrieval|debug retrieval)\b/i;
-const ADMIN_KNOWLEDGE_DIAGNOSTIC_TERMS =
-  /\b(active knowledge sources|knowledge manifest|canonical for blogs|canonical blog|knowledge sources|knowledge index|provider knowledge|provider availability|dr\.?\s*claire availability|stale dr\.?\s*michelle references|who is in big sky today)\b/i;
-const ADMIN_CONVERSATION_REVIEW_TERMS =
-  /\b(show|review|summarize|list|recent|open|details?|messages?)\b.*\b(wendy|conversations?|chats?|dry needling|leads?|resources?|recent-\d+|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{6,})\b|\b(conversations?|chats?)\s+(about|that became|where|for)\b/i;
 
 function isChatMessage(value: unknown): value is ChatMessage {
   if (!value || typeof value !== "object") {
@@ -172,18 +174,6 @@ function getLatestUserContent(messages: ChatMessage[]) {
   return messages.findLast((message) => message.role === "user")?.content ?? "";
 }
 
-function isAdminDiagnosticsRequest(messages: ChatMessage[]) {
-  return (
-    ADMIN_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages)) ||
-    ADMIN_RETRIEVAL_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages)) ||
-    ADMIN_KNOWLEDGE_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages))
-  );
-}
-
-function isAdminConversationReviewRequest(messages: ChatMessage[]) {
-  return ADMIN_CONVERSATION_REVIEW_TERMS.test(getLatestUserContent(messages));
-}
-
 function hasValidAdminCode(messages: ChatMessage[]) {
   const adminCode = process.env.WENDY_ADMIN_CODE?.trim();
   const latestUserMessage = getLatestUserContent(messages).trim();
@@ -191,44 +181,6 @@ function hasValidAdminCode(messages: ChatMessage[]) {
   return Boolean(adminCode && latestUserMessage.includes(adminCode));
 }
 
-function getAdminDiagnosticsFlags(messages: ChatMessage[]) {
-  const adminEnvExists = Boolean(process.env.WENDY_ADMIN_CODE?.trim());
-  const adminCodeDetected = hasValidAdminCode(messages);
-  const adminIntentDetected = isAdminDiagnosticsRequest(messages);
-  const adminReviewDetected = isAdminConversationReviewRequest(messages);
-
-  return {
-    adminEnvExists,
-    adminCodeDetected,
-    adminIntentDetected,
-    adminReviewDetected,
-    diagnosticsModeActivated: adminCodeDetected && adminIntentDetected,
-    conversationReviewModeActivated: adminCodeDetected && adminReviewDetected,
-  };
-}
-
-function isAdminRetrievalDiagnosticsRequest(messages: ChatMessage[]) {
-  return ADMIN_RETRIEVAL_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages));
-}
-
-function isAdminKnowledgeDiagnosticsRequest(messages: ChatMessage[]) {
-  return ADMIN_KNOWLEDGE_DIAGNOSTIC_TERMS.test(getLatestUserContent(messages));
-}
-
-function getRetrievalDiagnosticQuery(messages: ChatMessage[]) {
-  const latest = getLatestUserContent(messages);
-  const forMatch = latest.match(/\b(?:for|about|on)\s+(.+)$/i);
-
-  if (forMatch?.[1]) {
-    return forMatch[1]
-      .replace(/\b(manager code|show retrieval matches|why was no resource returned|why no resource|debug retrieval)\b/gi, "")
-      .trim();
-  }
-
-  return latest
-    .replace(/\b(manager code|show retrieval matches|why was no resource returned|why no resource|debug retrieval)\b/gi, "")
-    .trim();
-}
 
 function includesAny(text: string, patterns: RegExp[]) {
   return patterns.some((pattern) => pattern.test(text));
@@ -855,29 +807,6 @@ function getConversationReviewFilters(messages: ChatMessage[]) {
   };
 }
 
-function getConversationDetailRequest(messages: ChatMessage[]) {
-  const latest = getLatestUserContent(messages);
-  const detailIntent =
-    /\b(show|open|view|details?|messages?)\b.*\b(conversation|chat|messages?)\b/i.test(latest) ||
-    /\b(conversation|chat)\s+(details?|messages?)\b/i.test(latest);
-
-  if (!detailIntent) {
-    return undefined;
-  }
-
-  const uuidMatch = latest.match(
-    /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i,
-  );
-
-  if (uuidMatch) {
-    return uuidMatch[0];
-  }
-
-  const shortMatch = latest.match(/\b(?:conversation\s+id|id|conversation|open conversation|show messages for conversation)\s*:?\s*([0-9a-f]{6,})\b/i);
-
-  return shortMatch?.[1];
-}
-
 async function resolveConversationId(reference: string) {
   if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(reference)) {
     return reference;
@@ -889,18 +818,19 @@ async function resolveConversationId(reference: string) {
     return undefined;
   }
 
+  const recentReference = reference.match(/^recent-(\d+)$/i);
+
+  if (recentReference?.[1]) {
+    const index = Number(recentReference[1]) - 1;
+    return index >= 0 ? recent.conversations[index]?.id : undefined;
+  }
+
   return recent.conversations.find((conversation) =>
     conversation.id.toLowerCase().startsWith(reference.toLowerCase()),
   )?.id;
 }
 
-async function getAdminConversationDetailReport(messages: ChatMessage[]) {
-  const requestedReference = getConversationDetailRequest(messages);
-
-  if (!requestedReference) {
-    return undefined;
-  }
-
+async function getAdminConversationDetailReport(requestedReference: string) {
   const conversationId = await resolveConversationId(requestedReference);
 
   if (!conversationId) {
@@ -959,12 +889,6 @@ async function getAdminConversationDetailReport(messages: ChatMessage[]) {
 }
 
 async function getAdminConversationReviewReport(messages: ChatMessage[]) {
-  const detailReport = await getAdminConversationDetailReport(messages);
-
-  if (detailReport) {
-    return detailReport;
-  }
-
   const filters = getConversationReviewFilters(messages);
   const result = await getRecentWendyConversationSummaries({
     ...filters,
@@ -1126,8 +1050,78 @@ async function getAdminDiagnosticsReport() {
   ].join("\n");
 }
 
-function getAdminRetrievalDiagnosticsReport(messages: ChatMessage[], pageContext: string) {
-  const query = getRetrievalDiagnosticQuery(messages) || "dry needling";
+async function getAdminAnalyticsReport(topTopicsOnly = false) {
+  const insightSummary = await getConversationInsightSummary();
+  const topQuestionTopics = await getTopQuestionTopics(10);
+  const supabaseDiagnostics = await getSupabaseDiagnostics();
+  const topicLines = topQuestionTopics.length
+    ? topQuestionTopics.map(({ topic, count }, index) => `${index + 1}. ${topic}: ${count}`).join("\n")
+    : "No topic counts available.";
+
+  if (topTopicsOnly) {
+    return [
+      "Wendy top topics",
+      "",
+      topicLines,
+      "",
+      "Admin-only aggregate output. No raw messages or private lead details are included.",
+    ].join("\n");
+  }
+
+  return [
+    "Wendy analytics summary",
+    "",
+    `Safe local analytics events: ${insightSummary.totalInsights}`,
+    `Supabase configured: ${supabaseDiagnostics.configured ? "Yes" : "No"}`,
+    `Supabase health: ${supabaseDiagnostics.healthy ? "Healthy" : "Unavailable or not configured"}`,
+    `Supabase total events: ${supabaseDiagnostics.totalEvents}`,
+    `Supabase total leads: ${supabaseDiagnostics.totalLeads}`,
+    `Booking link clicks: ${insightSummary.bookingLinkClicks}`,
+    `Lead forms opened/submitted: ${insightSummary.leadFormOpened}/${insightSummary.leadFormSubmitted}`,
+    `Resource recommendations: ${insightSummary.resourceRecommended}`,
+    "",
+    "Top topics:",
+    topicLines,
+    "",
+    "Admin-only aggregate output. No raw messages, secrets, or private lead details are included.",
+  ].join("\n");
+}
+
+type AdminRetrievalMode =
+  | "explicit_resource_request"
+  | "contextual_recommendation"
+  | "provider_answer"
+  | "pricing_answer"
+  | "hours_answer";
+
+function classifyAdminRetrieval(query: string): {
+  detectedIntent: string;
+  mode: AdminRetrievalMode;
+} {
+  const text = query.toLowerCase();
+
+  if (/\b(price|pricing|cost|cash|rate|insurance|how much|\$)\b/.test(text)) {
+    return { detectedIntent: "pricing intent", mode: "pricing_answer" };
+  }
+
+  if (/\b(hours?|open|closed|today|monday|tuesday|wednesday|thursday|friday|saturday|sunday|availability)\b/.test(text)) {
+    return { detectedIntent: "clinic hours intent", mode: "hours_answer" };
+  }
+
+  if (/\b(provider|doctor|dr\.?|who should|which provider|claire|kyle|dave|david|josh|nichole|james|pediatric|pregnan|newborn|massage)\b/.test(text)) {
+    return { detectedIntent: "provider matching", mode: "provider_answer" };
+  }
+
+  if (/\b(contextual|recommendation|related reading)\b/.test(text)) {
+    return { detectedIntent: "educational intent", mode: "contextual_recommendation" };
+  }
+
+  return { detectedIntent: "article/resource intent", mode: "explicit_resource_request" };
+}
+
+function getAdminRetrievalDiagnosticsReport(query: string, pageContext: string) {
+  const classification = classifyAdminRetrieval(query);
+  const resourceMode = classification.mode === "explicit_resource_request" ? "explicit" : "contextual";
   const diagnostics = getResourceRetrievalDiagnostics(
     {
       query,
@@ -1136,117 +1130,116 @@ function getAdminRetrievalDiagnosticsReport(messages: ChatMessage[], pageContext
       excludedUrls: [],
       wantsMoreResources: true,
       includeBookingResource: false,
-      retrievalMode: "explicit",
+      retrievalMode: resourceMode,
     },
     5,
   );
+  const knowledgeMatches = retrieveDiagnosticDocuments(
+    {
+      query,
+      pageContext,
+      conversationContext: "",
+      excludedUrls: [],
+      wantsMoreResources: classification.mode === "explicit_resource_request",
+      includeBookingResource: false,
+      retrievalMode: resourceMode,
+    },
+    8,
+  );
+  const sourceDiagnostics = getKnowledgeSourceDiagnostics();
+  const finalResources = ["explicit_resource_request", "contextual_recommendation"].includes(
+    classification.mode,
+  )
+    ? diagnostics.returnedResources
+    : [];
 
   return [
     "Wendy retrieval diagnostics",
     "",
     `Query: ${query}`,
-    `Retrieval mode used: ${diagnostics.mode}`,
+    `Detected intent: ${classification.detectedIntent}`,
+    `Retrieval mode used: ${classification.mode}`,
+    `Internal resource-card mode: ${diagnostics.mode}`,
+    `Acceptance threshold: ${diagnostics.acceptanceThreshold}`,
     `Fallback used: ${diagnostics.fallbackUsed ? "Yes" : "No"}`,
     "",
-    diagnostics.returnedResources.length
-      ? `Returned resources:\n${diagnostics.returnedResources
+    "Knowledge sources searched:",
+    sourceDiagnostics.activeSources.length
+      ? sourceDiagnostics.activeSources
           .map(
-            (resource, index) =>
-              `${index + 1}. ${resource.title}\nScore: ${resource.score}\nType: ${resource.type}\nURL: ${resource.url}`,
+            (source) =>
+              `- ${source.file_path} (${source.source_type}; ${source.canonical ? "canonical" : "non-canonical"})`,
+          )
+          .join("\n")
+      : "- Generated knowledge-index fallback",
+    "",
+    knowledgeMatches.length
+      ? `Top ranked knowledge matches:\n${knowledgeMatches
+          .map(
+            (match, index) => [
+              `${index + 1}. ${match.title}`,
+              match.url ? `URL: ${match.url}` : "URL: n/a",
+              `Source type: ${match.sourceType}`,
+              `Category: ${match.category}`,
+              `Tags: ${match.tags.join(", ") || "none"}`,
+              `Score/confidence: ${match.score}`,
+              `Status: ${index < 3 ? "accepted" : "rejected"}`,
+              `Reason: ${index < 3 ? "Top-three ranked knowledge match for answer context." : "Ranked below the answer-context inspection limit."}`,
+              `Canonical source: ${match.canonicalSource}`,
+            ].join("\n"),
           )
           .join("\n\n")}`
-      : "Returned resources: none",
+      : "Top ranked knowledge matches: none",
     "",
     diagnostics.topCandidates.length
-      ? `Top candidates:\n${diagnostics.topCandidates
+      ? `Top ranked resource candidates:\n${diagnostics.topCandidates
           .map(
             (candidate, index) =>
-              `${index + 1}. ${candidate.title}\nScore: ${candidate.score}\nCategory: ${candidate.category}\nURL: ${candidate.url}\nWhy: ${candidate.reasons.join("; ") || "keyword/category fallback only"}`,
+              [
+                `${index + 1}. ${candidate.title}`,
+                `URL: ${candidate.url}`,
+                `Source type: ${candidate.sourceType}`,
+                `Category: ${candidate.category}`,
+                `Tags: ${candidate.tags.join(", ") || "none"}`,
+                `Score/confidence: ${candidate.score}`,
+                `Status: ${candidate.status}`,
+                `Reason: ${candidate.decisionReason}`,
+                `Ranking signals: ${candidate.reasons.join("; ") || "keyword/category fallback only"}`,
+              ].join("\n"),
           )
           .join("\n\n")}`
-      : "Top candidates: none",
+      : "Top ranked resource candidates: none",
+    "",
+    diagnostics.fallbackMatches.length
+      ? `Fallback matches used:\n${diagnostics.fallbackMatches
+          .map((match, index) => `${index + 1}. ${match.title} | ${match.url} | score ${match.score}`)
+          .join("\n")}`
+      : "Fallback matches used: none",
+    "",
+    finalResources.length
+      ? `Final resources that would be shown to the user:\n${finalResources
+          .map(
+            (resource, index) =>
+              `${index + 1}. ${resource.title}\nURL: ${resource.url}\nType: ${resource.type}\nScore: ${resource.score}`,
+          )
+          .join("\n\n")}`
+      : "Final resources that would be shown to the user: none for this response mode.",
     "",
     "Admin-only diagnostic output. No user messages, secrets, system prompts, or retrieval chunks are exposed.",
   ].join("\n");
 }
 
-function getProviderKnowledgeQuery(messages: ChatMessage[]) {
-  const latest = getLatestUserContent(messages);
-  const providerMatch = latest.match(/\b(dr\.?\s*(?:dave|david|josh|kyle|claire)|nichole|james)\b/i);
-
-  return providerMatch?.[1] ?? "";
-}
-
-function getAdminKnowledgeDiagnosticsReport(messages: ChatMessage[]) {
-  const latest = getLatestUserContent(messages);
-  const providerQuery = getProviderKnowledgeQuery(messages);
+function getAdminKnowledgeDiagnosticsReport() {
   const dateTime = getWendyDateTimeContext();
   const diagnostics = getKnowledgeSourceDiagnostics();
-
-  if (/\bstale dr\.?\s*michelle references\b/i.test(latest)) {
-    return [
-      "Wendy stale provider knowledge check",
-      "",
-      `Dr. Michelle active references: ${diagnostics.staleProviderWarnings.length ? diagnostics.staleProviderWarnings.join(" ") : "none"}`,
-      `Current clinic date/time: ${dateTime.dayOfWeek}, ${dateTime.date} at ${dateTime.localTime} (${dateTime.timeOfDay})`,
-      "Admin-only diagnostic output.",
-    ].join("\n");
-  }
-
-  if (/\bwho is in big sky today\b/i.test(latest)) {
-    const todayAnswer = dateTime.dayOfWeek === "Wednesday"
-      ? "Dr. Claire is scheduled in Big Sky today; she is not at Four Corners on Wednesdays."
-      : dateTime.dayOfWeek === "Thursday"
-        ? "Dr. Kyle is scheduled in Big Sky today from 8:00 AM-5:00 PM."
-        : dateTime.dayOfWeek === "Friday"
-          ? "Friday Big Sky availability may be seasonal or at Dr. Dave's discretion."
-          : "No named recurring Big Sky provider shift is documented for today beyond the general clinic schedule.";
-
-    return [
-      "Wendy Big Sky provider diagnostic",
-      "",
-      `Current clinic date/time: ${dateTime.dayOfWeek}, ${dateTime.date} at ${dateTime.localTime} (${dateTime.timeOfDay})`,
-      todayAnswer,
-      "Live appointment availability is not guaranteed; confirm in JaneApp or by calling the clinic.",
-    ].join("\n");
-  }
-
-  if (/\b(provider knowledge|availability)\b/i.test(latest) && providerQuery) {
-    const providerChunks = getProviderKnowledgeDiagnostics(providerQuery);
-
-    return [
-      "Wendy provider knowledge diagnostics",
-      "",
-      `Provider query: ${providerQuery}`,
-      `Current clinic date/time: ${dateTime.dayOfWeek}, ${dateTime.date} at ${dateTime.localTime} (${dateTime.timeOfDay})`,
-      providerChunks.length
-        ? providerChunks
-            .map((chunk, index) =>
-              [
-                `${index + 1}. ${chunk.title}`,
-                `Source type: ${chunk.sourceType}`,
-                `Chunk type: ${chunk.chunkType}`,
-                `Priority: ${chunk.priority}`,
-                `Canonical source: ${chunk.canonicalSource}`,
-                `Tags: ${chunk.tags.join(", ") || "none"}`,
-                `Text: ${chunk.text}`,
-              ].join("\n"),
-            )
-            .join("\n\n")
-        : "No provider chunk found for that provider query.",
-      "",
-      "Admin-only diagnostic output. No secrets, system prompts, API keys, or raw private lead details are included.",
-    ].join("\n");
-  }
-
-  const activeSourceLines = diagnostics.activeSources.length
-    ? diagnostics.activeSources
+  const sourceLines = diagnostics.allSources.length
+    ? diagnostics.allSources
         .map(
           (source) =>
-            `- ${source.source_id}: ${source.file_path} (${source.source_type}, priority ${source.priority}, canonical ${source.canonical ? "yes" : "no"}, exists ${source.exists ? "yes" : "no"})`,
+            `- ${source.file_path}: ${source.used_by_retrieval ? "active" : "inactive"}; ${source.canonical ? "canonical" : "non-canonical"}; type ${source.source_type}; priority ${source.priority}; exists ${source.exists ? "yes" : "no"}`,
         )
         .join("\n")
-    : "No manifest active sources found; Wendy is using generated Markdown fallback.";
+    : "No manifest sources found; Wendy is using generated Markdown fallback.";
   const sourceTypeCounts = Object.entries(diagnostics.countsBySourceType)
     .map(([sourceType, count]) => `${sourceType}: ${count}`)
     .join(", ") || "none";
@@ -1266,18 +1259,146 @@ function getAdminKnowledgeDiagnosticsReport(messages: ChatMessage[]) {
     `Knowledge index chunks: ${diagnostics.knowledgeIndexChunkCount}`,
     `Counts by source type: ${sourceTypeCounts}`,
     `Counts by chunk type: ${chunkTypeCounts}`,
+    "Provider source: src/lib/providers.ts and data/generated/clinic-knowledge.json",
+    "Pricing source: structured clinic pricing facts plus active Jane booking knowledge",
+    "Hours source: structured clinic hours/provider availability facts in data/generated/clinic-knowledge.json",
     diagnostics.duplicateWarnings.length
       ? `Duplicate/stale warnings: ${diagnostics.duplicateWarnings.join(" ")}`
       : "Duplicate/stale warnings: none",
     `Dr. Michelle active references: ${diagnostics.staleProviderWarnings.length ? diagnostics.staleProviderWarnings.join(" ") : "none"}`,
-    "Dr. Claire availability: Four Corners provider; Big Sky Wednesdays and not at Four Corners on Wednesdays; at-home mom/newborn visits when applicable.",
     `Current clinic date/time: ${dateTime.dayOfWeek}, ${dateTime.date} at ${dateTime.localTime} (${dateTime.timeOfDay}; ${dateTime.timeZone})`,
     "",
-    "Active retrieval sources:",
-    activeSourceLines,
+    "Knowledge files:",
+    sourceLines,
     "",
     "Clinic facts, provider routing, pricing, hours, safety, booking, massage, and animal chiropractic are designed to outrank blog content. Blog/resource cards use data/generated/blog-index.json as canonical.",
   ].join("\n");
+}
+
+function normalizeProviderQuery(providerQuery: string) {
+  const query = providerQuery.toLowerCase().replace(/[^a-z\s]/g, " ").replace(/\s+/g, " ").trim();
+
+  if (/\b(?:dave|david)\b/.test(query)) return "dr-david";
+  if (/\bjosh\b/.test(query)) return "dr-josh";
+  if (/\bkyle\b/.test(query)) return "dr-kyle";
+  if (/\bclaire\b/.test(query)) return "dr-claire";
+  if (/\bnichole\b/.test(query)) return "nichole";
+  if (/\bjames\b/.test(query)) return "james";
+  return "";
+}
+
+function getAdminProviderDiagnosticsReport(command: Extract<AdminCommand, { type: "provider_knowledge" }>) {
+  const diagnostics = getKnowledgeSourceDiagnostics();
+  const dateTime = getWendyDateTimeContext();
+  const providerId = command.provider ? normalizeProviderQuery(command.provider) : "";
+  const selectedProviders = providerId
+    ? wendyProviders.filter((provider) => provider.id === providerId)
+    : wendyProviders;
+
+  if (command.staleCheck) {
+    return [
+      "Wendy stale provider diagnostics",
+      "",
+      `Dr. Michelle active reference count: ${diagnostics.staleProviderWarnings.length}`,
+      diagnostics.staleProviderWarnings.length
+        ? `Warnings: ${diagnostics.staleProviderWarnings.join(" ")}`
+        : "Warnings: none",
+      `Active provider directory: ${wendyProviders.map((provider) => provider.name).join(", ")}`,
+      "Admin-only diagnostic output. Historical conversation archives are not rewritten or inspected by this check.",
+    ].join("\n");
+  }
+
+  if (command.scheduleToday) {
+    const todayAnswer = dateTime.dayOfWeek === "Wednesday"
+      ? "Dr. Claire is scheduled in Big Sky today; she is not at Four Corners on Wednesdays."
+      : dateTime.dayOfWeek === "Thursday"
+        ? "Dr. Kyle is scheduled in Big Sky today from 8:00 AM-5:00 PM."
+        : dateTime.dayOfWeek === "Friday"
+          ? "Friday Big Sky availability may be seasonal or at Dr. Dave's discretion."
+          : "No named recurring Big Sky provider shift is documented for today beyond the general clinic schedule.";
+
+    return [
+      "Wendy Big Sky provider diagnostic",
+      "",
+      `Current clinic date/time: ${dateTime.dayOfWeek}, ${dateTime.date} at ${dateTime.localTime} (${dateTime.timeOfDay})`,
+      todayAnswer,
+      "Live appointment availability is not guaranteed; confirm in JaneApp or by calling the clinic.",
+    ].join("\n");
+  }
+
+  const providerChunks = command.provider
+    ? getProviderKnowledgeDiagnostics(command.provider)
+    : [];
+  const ranking = command.provider
+    ? rankWendyProviders({ query: command.provider, max: 3 })
+    : [];
+
+  return [
+    "Wendy provider knowledge diagnostics",
+    "",
+    `Provider query: ${command.provider ?? "all active providers"}`,
+    selectedProviders.length
+      ? selectedProviders
+          .map((provider, index) => [
+            `${index + 1}. ${provider.name} (${provider.role})`,
+            `Locations: ${provider.locations.join(", ")}`,
+            `Availability: ${provider.availabilityNote ?? "No recurring availability note; confirm live schedule."}`,
+            `Focus areas: ${provider.focus.join(", ")}`,
+          ].join("\n"))
+          .join("\n\n")
+      : "No active provider matched that query.",
+    "",
+    "Routing rules:",
+    "- Dr. Claire: primary pregnancy, postpartum, pediatrics, newborn, and family-care match; Big Sky Wednesdays and not Four Corners Wednesdays.",
+    "- Dr. Kyle: Big Sky Thursdays 8 AM-5 PM; sports/performance focus.",
+    "- Dr. Dave: both locations with varying hours.",
+    "- Dr. Josh: Four Corners; general and small-animal chiropractic.",
+    "- Nichole: Big Sky massage. James: Four Corners massage.",
+    "",
+    ranking.length
+      ? `Provider ranking output:\n${ranking
+          .map(
+            (provider, index) =>
+              `${index + 1}. ${provider.name} | score ${provider.score} | ${provider.reasons.join("; ")}`,
+          )
+          .join("\n")}`
+      : "Provider ranking output: no example query supplied or no active match.",
+    "",
+    providerChunks.length
+      ? `Canonical provider chunks:\n${providerChunks
+          .map(
+            (chunk, index) =>
+              `${index + 1}. ${chunk.title} | ${chunk.canonicalSource} | priority ${chunk.priority}\n${chunk.text}`,
+          )
+          .join("\n\n")}`
+      : "Canonical provider chunks: none requested or found.",
+    "",
+    `Stale provider warnings: ${diagnostics.staleProviderWarnings.length ? diagnostics.staleProviderWarnings.join(" ") : "none"}`,
+    "Admin-only diagnostic output. No secrets, hidden prompts, or private lead details are included.",
+  ].join("\n");
+}
+
+async function runAuthorizedAdminCommand(
+  command: AdminCommand,
+  messages: ChatMessage[],
+  pageContext: string,
+) {
+  switch (command.type) {
+    case "retrieval_diagnostics":
+      return getAdminRetrievalDiagnosticsReport(command.query, pageContext);
+    case "knowledge_sources":
+      return getAdminKnowledgeDiagnosticsReport();
+    case "provider_knowledge":
+      return getAdminProviderDiagnosticsReport(command);
+    case "conversation_review":
+      return getAdminConversationReviewReport(messages);
+    case "conversation_detail":
+      return getAdminConversationDetailReport(command.reference);
+    case "system_health":
+      return getAdminDiagnosticsReport();
+    case "analytics_summary":
+      return getAdminAnalyticsReport(Boolean(command.topTopicsOnly));
+  }
 }
 
 export async function POST(request: Request) {
@@ -1296,57 +1417,37 @@ export async function POST(request: Request) {
     );
   }
 
-  const adminDiagnosticsFlags = getAdminDiagnosticsFlags(messages);
+  const latestUserMessage = getLatestUserContent(messages).trim();
+  const adminCode = process.env.WENDY_ADMIN_CODE?.trim() ?? "";
+  const adminCodeDetected = hasValidAdminCode(messages);
+  const unauthenticatedAdminCommand = looksLikeAdminCommand(latestUserMessage);
+  const adminCommand = adminCodeDetected
+    ? parseAdminCommand(removeAdminCode(latestUserMessage, adminCode))
+    : undefined;
 
-  if (process.env.NODE_ENV === "development") {
-    console.log("[Wendy admin diagnostics]", adminDiagnosticsFlags);
-  }
-
-  if (
-    adminDiagnosticsFlags.adminIntentDetected ||
-    adminDiagnosticsFlags.adminReviewDetected
-  ) {
-    if (!adminDiagnosticsFlags.adminCodeDetected) {
-      return Response.json({
-        message:
-          "I can help with general Windy Ridge website questions, but admin diagnostics and conversation review are only available to authorized managers.",
-        resources: [],
-      });
-    }
-
-    if (adminDiagnosticsFlags.conversationReviewModeActivated) {
-      return Response.json({
-        message: await getAdminConversationReviewReport(messages),
-        resources: [],
-      });
-    }
-
-    if (adminDiagnosticsFlags.diagnosticsModeActivated) {
-      if (isAdminRetrievalDiagnosticsRequest(messages)) {
-        return Response.json({
-          message: getAdminRetrievalDiagnosticsReport(messages, pageContext),
-          resources: [],
-        });
-      }
-
-      if (isAdminKnowledgeDiagnosticsRequest(messages)) {
-        return Response.json({
-          message: getAdminKnowledgeDiagnosticsReport(messages),
-          resources: [],
-        });
-      }
-
-      return Response.json({
-        message: await getAdminDiagnosticsReport(),
-        resources: [],
-      });
-    }
-  }
-
-  if (adminDiagnosticsFlags.adminCodeDetected) {
+  if (unauthenticatedAdminCommand && !adminCodeDetected) {
     return Response.json({
       message:
-        "I can help with Wendy diagnostics when you ask for a status report, or I can show recent Wendy conversations for QA review.",
+        "I can help with general Windy Ridge website questions, but admin diagnostics and conversation review are only available to authorized managers.",
+      resources: [],
+    });
+  }
+
+  if (adminCommand) {
+    if (process.env.NODE_ENV === "development") {
+      console.log("[Wendy admin command]", { type: adminCommand.type });
+    }
+
+    return Response.json({
+      message: await runAuthorizedAdminCommand(adminCommand, messages, pageContext),
+      resources: [],
+    });
+  }
+
+  if (adminCodeDetected) {
+    return Response.json({
+      message:
+        "Admin code accepted, but I did not recognize that command. Try: Show retrieval matches for dry needling; Show active knowledge sources; Show provider knowledge; Show recent Wendy conversations; Show system health; or Show analytics summary.",
       resources: [],
     });
   }

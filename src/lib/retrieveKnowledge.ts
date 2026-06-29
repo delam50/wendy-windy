@@ -55,6 +55,8 @@ export type RetrievedDiagnosticDocument = {
   sourceType: string;
   chunkType: string;
   sourceBucket: string;
+  category: string;
+  tags: string[];
   score: number;
   preview: string;
   canonicalSource: string;
@@ -1422,6 +1424,8 @@ export function retrieveDiagnosticDocuments(
       sourceType: chunk.sourceType ?? "markdown_fallback",
       chunkType: chunk.chunkType ?? "markdown_section",
       sourceBucket: chunk.category ?? chunk.sourceType ?? "knowledge",
+      category: chunk.category ?? "Knowledge",
+      tags: chunk.tags ?? [],
       score,
       preview: compactText(chunk.text).slice(0, 280),
       canonicalSource: chunk.canonicalSource ?? chunk.source,
@@ -1464,17 +1468,44 @@ export function getResourceRetrievalDiagnostics(
     .sort((first, second) => second.score - first.score)
     .slice(0, maxResources);
   const resources = retrieveResources(diagnosticInput, maxResources);
+  const acceptanceThreshold = diagnosticInput.retrievalMode === "explicit" ? 28 : 58;
+  const returnedUrls = new Set(resources.map((resource) => resource.url.toLowerCase()));
+  const candidatesWithDecisions = scoredArticles.map((candidate) => {
+    const returned = returnedUrls.has(candidate.url.toLowerCase());
+    const meetsThreshold = candidate.score >= acceptanceThreshold;
+
+    return {
+      ...candidate,
+      sourceType: "blog",
+      status: returned ? "accepted" : "rejected",
+      decisionReason: returned
+        ? `Accepted: met the ${acceptanceThreshold}-point threshold and ranked within the resource limit.`
+        : meetsThreshold
+          ? "Rejected from final display: qualified but ranked below the resource-card limit or was deduplicated."
+          : `Rejected: score was below the ${acceptanceThreshold}-point threshold.`,
+    };
+  });
 
   return {
     mode: diagnosticInput.retrievalMode,
-    fallbackUsed: resources.length > 0 && scoredArticles[0]?.score < (diagnosticInput.retrievalMode === "explicit" ? 28 : 58),
+    acceptanceThreshold,
+    fallbackUsed: resources.length > 0 && scoredArticles[0]?.score < acceptanceThreshold,
     returnedResources: resources.map((resource) => ({
       title: resource.title,
       url: resource.url,
       type: resource.type,
       score: resource.score,
     })),
-    topCandidates: scoredArticles,
+    topCandidates: candidatesWithDecisions,
+    fallbackMatches:
+      resources.length > 0 && scoredArticles[0]?.score < acceptanceThreshold
+        ? resources.map((resource) => ({
+            title: resource.title,
+            url: resource.url,
+            type: resource.type,
+            score: resource.score,
+          }))
+        : [],
   };
 }
 

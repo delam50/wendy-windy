@@ -71,6 +71,7 @@ export const wendyProviders: WendyProvider[] = [
       "pediatrics",
       "pregnancy",
       "postpartum",
+      "perinatal care",
       "family chiropractic",
       "newborn care",
       "children",

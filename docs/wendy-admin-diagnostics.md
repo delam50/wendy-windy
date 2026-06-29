@@ -7,7 +7,7 @@ Wendy supports a server-side admin diagnostics mode for authorized Windy Ridge m
 In Vercel, set:
 
 ```txt
-WENDY_ADMIN_CODE=43Milltown!
+WENDY_ADMIN_CODE=[set a private manager code]
 ```
 
 Recommended path:
@@ -21,24 +21,24 @@ Next.js reads server-side environment variables from `.env.local` during local d
 If `.env.local` does not exist, create it and include:
 
 ```txt
-WENDY_ADMIN_CODE=43Milltown!
+WENDY_ADMIN_CODE=[your private manager code]
 ```
 
 If `.env.local` already exists, add the same `WENDY_ADMIN_CODE` line to it. Keep this value server-side only. Do not put it in React components, WordPress embed snippets, browser JavaScript, or any `NEXT_PUBLIC_` variable.
 
-## How To Request A Status Report
+## Supported Admin Commands
 
-A manager can ask Wendy for diagnostics by including the admin code and a status-style request in the chat message.
+A manager can ask Wendy for diagnostics by including the admin code and one explicit command.
 
 Safe test phrase example:
 
 ```txt
-I am Dr. Kyle. Manager code: [your admin code]. Give me Wendy’s status report.
+Give me Wendy status report [your admin code]
 ```
 
-Wendy will only return diagnostics when the message includes the correct `WENDY_ADMIN_CODE` value and asks for status, diagnostics, usage, report, performance, health, or system report.
+Supported command families include retrieval diagnostics, knowledge sources, provider knowledge, conversation review/detail, system health, and analytics. For example: `Show retrieval matches for dry needling`, `Show active knowledge sources`, `Show provider knowledge for Dr. Claire`, `Show recent Wendy conversations`, `Open recent-1`, and `Show analytics summary`.
 
-If someone asks for diagnostics without the code, Wendy will politely stay in general website-question mode.
+Wendy parses an admin command only after the correct code is present. Without authorization, it returns no diagnostic data.
 
 ## What The Report Includes
 
