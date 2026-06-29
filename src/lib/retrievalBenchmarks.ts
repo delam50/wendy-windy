@@ -75,7 +75,7 @@ const tests: RetrievalBenchmarkTest[] = [
     id: "big-sky-hours",
     question: "What are Big Sky hours?",
     expectedTopic: "Big Sky clinic hours",
-    expectedTerms: ["big sky", "dr. kyle", "dr. michelle", "hours"],
+    expectedTerms: ["big sky", "dr. claire", "dr. kyle", "hours"],
     mode: "clinic_fact",
   },
   {
@@ -96,7 +96,7 @@ const tests: RetrievalBenchmarkTest[] = [
     id: "pediatric-provider",
     question: "My 5 year old has growing pains, who should I see?",
     expectedTopic: "Pediatric provider routing",
-    expectedTerms: ["dr. claire", "dr. michelle", "pediatric"],
+    expectedTerms: ["dr. claire", "pediatric"],
     mode: "provider_answer",
   },
   {
@@ -308,4 +308,3 @@ export function summarizeRetrievalBenchmarkResults(results: RetrievalBenchmarkRe
     mostCommonFailureType,
   };
 }
-

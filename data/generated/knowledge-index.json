@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T18:05:49.792Z",
+  "generated_at": "2026-06-29T15:34:18.329Z",
   "architecture": "canonical-wendy-knowledge-v1",
   "vector_ready": true,
   "embedding_plan": {
@@ -105,16 +105,16 @@
       "tags": [
         "big sky",
         "hours",
+        "dr claire",
         "dr kyle",
-        "dr michelle",
         "friday availability"
       ],
       "priority": 105,
-      "text": "Big Sky general availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Michelle 9:00 AM-4:00 PM, Thursday Dr. Kyle 8:00 AM-5:00 PM. Friday Big Sky availability may be seasonal and at Dr. Dave's discretion, so users should call or check JaneApp. Saturday and Sunday are closed.",
+      "text": "Big Sky general availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Claire is in Big Sky, and Thursday Dr. Kyle is in Big Sky 8:00 AM-5:00 PM. Friday Big Sky availability may be seasonal and at Dr. Dave's discretion, so users should call or check JaneApp. Saturday and Sunday are closed. General clinic hours and provider availability are different, and neither guarantees live appointment openings.",
       "metadata": {},
       "canonical_source": "data/generated/clinic-knowledge.json",
-      "searchable_text": "Big Sky clinic hours and provider availability Clinic Hours big sky hours dr kyle dr michelle friday availability Big Sky general availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Michelle 9:00 AM-4:00 PM, Thursday Dr. Kyle 8:00 AM-5:00 PM. Friday Big Sky availability may be seasonal and at Dr. Dave's discretion, so users should call or check JaneApp. Saturday and Sunday are closed.",
-      "embedding_text": "Title: Big Sky clinic hours and provider availability Category: Clinic Hours Tags: big sky, hours, dr kyle, dr michelle, friday availability Big Sky general availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Michelle 9:00 AM-4:00 PM, Thursday Dr. Kyle 8:00 AM-5:00 PM. Friday Big Sky availability may be seasonal and at Dr. Dave's discretion, so users should call or check JaneApp. Saturday and Sunday are closed.",
+      "searchable_text": "Big Sky clinic hours and provider availability Clinic Hours big sky hours dr claire dr kyle friday availability Big Sky general availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Claire is in Big Sky, and Thursday Dr. Kyle is in Big Sky 8:00 AM-5:00 PM. Friday Big Sky availability may be seasonal and at Dr. Dave's discretion, so users should call or check JaneApp. Saturday and Sunday are closed. General clinic hours and provider availability are different, and neither guarantees live appointment openings.",
+      "embedding_text": "Title: Big Sky clinic hours and provider availability Category: Clinic Hours Tags: big sky, hours, dr claire, dr kyle, friday availability Big Sky general availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Claire is in Big Sky, and Thursday Dr. Kyle is in Big Sky 8:00 AM-5:00 PM. Friday Big Sky availability may be seasonal and at Dr. Dave's discretion, so users should call or check JaneApp. Saturday and Sunday are closed. General clinic hours and provider availability are different, and neither guarantees live appointment openings.",
       "embedding_model": null,
       "embedding_updated_at": null,
       "vector_id": null
@@ -128,17 +128,16 @@
       "tags": [
         "provider availability",
         "dr kyle",
-        "dr michelle",
         "dr dave",
         "dr claire",
         "dr josh"
       ],
       "priority": 103,
-      "text": "Provider availability: Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM. Dr. Michelle is in Big Sky Wednesdays 9:00 AM-4:00 PM and has limited hours at both locations. Dr. Dave practices at both locations with varying hours. Dr. Josh is Four Corners only. Dr. Claire is Four Corners only and also offers at-home visits for mom and newborn.",
+      "text": "Provider availability: Dr. Claire is a Four Corners provider whose Wednesday shift is in Big Sky; she is not at Four Corners on Wednesdays. She also offers at-home visits for mom and newborn when applicable. Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM. Dr. Dave practices at both locations with varying hours, and Friday Big Sky availability may be seasonal or at his discretion. Dr. Josh is Four Corners only. Nichole provides Big Sky massage therapy, and James provides Four Corners massage therapy. Live appointment openings must be confirmed in JaneApp or with the clinic.",
       "metadata": {},
       "canonical_source": "data/generated/clinic-knowledge.json",
-      "searchable_text": "Provider availability rules Providers provider availability dr kyle dr michelle dr dave dr claire dr josh Provider availability: Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM. Dr. Michelle is in Big Sky Wednesdays 9:00 AM-4:00 PM and has limited hours at both locations. Dr. Dave practices at both locations with varying hours. Dr. Josh is Four Corners only. Dr. Claire is Four Corners only and also offers at-home visits for mom and newborn.",
-      "embedding_text": "Title: Provider availability rules Category: Providers Tags: provider availability, dr kyle, dr michelle, dr dave, dr claire, dr josh Provider availability: Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM. Dr. Michelle is in Big Sky Wednesdays 9:00 AM-4:00 PM and has limited hours at both locations. Dr. Dave practices at both locations with varying hours. Dr. Josh is Four Corners only. Dr. Claire is Four Corners only and also offers at-home visits for mom and newborn.",
+      "searchable_text": "Provider availability rules Providers provider availability dr kyle dr dave dr claire dr josh Provider availability: Dr. Claire is a Four Corners provider whose Wednesday shift is in Big Sky; she is not at Four Corners on Wednesdays. She also offers at-home visits for mom and newborn when applicable. Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM. Dr. Dave practices at both locations with varying hours, and Friday Big Sky availability may be seasonal or at his discretion. Dr. Josh is Four Corners only. Nichole provides Big Sky massage therapy, and James provides Four Corners massage therapy. Live appointment openings must be confirmed in JaneApp or with the clinic.",
+      "embedding_text": "Title: Provider availability rules Category: Providers Tags: provider availability, dr kyle, dr dave, dr claire, dr josh Provider availability: Dr. Claire is a Four Corners provider whose Wednesday shift is in Big Sky; she is not at Four Corners on Wednesdays. She also offers at-home visits for mom and newborn when applicable. Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM. Dr. Dave practices at both locations with varying hours, and Friday Big Sky availability may be seasonal or at his discretion. Dr. Josh is Four Corners only. Nichole provides Big Sky massage therapy, and James provides Four Corners massage therapy. Live appointment openings must be confirmed in JaneApp or with the clinic.",
       "embedding_model": null,
       "embedding_updated_at": null,
       "vector_id": null
@@ -239,6 +238,7 @@
         "dr. claire",
         "chiropractor",
         "four corners",
+        "big sky",
         "pediatrics",
         "pregnancy",
         "postpartum",
@@ -247,39 +247,11 @@
         "children"
       ],
       "priority": 102,
-      "text": "Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners. Availability: Also offers at-home visits for mom and newborn. Focus areas: pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children. Dr. Claire is a strong option for pregnancy, postpartum, pediatric, newborn, and family care at Four Corners, including at-home visits for moms and newborns.",
+      "text": "Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Big Sky on Wednesdays and not at Four Corners on Wednesdays. Also offers at-home visits for mom and newborn when applicable. Focus areas: pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children. Dr. Claire is the primary provider to mention for pregnancy, postpartum, perinatal, pediatric, newborn, child, and family care. Wednesdays are her Big Sky day, so she is not at Four Corners on Wednesdays. She also offers at-home visits for moms and newborns when applicable.",
       "metadata": {},
       "canonical_source": "data/generated/clinic-knowledge.json",
-      "searchable_text": "Dr. Claire provider profile Providers dr. claire chiropractor four corners pediatrics pregnancy postpartum family chiropractic newborn care children Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners. Availability: Also offers at-home visits for mom and newborn. Focus areas: pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children. Dr. Claire is a strong option for pregnancy, postpartum, pediatric, newborn, and family care at Four Corners, including at-home visits for moms and newborns.",
-      "embedding_text": "Title: Dr. Claire provider profile Category: Providers Tags: dr. claire, chiropractor, four corners, pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners. Availability: Also offers at-home visits for mom and newborn. Focus areas: pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children. Dr. Claire is a strong option for pregnancy, postpartum, pediatric, newborn, and family care at Four Corners, including at-home visits for moms and newborns.",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "provider-dr-michelle",
-      "source_type": "provider",
-      "chunk_type": "provider_profile",
-      "title": "Dr. Michelle provider profile",
-      "category": "Providers",
-      "tags": [
-        "dr. michelle",
-        "chiropractor",
-        "four corners",
-        "big sky",
-        "pediatrics",
-        "pregnancy",
-        "perinatal care",
-        "women's health",
-        "family chiropractic",
-        "general chiropractic"
-      ],
-      "priority": 102,
-      "text": "Dr. Michelle is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Limited hours at both locations; Big Sky Wednesdays 9 AM-4 PM. Check JaneApp or the website for current availability. Focus areas: pediatrics, pregnancy, perinatal care, women's health, family chiropractic, general chiropractic. Dr. Michelle is also involved in pregnancy, pediatric, perinatal, women's health, family, and general chiropractic care. Do not overstate her availability; direct users to JaneApp or the website for current openings.",
-      "metadata": {},
-      "canonical_source": "data/generated/clinic-knowledge.json",
-      "searchable_text": "Dr. Michelle provider profile Providers dr. michelle chiropractor four corners big sky pediatrics pregnancy perinatal care women's health family chiropractic general chiropractic Dr. Michelle is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Limited hours at both locations; Big Sky Wednesdays 9 AM-4 PM. Check JaneApp or the website for current availability. Focus areas: pediatrics, pregnancy, perinatal care, women's health, family chiropractic, general chiropractic. Dr. Michelle is also involved in pregnancy, pediatric, perinatal, women's health, family, and general chiropractic care. Do not overstate her availability; direct users to JaneApp or the website for current openings.",
-      "embedding_text": "Title: Dr. Michelle provider profile Category: Providers Tags: dr. michelle, chiropractor, four corners, big sky, pediatrics, pregnancy, perinatal care, women's health, family chiropractic, general chiropractic Dr. Michelle is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Limited hours at both locations; Big Sky Wednesdays 9 AM-4 PM. Check JaneApp or the website for current availability. Focus areas: pediatrics, pregnancy, perinatal care, women's health, family chiropractic, general chiropractic. Dr. Michelle is also involved in pregnancy, pediatric, perinatal, women's health, family, and general chiropractic care. Do not overstate her availability; direct users to JaneApp or the website for current openings.",
+      "searchable_text": "Dr. Claire provider profile Providers dr. claire chiropractor four corners big sky pediatrics pregnancy postpartum family chiropractic newborn care children Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Big Sky on Wednesdays and not at Four Corners on Wednesdays. Also offers at-home visits for mom and newborn when applicable. Focus areas: pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children. Dr. Claire is the primary provider to mention for pregnancy, postpartum, perinatal, pediatric, newborn, child, and family care. Wednesdays are her Big Sky day, so she is not at Four Corners on Wednesdays. She also offers at-home visits for moms and newborns when applicable.",
+      "embedding_text": "Title: Dr. Claire provider profile Category: Providers Tags: dr. claire, chiropractor, four corners, big sky, pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Big Sky on Wednesdays and not at Four Corners on Wednesdays. Also offers at-home visits for mom and newborn when applicable. Focus areas: pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children. Dr. Claire is the primary provider to mention for pregnancy, postpartum, perinatal, pediatric, newborn, child, and family care. Wednesdays are her Big Sky day, so she is not at Four Corners on Wednesdays. She also offers at-home visits for moms and newborns when applicable.",
       "embedding_model": null,
       "embedding_updated_at": null,
       "vector_id": null
@@ -3439,73 +3411,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-3-new-patient-evaluation-and-adjustment",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "New Patient Evaluation and Adjustment",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "New Patient Evaluation and Adjustment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $130.00 Providers: Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: If you’re new to our office, this is the perfect place to start. Your visit includes a comprehensive exam and chiropractic adjustment. If additional soft tissue therapies are recommended, we’ll review options and any additional costs with you beforehand.",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "New Patient Evaluation and Adjustment JaneApp Booking janeapp booking pricing appointment New Patient Evaluation and Adjustment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $130.00 Providers: Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: If you’re new to our office, this is the perfect place to start. Your visit includes a comprehensive exam and chiropractic adjustment. If additional soft tissue therapies are recommended, we’ll review options and any additional costs with you beforehand.",
-      "embedding_text": "Title: New Patient Evaluation and Adjustment Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment New Patient Evaluation and Adjustment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $130.00 Providers: Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: If you’re new to our office, this is the perfect place to start. Your visit includes a comprehensive exam and chiropractic adjustment. If additional soft tissue therapies are recommended, we’ll review options and any additional costs with you beforehand.",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-4-adjustment-and-soft-tissue-treatment",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Adjustment and Soft Tissue Treatment",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Adjustment and Soft Tissue Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $140.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: This visit includes a chiropractic adjustment along with manual or instrument-assisted soft tissue work, such as cranial techniques, taping, cupping, or dry needling, as clinically appropriate.",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Adjustment and Soft Tissue Treatment JaneApp Booking janeapp booking pricing appointment Adjustment and Soft Tissue Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $140.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: This visit includes a chiropractic adjustment along with manual or instrument-assisted soft tissue work, such as cranial techniques, taping, cupping, or dry needling, as clinically appropriate.",
-      "embedding_text": "Title: Adjustment and Soft Tissue Treatment Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Adjustment and Soft Tissue Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $140.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: This visit includes a chiropractic adjustment along with manual or instrument-assisted soft tissue work, such as cranial techniques, taping, cupping, or dry needling, as clinically appropriate.",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-5-pediatric-new-patient-evaluation-and-treatment",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Pediatric New Patient Evaluation and Treatment",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Pediatric New Patient Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $130.00 Providers: Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: This visit is designed for children age 12 and under who are new to our office. It includes a comprehensive pediatric evaluation and a gentle, age-appropriate chiropractic adjustment. We’ll review your child’s health history, discuss any concerns, and outline clear next steps to support healthy growth, development, and overall well-being.",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Pediatric New Patient Evaluation and Treatment JaneApp Booking janeapp booking pricing appointment Pediatric New Patient Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $130.00 Providers: Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: This visit is designed for children age 12 and under who are new to our office. It includes a comprehensive pediatric evaluation and a gentle, age-appropriate chiropractic adjustment. We’ll review your child’s health history, discuss any concerns, and outline clear next steps to support healthy growth, development, and overall well-being.",
-      "embedding_text": "Title: Pediatric New Patient Evaluation and Treatment Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Pediatric New Patient Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $130.00 Providers: Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: This visit is designed for children age 12 and under who are new to our office. It includes a comprehensive pediatric evaluation and a gentle, age-appropriate chiropractic adjustment. We’ll review your child’s health history, discuss any concerns, and outline clear next steps to support healthy growth, development, and overall well-being.",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-6-small-animal-follow-up",
+      "id": "janeapp-booking-3-small-animal-follow-up",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Small Animal Follow-Up",
@@ -3527,51 +3433,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-7-follow-up-appointment",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Follow-Up Appointment",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Follow-Up Appointment Discipline: Chiropractic Duration: 15 minutes Scheduled time: 15 minutes Current listed price: $65.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: For returning patients, choose this appointment. If you’re new to our office, please schedule a New Patient Exam. If you’d like care that includes both an adjustment and soft tissue work, select the Adjustment + Soft Tissue appointment option.",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Follow-Up Appointment JaneApp Booking janeapp booking pricing appointment Follow-Up Appointment Discipline: Chiropractic Duration: 15 minutes Scheduled time: 15 minutes Current listed price: $65.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: For returning patients, choose this appointment. If you’re new to our office, please schedule a New Patient Exam. If you’d like care that includes both an adjustment and soft tissue work, select the Adjustment + Soft Tissue appointment option.",
-      "embedding_text": "Title: Follow-Up Appointment Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Follow-Up Appointment Discipline: Chiropractic Duration: 15 minutes Scheduled time: 15 minutes Current listed price: $65.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: For returning patients, choose this appointment. If you’re new to our office, please schedule a New Patient Exam. If you’d like care that includes both an adjustment and soft tissue work, select the Adjustment + Soft Tissue appointment option.",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-8-established-patient-re-evaluation-and-treatment",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Established Patient Re-Evaluation and Treatment",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Established Patient Re-Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $120.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: Choose this visit if you’re an established patient with a new concern that needs additional evaluation, or if it’s been more than six months since your last appointment. This visit also serves as a progress review of your current corrective phase to assess how you’re progressing and make any necessary updates to your care.",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Established Patient Re-Evaluation and Treatment JaneApp Booking janeapp booking pricing appointment Established Patient Re-Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $120.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: Choose this visit if you’re an established patient with a new concern that needs additional evaluation, or if it’s been more than six months since your last appointment. This visit also serves as a progress review of your current corrective phase to assess how you’re progressing and make any necessary updates to your care.",
-      "embedding_text": "Title: Established Patient Re-Evaluation and Treatment Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Established Patient Re-Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $120.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider Booking type: Online bookable Description: Choose this visit if you’re an established patient with a new concern that needs additional evaluation, or if it’s been more than six months since your last appointment. This visit also serves as a progress review of your current corrective phase to assess how you’re progressing and make any necessary updates to your care.",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-9-soft-tissue-appointment",
+      "id": "janeapp-booking-4-soft-tissue-appointment",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Soft Tissue Appointment",
@@ -3593,7 +3455,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-10-pediatric-follow-up-appointment",
+      "id": "janeapp-booking-5-pediatric-follow-up-appointment",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Pediatric Follow-Up Appointment",
@@ -3615,7 +3477,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-11-pregnancy-new-patient-evaluation-and-treatment",
+      "id": "janeapp-booking-6-pregnancy-new-patient-evaluation-and-treatment",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Pregnancy New Patient Evaluation and Treatment",
@@ -3637,7 +3499,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-12-pregnancy-follow-up-appointment",
+      "id": "janeapp-booking-7-pregnancy-follow-up-appointment",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Pregnancy Follow-Up Appointment",
@@ -3659,7 +3521,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-13-small-animal-initial-evaluation",
+      "id": "janeapp-booking-8-small-animal-initial-evaluation",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Small Animal Initial Evaluation",
@@ -3681,7 +3543,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-14-fire-cupping",
+      "id": "janeapp-booking-9-fire-cupping",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Fire Cupping",
@@ -3703,7 +3565,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-15-new-patient-evaluation-and-treatment-dr-david-dalgardno",
+      "id": "janeapp-booking-10-new-patient-evaluation-and-treatment-dr-david-dalgardno",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "New Patient Evaluation and Treatment- Dr. David Dalgardno",
@@ -3725,7 +3587,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-16-adjustment-and-fire-cupping",
+      "id": "janeapp-booking-11-adjustment-and-fire-cupping",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Adjustment and Fire Cupping",
@@ -3747,29 +3609,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-17-pregnancy-new-patient-evaluation-and-treatment",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Pregnancy New Patient Evaluation and Treatment",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Pregnancy New Patient Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $130.00 Providers: Dr. Michelle Snider Booking type: Online bookable Description: This visit is designed for expectant mothers who are new to our office. It includes a comprehensive pregnancy-specific evaluation and your first chiropractic adjustment, tailored to your current stage of pregnancy. We’ll review your health history, discuss any concerns, and create a care plan focused on comfort, pelvic balance, and supporting a healthy pregnancy.",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Pregnancy New Patient Evaluation and Treatment JaneApp Booking janeapp booking pricing appointment Pregnancy New Patient Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $130.00 Providers: Dr. Michelle Snider Booking type: Online bookable Description: This visit is designed for expectant mothers who are new to our office. It includes a comprehensive pregnancy-specific evaluation and your first chiropractic adjustment, tailored to your current stage of pregnancy. We’ll review your health history, discuss any concerns, and create a care plan focused on comfort, pelvic balance, and supporting a healthy pregnancy.",
-      "embedding_text": "Title: Pregnancy New Patient Evaluation and Treatment Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Pregnancy New Patient Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $130.00 Providers: Dr. Michelle Snider Booking type: Online bookable Description: This visit is designed for expectant mothers who are new to our office. It includes a comprehensive pregnancy-specific evaluation and your first chiropractic adjustment, tailored to your current stage of pregnancy. We’ll review your health history, discuss any concerns, and create a care plan focused on comfort, pelvic balance, and supporting a healthy pregnancy.",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-18-therapeutic-massage-60-minutes",
+      "id": "janeapp-booking-12-therapeutic-massage-60-minutes",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Therapeutic Massage - 60 Minutes",
@@ -3791,7 +3631,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-19-therapeutic-massage-90-minutes",
+      "id": "janeapp-booking-13-therapeutic-massage-90-minutes",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Therapeutic Massage - 90 Minutes",
@@ -3813,7 +3653,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-20-therapeutic-massage-120-minutes",
+      "id": "janeapp-booking-14-therapeutic-massage-120-minutes",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Therapeutic Massage - 120 Minutes",
@@ -3835,29 +3675,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-21-home-visit",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Home Visit",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Home Visit Discipline: Chiropractic Duration: 60 minutes Scheduled time: 60 minutes Current listed price: Call to book; pricing may need confirmation Providers: Dr. Claire Schauf, Dr. Michelle Snider Booking type: Call to book",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Home Visit JaneApp Booking janeapp booking pricing appointment Home Visit Discipline: Chiropractic Duration: 60 minutes Scheduled time: 60 minutes Current listed price: Call to book; pricing may need confirmation Providers: Dr. Claire Schauf, Dr. Michelle Snider Booking type: Call to book",
-      "embedding_text": "Title: Home Visit Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Home Visit Discipline: Chiropractic Duration: 60 minutes Scheduled time: 60 minutes Current listed price: Call to book; pricing may need confirmation Providers: Dr. Claire Schauf, Dr. Michelle Snider Booking type: Call to book",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-22-mr-james-beaudry",
+      "id": "janeapp-booking-15-mr-james-beaudry",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Mr. James Beaudry",
@@ -3879,7 +3697,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-23-dr-david-dalgardno",
+      "id": "janeapp-booking-16-dr-david-dalgardno",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Dr. David Dalgardno",
@@ -3901,7 +3719,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-24-dr-kyle-delamielleure",
+      "id": "janeapp-booking-17-dr-kyle-delamielleure",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Dr. Kyle Delamielleure",
@@ -3923,7 +3741,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-25-dr-joshua-prange",
+      "id": "janeapp-booking-18-dr-joshua-prange",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Dr. Joshua Prange",
@@ -3945,7 +3763,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-26-dr-claire-schauf",
+      "id": "janeapp-booking-19-dr-claire-schauf",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Dr. Claire Schauf",
@@ -3967,29 +3785,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-27-dr-michelle-snider",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Dr. Michelle Snider",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Dr. Michelle Snider Disciplines: Chiropractic Bio summary: Originally from Keystone, Colorado, Dr. Michelle grew up ski racing, where frequent injuries sparked her journey in becoming a Chiropractor. She earned her Doctor of Chiropractic degree from the University of Western States. After a decade of moving around the country with her Navy husband, she’s excited to call Montana home and join the Windy Ridge Chiropractic team. Dr. Michelle provides compassionate, family-focused care for patients of all ages — from newborns and expectant mothers to athletes and active families. She personally tailors each visit to her patient’s needs using soft tissue techniques, cranial work, and a wide range of adjusting styles, including low-force methods. She is a ---",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Dr. Michelle Snider JaneApp Booking janeapp booking pricing appointment Dr. Michelle Snider Disciplines: Chiropractic Bio summary: Originally from Keystone, Colorado, Dr. Michelle grew up ski racing, where frequent injuries sparked her journey in becoming a Chiropractor. She earned her Doctor of Chiropractic degree from the University of Western States. After a decade of moving around the country with her Navy husband, she’s excited to call Montana home and join the Windy Ridge Chiropractic team. Dr. Michelle provides compassionate, family-focused care for patients of all ages — from newborns and expectant mothers to athletes and active families. She personally tailors each visit to her patient’s needs using soft tissue techniques, cranial work, and a wide range of adjusting styles, including low-force methods. She is a ---",
-      "embedding_text": "Title: Dr. Michelle Snider Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Dr. Michelle Snider Disciplines: Chiropractic Bio summary: Originally from Keystone, Colorado, Dr. Michelle grew up ski racing, where frequent injuries sparked her journey in becoming a Chiropractor. She earned her Doctor of Chiropractic degree from the University of Western States. After a decade of moving around the country with her Navy husband, she’s excited to call Montana home and join the Windy Ridge Chiropractic team. Dr. Michelle provides compassionate, family-focused care for patients of all ages — from newborns and expectant mothers to athletes and active families. She personally tailors each visit to her patient’s needs using soft tissue techniques, cranial work, and a wide range of adjusting styles, including low-force methods. She is a ---",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-28-windy-ridge-chiropractic-big-sky",
+      "id": "janeapp-booking-20-windy-ridge-chiropractic-big-sky",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Windy Ridge Chiropractic - Big Sky",
@@ -4012,139 +3808,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-29-new-patient-evaluation-and-adjustment-big-sky",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "New Patient Evaluation and Adjustment - Big Sky",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "New Patient Evaluation and Adjustment - Big Sky Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $150.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Michelle Snider Booking type: Online bookable Description: If you’re new to our office, this is the perfect place to start. Your visit includes a comprehensive exam and chiropractic adjustment. If additional soft tissue therapies are recommended, we’ll review options and any additional costs with you beforehand.",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "New Patient Evaluation and Adjustment - Big Sky JaneApp Booking janeapp booking pricing appointment New Patient Evaluation and Adjustment - Big Sky Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $150.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Michelle Snider Booking type: Online bookable Description: If you’re new to our office, this is the perfect place to start. Your visit includes a comprehensive exam and chiropractic adjustment. If additional soft tissue therapies are recommended, we’ll review options and any additional costs with you beforehand.",
-      "embedding_text": "Title: New Patient Evaluation and Adjustment - Big Sky Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment New Patient Evaluation and Adjustment - Big Sky Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $150.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Michelle Snider Booking type: Online bookable Description: If you’re new to our office, this is the perfect place to start. Your visit includes a comprehensive exam and chiropractic adjustment. If additional soft tissue therapies are recommended, we’ll review options and any additional costs with you beforehand.",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-30-established-patient-re-evaluation-and-treatment",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Established Patient Re-Evaluation and Treatment",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Established Patient Re-Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $120.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Michelle Snider Booking type: Online bookable Description: Choose this visit if you’re an established patient with a new concern that needs additional evaluation, or if it’s been more than six months since your last appointment. This visit also serves as a progress review of your current corrective phase to assess how you’re progressing and make any necessary updates to your care.",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Established Patient Re-Evaluation and Treatment JaneApp Booking janeapp booking pricing appointment Established Patient Re-Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $120.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Michelle Snider Booking type: Online bookable Description: Choose this visit if you’re an established patient with a new concern that needs additional evaluation, or if it’s been more than six months since your last appointment. This visit also serves as a progress review of your current corrective phase to assess how you’re progressing and make any necessary updates to your care.",
-      "embedding_text": "Title: Established Patient Re-Evaluation and Treatment Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Established Patient Re-Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $120.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Michelle Snider Booking type: Online bookable Description: Choose this visit if you’re an established patient with a new concern that needs additional evaluation, or if it’s been more than six months since your last appointment. This visit also serves as a progress review of your current corrective phase to assess how you’re progressing and make any necessary updates to your care.",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-31-return-visit-big-sky",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Return Visit - Big Sky",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Return Visit - Big Sky Discipline: Chiropractic Duration: 15 minutes Scheduled time: 15 minutes Current listed price: $85.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Michelle Snider Booking type: Online bookable Description: Select this visit if you& 39;ve been seen before, and need another visit!",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Return Visit - Big Sky JaneApp Booking janeapp booking pricing appointment Return Visit - Big Sky Discipline: Chiropractic Duration: 15 minutes Scheduled time: 15 minutes Current listed price: $85.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Michelle Snider Booking type: Online bookable Description: Select this visit if you& 39;ve been seen before, and need another visit!",
-      "embedding_text": "Title: Return Visit - Big Sky Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Return Visit - Big Sky Discipline: Chiropractic Duration: 15 minutes Scheduled time: 15 minutes Current listed price: $85.00 Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Michelle Snider Booking type: Online bookable Description: Select this visit if you& 39;ve been seen before, and need another visit!",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-32-signature-wellness-visit",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Signature Wellness Visit",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Signature Wellness Visit Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $130.00 Providers: Dr. Michelle Snider Booking type: Online bookable Description: This visit blends chiropractic care with advanced soft tissue and cranial techniques to restore balance throughout the body. Dr. Michelle supports each patient’s unique needs—physical, emotional, and nutritional—using a blend of hands-on therapy, personalized supplement insight, and wellness coaching for lasting results.",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Signature Wellness Visit JaneApp Booking janeapp booking pricing appointment Signature Wellness Visit Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $130.00 Providers: Dr. Michelle Snider Booking type: Online bookable Description: This visit blends chiropractic care with advanced soft tissue and cranial techniques to restore balance throughout the body. Dr. Michelle supports each patient’s unique needs—physical, emotional, and nutritional—using a blend of hands-on therapy, personalized supplement insight, and wellness coaching for lasting results.",
-      "embedding_text": "Title: Signature Wellness Visit Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Signature Wellness Visit Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $130.00 Providers: Dr. Michelle Snider Booking type: Online bookable Description: This visit blends chiropractic care with advanced soft tissue and cranial techniques to restore balance throughout the body. Dr. Michelle supports each patient’s unique needs—physical, emotional, and nutritional—using a blend of hands-on therapy, personalized supplement insight, and wellness coaching for lasting results.",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-33-pediatric-new-patient-big-sky",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Pediatric New Patient- Big Sky",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Pediatric New Patient- Big Sky Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $150.00 Providers: Dr. Michelle Snider Booking type: Online bookable Description: Book this appointment if your child has never been seen before.",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Pediatric New Patient- Big Sky JaneApp Booking janeapp booking pricing appointment Pediatric New Patient- Big Sky Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $150.00 Providers: Dr. Michelle Snider Booking type: Online bookable Description: Book this appointment if your child has never been seen before.",
-      "embedding_text": "Title: Pediatric New Patient- Big Sky Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Pediatric New Patient- Big Sky Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $150.00 Providers: Dr. Michelle Snider Booking type: Online bookable Description: Book this appointment if your child has never been seen before.",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-34-pregnancy-new-patient-evaluation-and-treatment",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Pregnancy New Patient Evaluation and Treatment",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Pregnancy New Patient Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $150.00 Providers: Dr. Michelle Snider Booking type: Online bookable Description: This visit is designed for expectant mothers who are new to our office. It includes a comprehensive pregnancy-specific evaluation and your first chiropractic adjustment, tailored to your current stage of pregnancy. We’ll review your health history, discuss any concerns, and create a care plan focused on comfort, pelvic balance, and supporting a healthy pregnancy.",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Pregnancy New Patient Evaluation and Treatment JaneApp Booking janeapp booking pricing appointment Pregnancy New Patient Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $150.00 Providers: Dr. Michelle Snider Booking type: Online bookable Description: This visit is designed for expectant mothers who are new to our office. It includes a comprehensive pregnancy-specific evaluation and your first chiropractic adjustment, tailored to your current stage of pregnancy. We’ll review your health history, discuss any concerns, and create a care plan focused on comfort, pelvic balance, and supporting a healthy pregnancy.",
-      "embedding_text": "Title: Pregnancy New Patient Evaluation and Treatment Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Pregnancy New Patient Evaluation and Treatment Discipline: Chiropractic Duration: 30 minutes Scheduled time: 30 minutes Current listed price: $150.00 Providers: Dr. Michelle Snider Booking type: Online bookable Description: This visit is designed for expectant mothers who are new to our office. It includes a comprehensive pregnancy-specific evaluation and your first chiropractic adjustment, tailored to your current stage of pregnancy. We’ll review your health history, discuss any concerns, and create a care plan focused on comfort, pelvic balance, and supporting a healthy pregnancy.",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-35-adjustment-and-soft-tissue-treatment-big-sky",
+      "id": "janeapp-booking-21-adjustment-and-soft-tissue-treatment-big-sky",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Adjustment and Soft Tissue Treatment - Big Sky",
@@ -4166,7 +3830,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-36-30-min-pre-chiropractic-warm-up-massage",
+      "id": "janeapp-booking-22-30-min-pre-chiropractic-warm-up-massage",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "30 Min Pre-Chiropractic Warm Up Massage",
@@ -4188,7 +3852,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-37-60-min-therapeutic-massage-big-sky",
+      "id": "janeapp-booking-23-60-min-therapeutic-massage-big-sky",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "60 Min Therapeutic Massage- Big Sky",
@@ -4210,7 +3874,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-38-90-min-therapeutic-massage-big-sky",
+      "id": "janeapp-booking-24-90-min-therapeutic-massage-big-sky",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "90 Min Therapeutic Massage- Big Sky",
@@ -4232,29 +3896,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-39-home-visit",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Home Visit",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Home Visit Discipline: Chiropractic Duration: 60 minutes Scheduled time: 60 minutes Current listed price: Call to book; pricing may need confirmation Providers: Dr. Michelle Snider Booking type: Call to book",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Home Visit JaneApp Booking janeapp booking pricing appointment Home Visit Discipline: Chiropractic Duration: 60 minutes Scheduled time: 60 minutes Current listed price: Call to book; pricing may need confirmation Providers: Dr. Michelle Snider Booking type: Call to book",
-      "embedding_text": "Title: Home Visit Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Home Visit Discipline: Chiropractic Duration: 60 minutes Scheduled time: 60 minutes Current listed price: Call to book; pricing may need confirmation Providers: Dr. Michelle Snider Booking type: Call to book",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-40-dr-david-dalgardno",
+      "id": "janeapp-booking-25-dr-david-dalgardno",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Dr. David Dalgardno",
@@ -4276,7 +3918,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-41-dr-kyle-delamielleure",
+      "id": "janeapp-booking-26-dr-kyle-delamielleure",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Dr. Kyle Delamielleure",
@@ -4298,29 +3940,7 @@
       "vector_id": null
     },
     {
-      "id": "janeapp-booking-42-dr-michelle-snider",
-      "source_type": "booking",
-      "chunk_type": "booking_info",
-      "title": "Dr. Michelle Snider",
-      "category": "JaneApp Booking",
-      "tags": [
-        "janeapp",
-        "booking",
-        "pricing",
-        "appointment"
-      ],
-      "priority": 88,
-      "text": "Dr. Michelle Snider Disciplines: Chiropractic Bio summary: Originally from Keystone, Colorado, Dr. Michelle grew up ski racing, where frequent injuries sparked her journey in becoming a Chiropractor. She earned her Doctor of Chiropractic degree from the University of Western States. After a decade of moving around the country with her Navy husband, she’s excited to call Montana home and join the Windy Ridge Chiropractic team. Dr. Michelle provides compassionate, family-focused care for patients of all ages — from newborns and expectant mothers to athletes and active families. She personally tailors each visit to her patient’s needs using soft tissue techniques, cranial work, and a wide range of adjusting styles, including low-force methods. She is a",
-      "metadata": {},
-      "canonical_source": "data/generated/jane-knowledge.md",
-      "searchable_text": "Dr. Michelle Snider JaneApp Booking janeapp booking pricing appointment Dr. Michelle Snider Disciplines: Chiropractic Bio summary: Originally from Keystone, Colorado, Dr. Michelle grew up ski racing, where frequent injuries sparked her journey in becoming a Chiropractor. She earned her Doctor of Chiropractic degree from the University of Western States. After a decade of moving around the country with her Navy husband, she’s excited to call Montana home and join the Windy Ridge Chiropractic team. Dr. Michelle provides compassionate, family-focused care for patients of all ages — from newborns and expectant mothers to athletes and active families. She personally tailors each visit to her patient’s needs using soft tissue techniques, cranial work, and a wide range of adjusting styles, including low-force methods. She is a",
-      "embedding_text": "Title: Dr. Michelle Snider Category: JaneApp Booking Tags: janeapp, booking, pricing, appointment Dr. Michelle Snider Disciplines: Chiropractic Bio summary: Originally from Keystone, Colorado, Dr. Michelle grew up ski racing, where frequent injuries sparked her journey in becoming a Chiropractor. She earned her Doctor of Chiropractic degree from the University of Western States. After a decade of moving around the country with her Navy husband, she’s excited to call Montana home and join the Windy Ridge Chiropractic team. Dr. Michelle provides compassionate, family-focused care for patients of all ages — from newborns and expectant mothers to athletes and active families. She personally tailors each visit to her patient’s needs using soft tissue techniques, cranial work, and a wide range of adjusting styles, including low-force methods. She is a",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "janeapp-booking-43-nichole-wambsgans",
+      "id": "janeapp-booking-27-nichole-wambsgans",
       "source_type": "booking",
       "chunk_type": "booking_info",
       "title": "Nichole Wambsgans",
@@ -4760,51 +4380,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-20-big-sky-mt",
-      "source_type": "service",
-      "chunk_type": "service_info",
-      "title": "BIG SKY, MT",
-      "url": "https://windyridgechiropractic.com/big-sky-chiropractor/",
-      "category": "Sitemap Knowledge",
-      "tags": [
-        "sitemap",
-        "services",
-        "locations"
-      ],
-      "priority": 50,
-      "text": "BIG SKY, MT URL: Priority score: 2 BIG SKY, MT Windy Ridge Chiropractic in Big Sky, Montana provides hands-on care for residents, seasonal visitors, and mountain athletes looking to stay active and pain-free. As a trusted Big Sky chiropractor located in Town Center near the base of Lone Peak, we help patients recover from ski injuries, reduce back and neck pain, improve mobility, and maintain performance in the mountains. Our approach focuses on identifying the root cause of dysfunction, not just treating symptoms, so you can return to activity with confidence. Whether you live here year-round or are visiting for skiing, hiking, or mountain biking, our care is tailored to keep you moving and performing at a high level in the Big Sky environment. 9 average rating · 56 reviews Read all reviews on Google Dae M. 3 weeks ago ★★★★★ Great experience! Had a rather complex cervicogenic vertigo/dizziness and ear rocks issue combined with rotator cuff PRP recovery and Dr Dave’s (and Dr Snider’s) experience, bedside manner and skill really saved me. Owner response: Thanks for the kind words Dae! It was so great to see you the other day, looks like you’re thriving again. Michelle and Nicole (Massage Therapist)! I've been having horrible sciatica pain and all three of them have been helping me for the past several weeks. My pain was 12/10 when I started with them and today I can say it's 1/10 thanks to their excellent care! I highly recommend all three of them! 3 months ago ★★★★★ I can’t say enough good things about Dr. I came to her after a leg injury I sustained while training for a half marathon, and she helped me recover faster than I ever thought possible. She took the time to understand exactly what was going on. Owner response: Thank you so much for taking the time to share th",
-      "metadata": {},
-      "canonical_source": "data/generated/sitemap-knowledge.md",
-      "searchable_text": "BIG SKY, MT Sitemap Knowledge sitemap services locations BIG SKY, MT URL: Priority score: 2 BIG SKY, MT Windy Ridge Chiropractic in Big Sky, Montana provides hands-on care for residents, seasonal visitors, and mountain athletes looking to stay active and pain-free. As a trusted Big Sky chiropractor located in Town Center near the base of Lone Peak, we help patients recover from ski injuries, reduce back and neck pain, improve mobility, and maintain performance in the mountains. Our approach focuses on identifying the root cause of dysfunction, not just treating symptoms, so you can return to activity with confidence. Whether you live here year-round or are visiting for skiing, hiking, or mountain biking, our care is tailored to keep you moving and performing at a high level in the Big Sky environment. 9 average rating · 56 reviews Read all reviews on Google Dae M. 3 weeks ago ★★★★★ Great experience! Had a rather complex cervicogenic vertigo/dizziness and ear rocks issue combined with rotator cuff PRP recovery and Dr Dave’s (and Dr Snider’s) experience, bedside manner and skill really saved me. Owner response: Thanks for the kind words Dae! It was so great to see you the other day, looks like you’re thriving again. Michelle and Nicole (Massage Therapist)! I've been having horrible sciatica pain and all three of them have been helping me for the past several weeks. My pain was 12/10 when I started with them and today I can say it's 1/10 thanks to their excellent care! I highly recommend all three of them! 3 months ago ★★★★★ I can’t say enough good things about Dr. I came to her after a leg injury I sustained while training for a half marathon, and she helped me recover faster than I ever thought possible. She took the time to understand exactly what was going on. Owner response: Thank you so much for taking the time to share th",
-      "embedding_text": "Title: BIG SKY, MT Category: Sitemap Knowledge Tags: sitemap, services, locations BIG SKY, MT URL: Priority score: 2 BIG SKY, MT Windy Ridge Chiropractic in Big Sky, Montana provides hands-on care for residents, seasonal visitors, and mountain athletes looking to stay active and pain-free. As a trusted Big Sky chiropractor located in Town Center near the base of Lone Peak, we help patients recover from ski injuries, reduce back and neck pain, improve mobility, and maintain performance in the mountains. Our approach focuses on identifying the root cause of dysfunction, not just treating symptoms, so you can return to activity with confidence. Whether you live here year-round or are visiting for skiing, hiking, or mountain biking, our care is tailored to keep you moving and performing at a high level in the Big Sky environment. 9 average rating · 56 reviews Read all reviews on Google Dae M. 3 weeks ago ★★★★★ Great experience! Had a rather complex cervicogenic vertigo/dizziness and ear rocks issue combined with rotator cuff PRP recovery and Dr Dave’s (and Dr Snider’s) experience, bedside manner and skill really saved me. Owner response: Thanks for the kind words Dae! It was so great to see you the other day, looks like you’re thriving again. Michelle and Nicole (Massage Therapist)! I've been having horrible sciatica pain and all three of them have been helping me for the past several weeks. My pain was 12/10 when I started with them and today I can say it's 1/10 thanks to their excellent care! I highly recommend all three of them! 3 months ago ★★★★★ I can’t say enough good things about Dr. I came to her after a leg injury I sustained while training for a half marathon, and she helped me recover faster than I ever thought possible. She took the time to understand exactly what was going on. Owner response: Thank you so much for taking the time to share th",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "sitemap-knowledge-21-our-chiropractic-team",
-      "source_type": "service",
-      "chunk_type": "service_info",
-      "title": "Our Chiropractic Team",
-      "url": "https://windyridgechiropractic.com/bozeman-chiropractic-team/",
-      "category": "Sitemap Knowledge",
-      "tags": [
-        "sitemap",
-        "services",
-        "locations"
-      ],
-      "priority": 50,
-      "text": "Our Chiropractic Team URL: Priority score: 2 Our Chiropractic Team Meet our Doctors Dr. David Dalgardno's journey to becoming a chiropractor began in Longview, Washington, where early experiences with injury kindled his desire to heal. Admitted to the University of Western States after rigorous study, he graduated in 2011 and practiced in his hometown, helping patients regain their active lifestyles. In 2017, he moved to Bozeman, Montana, to embrace mountain life fully. An avid outdoorsman and musician, Dr. David leverages his diverse interests to enrich his therapeutic approach, promoting healing through both his clinical practice and personal passions, aiming to improve patients' quality of life by reconnecting them with their cherished activities. Josh Prange, DC Born and raised in St. Josh pursued his academic journey at Westminster College, achieving a bachelor's degree in Biology. He further enhanced his education at Logan College of Chiropractic, where he earned both a Doctorate of Chiropractic and a Master of Science in Exercise Prescription and Sports Rehab. Upon completing his studies in 2010, Dr. Josh practiced in Fairbanks, AK, until 2013, when he moved to the Bozeman/Belgrade area in Montana to raise his family and continue his practice. With a deep passion for the outdoors and animals, he has been a dedicated practitioner in the Gallatin Valley for over ten years. Michelle Snider, DC Originally from Keystone, Colorado, Dr. Michelle grew up ski racing, where frequent injuries sparked her journey in becoming a Chiropractor. She earned her Doctor of Chiropractic degree from the University of Western States. After a decade of moving around the country with her Navy husband, she’s excited to call Montana home. Michelle provides compassionate, family-focused car",
-      "metadata": {},
-      "canonical_source": "data/generated/sitemap-knowledge.md",
-      "searchable_text": "Our Chiropractic Team Sitemap Knowledge sitemap services locations Our Chiropractic Team URL: Priority score: 2 Our Chiropractic Team Meet our Doctors Dr. David Dalgardno's journey to becoming a chiropractor began in Longview, Washington, where early experiences with injury kindled his desire to heal. Admitted to the University of Western States after rigorous study, he graduated in 2011 and practiced in his hometown, helping patients regain their active lifestyles. In 2017, he moved to Bozeman, Montana, to embrace mountain life fully. An avid outdoorsman and musician, Dr. David leverages his diverse interests to enrich his therapeutic approach, promoting healing through both his clinical practice and personal passions, aiming to improve patients' quality of life by reconnecting them with their cherished activities. Josh Prange, DC Born and raised in St. Josh pursued his academic journey at Westminster College, achieving a bachelor's degree in Biology. He further enhanced his education at Logan College of Chiropractic, where he earned both a Doctorate of Chiropractic and a Master of Science in Exercise Prescription and Sports Rehab. Upon completing his studies in 2010, Dr. Josh practiced in Fairbanks, AK, until 2013, when he moved to the Bozeman/Belgrade area in Montana to raise his family and continue his practice. With a deep passion for the outdoors and animals, he has been a dedicated practitioner in the Gallatin Valley for over ten years. Michelle Snider, DC Originally from Keystone, Colorado, Dr. Michelle grew up ski racing, where frequent injuries sparked her journey in becoming a Chiropractor. She earned her Doctor of Chiropractic degree from the University of Western States. After a decade of moving around the country with her Navy husband, she’s excited to call Montana home. Michelle provides compassionate, family-focused car",
-      "embedding_text": "Title: Our Chiropractic Team Category: Sitemap Knowledge Tags: sitemap, services, locations Our Chiropractic Team URL: Priority score: 2 Our Chiropractic Team Meet our Doctors Dr. David Dalgardno's journey to becoming a chiropractor began in Longview, Washington, where early experiences with injury kindled his desire to heal. Admitted to the University of Western States after rigorous study, he graduated in 2011 and practiced in his hometown, helping patients regain their active lifestyles. In 2017, he moved to Bozeman, Montana, to embrace mountain life fully. An avid outdoorsman and musician, Dr. David leverages his diverse interests to enrich his therapeutic approach, promoting healing through both his clinical practice and personal passions, aiming to improve patients' quality of life by reconnecting them with their cherished activities. Josh Prange, DC Born and raised in St. Josh pursued his academic journey at Westminster College, achieving a bachelor's degree in Biology. He further enhanced his education at Logan College of Chiropractic, where he earned both a Doctorate of Chiropractic and a Master of Science in Exercise Prescription and Sports Rehab. Upon completing his studies in 2010, Dr. Josh practiced in Fairbanks, AK, until 2013, when he moved to the Bozeman/Belgrade area in Montana to raise his family and continue his practice. With a deep passion for the outdoors and animals, he has been a dedicated practitioner in the Gallatin Valley for over ten years. Michelle Snider, DC Originally from Keystone, Colorado, Dr. Michelle grew up ski racing, where frequent injuries sparked her journey in becoming a Chiropractor. She earned her Doctor of Chiropractic degree from the University of Western States. After a decade of moving around the country with her Navy husband, she’s excited to call Montana home. Michelle provides compassionate, family-focused car",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "sitemap-knowledge-22-delanee-hicks",
+      "id": "sitemap-knowledge-20-delanee-hicks",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Delanee Hicks",
@@ -4826,7 +4402,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-23-dr-claire-schauf-d-c",
+      "id": "sitemap-knowledge-21-dr-claire-schauf-d-c",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Dr. Claire Schauf, D.C.",
@@ -4848,7 +4424,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-24-dr-david-dalgardno-d-c",
+      "id": "sitemap-knowledge-22-dr-david-dalgardno-d-c",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Dr. David Dalgardno, D.C.",
@@ -4870,7 +4446,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-25-dr-joshua-prange-d-c",
+      "id": "sitemap-knowledge-23-dr-joshua-prange-d-c",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Dr. Joshua Prange, D.C.",
@@ -4892,7 +4468,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-26-dr-kyle-delamielleure-d-c",
+      "id": "sitemap-knowledge-24-dr-kyle-delamielleure-d-c",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Dr. Kyle DeLamielleure, D.C.",
@@ -4914,51 +4490,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-27-dr-michelle-snider-d-c",
-      "source_type": "service",
-      "chunk_type": "service_info",
-      "title": "Dr. Michelle Snider, D.C.",
-      "url": "https://windyridgechiropractic.com/bozeman-chiropractic-team/dr-michelle-snider/",
-      "category": "Sitemap Knowledge",
-      "tags": [
-        "sitemap",
-        "services",
-        "locations"
-      ],
-      "priority": 50,
-      "text": "Dr. Michelle Snider, D.C. URL: Priority score: 2 PREGNANCY & 038; PEDIATRIC CHIROPRACTOR · WINDY RIDGE CHIROPRACTIC WEBSTER CERTIFIED · FAMILY-FOCUSED CARE Helping moms, babies, and families feel supported, understood, and cared for through every stage of life. Michelle provides compassionate, individualized care for pregnancy, postpartum, pediatric, and active family lifestyles using a combination of gentle techniques, soft tissue work, and cranial approaches. Known for taking time with each patient, she creates an environment where people feel unrushed, fully heard, and confident in their care. Michelle’s path into chiropractic care began through her own experience as a competitive ski racer. After dealing with multiple injuries throughout her athletic career, she was introduced to a form of care that went beyond simple symptom relief. Her treatment included not only adjustments, but also soft tissue work, recovery strategies, and nutritional support. That experience shaped how she views health today: as something that involves the entire body, not just isolated symptoms. During her undergraduate studies, she worked in a sleep research lab studying sleep deprivation and circadian rhythms. While she enjoyed the scientific side of research, she realized she wanted to work directly with people and have a more immediate impact on their health and daily life. Michelle combines her clinical training with a whole-body, patient-centered approach. She works with individuals and families to better understand what is happening in their body and create care plans that support long-term health and function. You can also meet the rest of our team here . Michelle approaches care with the understanding that no two patients are the same. Every visit begins with a detailed history and ",
-      "metadata": {},
-      "canonical_source": "data/generated/sitemap-knowledge.md",
-      "searchable_text": "Dr. Michelle Snider, D.C. Sitemap Knowledge sitemap services locations Dr. Michelle Snider, D.C. URL: Priority score: 2 PREGNANCY & 038; PEDIATRIC CHIROPRACTOR · WINDY RIDGE CHIROPRACTIC WEBSTER CERTIFIED · FAMILY-FOCUSED CARE Helping moms, babies, and families feel supported, understood, and cared for through every stage of life. Michelle provides compassionate, individualized care for pregnancy, postpartum, pediatric, and active family lifestyles using a combination of gentle techniques, soft tissue work, and cranial approaches. Known for taking time with each patient, she creates an environment where people feel unrushed, fully heard, and confident in their care. Michelle’s path into chiropractic care began through her own experience as a competitive ski racer. After dealing with multiple injuries throughout her athletic career, she was introduced to a form of care that went beyond simple symptom relief. Her treatment included not only adjustments, but also soft tissue work, recovery strategies, and nutritional support. That experience shaped how she views health today: as something that involves the entire body, not just isolated symptoms. During her undergraduate studies, she worked in a sleep research lab studying sleep deprivation and circadian rhythms. While she enjoyed the scientific side of research, she realized she wanted to work directly with people and have a more immediate impact on their health and daily life. Michelle combines her clinical training with a whole-body, patient-centered approach. She works with individuals and families to better understand what is happening in their body and create care plans that support long-term health and function. You can also meet the rest of our team here . Michelle approaches care with the understanding that no two patients are the same. Every visit begins with a detailed history and",
-      "embedding_text": "Title: Dr. Michelle Snider, D.C. Category: Sitemap Knowledge Tags: sitemap, services, locations Dr. Michelle Snider, D.C. URL: Priority score: 2 PREGNANCY & 038; PEDIATRIC CHIROPRACTOR · WINDY RIDGE CHIROPRACTIC WEBSTER CERTIFIED · FAMILY-FOCUSED CARE Helping moms, babies, and families feel supported, understood, and cared for through every stage of life. Michelle provides compassionate, individualized care for pregnancy, postpartum, pediatric, and active family lifestyles using a combination of gentle techniques, soft tissue work, and cranial approaches. Known for taking time with each patient, she creates an environment where people feel unrushed, fully heard, and confident in their care. Michelle’s path into chiropractic care began through her own experience as a competitive ski racer. After dealing with multiple injuries throughout her athletic career, she was introduced to a form of care that went beyond simple symptom relief. Her treatment included not only adjustments, but also soft tissue work, recovery strategies, and nutritional support. That experience shaped how she views health today: as something that involves the entire body, not just isolated symptoms. During her undergraduate studies, she worked in a sleep research lab studying sleep deprivation and circadian rhythms. While she enjoyed the scientific side of research, she realized she wanted to work directly with people and have a more immediate impact on their health and daily life. Michelle combines her clinical training with a whole-body, patient-centered approach. She works with individuals and families to better understand what is happening in their body and create care plans that support long-term health and function. You can also meet the rest of our team here . Michelle approaches care with the understanding that no two patients are the same. Every visit begins with a detailed history and",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "sitemap-knowledge-28-nichole-wambsgans-lmt",
-      "source_type": "service",
-      "chunk_type": "service_info",
-      "title": "Nichole Wambsgans, LMT",
-      "url": "https://windyridgechiropractic.com/bozeman-chiropractic-team/nichole-wambsgans/",
-      "category": "Sitemap Knowledge",
-      "tags": [
-        "sitemap",
-        "services",
-        "locations"
-      ],
-      "priority": 50,
-      "text": "Nichole Wambsgans, LMT URL: Priority score: 2 Nichole Wambsgans, LMT LICENSED MASSAGE THERAPIST · WINDY RIDGE CHIROPRACTIC DEEP TISSUE · MYOFASCIAL RELEASE · TRIGGER POINT THERAPY Providing results-driven, therapeutic massage designed to reduce pain, restore movement, and help you get back to doing what you love. Nichole brings over 15 years of experience and takes a clinical approach to care, focusing on the root cause of restriction rather than temporary relief. Her work is intentional, targeted, and built for people who want real results. Michelle’s path into chiropractic care began through her own experience as a competitive ski racer. After dealing with multiple injuries throughout her athletic career, she was introduced to a form of care that went beyond simple symptom relief. Her treatment included not only adjustments, but also soft tissue work, recovery strategies, and nutritional support. That experience shaped how she views health today: as something that involves the entire body, not just isolated symptoms. During her undergraduate studies, she worked in a sleep research lab studying sleep deprivation and circadian rhythms. While she enjoyed the scientific side of research, she realized she wanted to work directly with people and have a more immediate impact on their health and daily life. Michelle combines her clinical training with a whole-body, patient-centered approach. She works with individuals and families to better understand what is happening in their body and create care plans that support long-term health and function. You can also meet the rest of our team here . Michelle approaches care with the understanding that no two patients are the same. Every visit begins with a detailed history and examination designed to uncover not just where the pain ",
-      "metadata": {},
-      "canonical_source": "data/generated/sitemap-knowledge.md",
-      "searchable_text": "Nichole Wambsgans, LMT Sitemap Knowledge sitemap services locations Nichole Wambsgans, LMT URL: Priority score: 2 Nichole Wambsgans, LMT LICENSED MASSAGE THERAPIST · WINDY RIDGE CHIROPRACTIC DEEP TISSUE · MYOFASCIAL RELEASE · TRIGGER POINT THERAPY Providing results-driven, therapeutic massage designed to reduce pain, restore movement, and help you get back to doing what you love. Nichole brings over 15 years of experience and takes a clinical approach to care, focusing on the root cause of restriction rather than temporary relief. Her work is intentional, targeted, and built for people who want real results. Michelle’s path into chiropractic care began through her own experience as a competitive ski racer. After dealing with multiple injuries throughout her athletic career, she was introduced to a form of care that went beyond simple symptom relief. Her treatment included not only adjustments, but also soft tissue work, recovery strategies, and nutritional support. That experience shaped how she views health today: as something that involves the entire body, not just isolated symptoms. During her undergraduate studies, she worked in a sleep research lab studying sleep deprivation and circadian rhythms. While she enjoyed the scientific side of research, she realized she wanted to work directly with people and have a more immediate impact on their health and daily life. Michelle combines her clinical training with a whole-body, patient-centered approach. She works with individuals and families to better understand what is happening in their body and create care plans that support long-term health and function. You can also meet the rest of our team here . Michelle approaches care with the understanding that no two patients are the same. Every visit begins with a detailed history and examination designed to uncover not just where the pain",
-      "embedding_text": "Title: Nichole Wambsgans, LMT Category: Sitemap Knowledge Tags: sitemap, services, locations Nichole Wambsgans, LMT URL: Priority score: 2 Nichole Wambsgans, LMT LICENSED MASSAGE THERAPIST · WINDY RIDGE CHIROPRACTIC DEEP TISSUE · MYOFASCIAL RELEASE · TRIGGER POINT THERAPY Providing results-driven, therapeutic massage designed to reduce pain, restore movement, and help you get back to doing what you love. Nichole brings over 15 years of experience and takes a clinical approach to care, focusing on the root cause of restriction rather than temporary relief. Her work is intentional, targeted, and built for people who want real results. Michelle’s path into chiropractic care began through her own experience as a competitive ski racer. After dealing with multiple injuries throughout her athletic career, she was introduced to a form of care that went beyond simple symptom relief. Her treatment included not only adjustments, but also soft tissue work, recovery strategies, and nutritional support. That experience shaped how she views health today: as something that involves the entire body, not just isolated symptoms. During her undergraduate studies, she worked in a sleep research lab studying sleep deprivation and circadian rhythms. While she enjoyed the scientific side of research, she realized she wanted to work directly with people and have a more immediate impact on their health and daily life. Michelle combines her clinical training with a whole-body, patient-centered approach. She works with individuals and families to better understand what is happening in their body and create care plans that support long-term health and function. You can also meet the rest of our team here . Michelle approaches care with the understanding that no two patients are the same. Every visit begins with a detailed history and examination designed to uncover not just where the pain",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "sitemap-knowledge-29-find-a-chiropractor-in-bozeman-windy-ridge-quiz",
+      "id": "sitemap-knowledge-25-find-a-chiropractor-in-bozeman-windy-ridge-quiz",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Find a Chiropractor in Bozeman | Windy Ridge Quiz",
@@ -4980,29 +4512,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-30-bozeman-chiropractic-in-four-corners",
-      "source_type": "service",
-      "chunk_type": "service_info",
-      "title": "Bozeman Chiropractic in Four Corners",
-      "url": "https://windyridgechiropractic.com/bozeman-chiropractor-in-four-corners/",
-      "category": "Sitemap Knowledge",
-      "tags": [
-        "sitemap",
-        "services",
-        "locations"
-      ],
-      "priority": 50,
-      "text": "Bozeman Chiropractic in Four Corners URL: Priority score: 2 Bozeman Chiropractic in Four Corners Care for Individuals and Families in Four Corners Looking for a Bozeman chiropractor in Four Corners? Windy Ridge Chiropractic provides expert, hands-on care for local residents, active families, and hardworking professionals who want to stay mobile, strong, and pain-free. Conveniently located near the Four Corners community, our clinic serves patients throughout Bozeman, Belgrade, and the Gallatin Valley . We help patients recover from back pain, neck pain, sports injuries, and work-related strain , while improving mobility and overall function. Whether you’re lifting, training, working long hours, or staying active outdoors, our care is designed to keep your body performing at a high level. If you’re searching for a Bozeman chiropractor in Four Corners, this location offers convenient access for patients coming from Belgrade, downtown Bozeman, and surrounding communities. Our Four Corners location is designed for convenience and efficiency. Whether you're heading in from work, the gym, or a day outside, we make it easy to get the care you need without disrupting your routine. With a focused, personalized approach, we help you stay consistent with your care and continue making progress toward your goals. At Windy Ridge Chiropractic, we specialize in personalized treatment plans that support long-term results—not just short-term relief. From injury recovery to ongoing performance care, our goal is simple: Help you move better, feel better, and live Life. 0 ★★★★★ · 100 reviews Read all reviews on Google Charlie a month ago ★★★★★ What a great team. The front desk is warm and welcoming. Kyle’s adjustments are gentle and incredibly effective—one visit completely resolved nerve p",
-      "metadata": {},
-      "canonical_source": "data/generated/sitemap-knowledge.md",
-      "searchable_text": "Bozeman Chiropractic in Four Corners Sitemap Knowledge sitemap services locations Bozeman Chiropractic in Four Corners URL: Priority score: 2 Bozeman Chiropractic in Four Corners Care for Individuals and Families in Four Corners Looking for a Bozeman chiropractor in Four Corners? Windy Ridge Chiropractic provides expert, hands-on care for local residents, active families, and hardworking professionals who want to stay mobile, strong, and pain-free. Conveniently located near the Four Corners community, our clinic serves patients throughout Bozeman, Belgrade, and the Gallatin Valley . We help patients recover from back pain, neck pain, sports injuries, and work-related strain , while improving mobility and overall function. Whether you’re lifting, training, working long hours, or staying active outdoors, our care is designed to keep your body performing at a high level. If you’re searching for a Bozeman chiropractor in Four Corners, this location offers convenient access for patients coming from Belgrade, downtown Bozeman, and surrounding communities. Our Four Corners location is designed for convenience and efficiency. Whether you're heading in from work, the gym, or a day outside, we make it easy to get the care you need without disrupting your routine. With a focused, personalized approach, we help you stay consistent with your care and continue making progress toward your goals. At Windy Ridge Chiropractic, we specialize in personalized treatment plans that support long-term results—not just short-term relief. From injury recovery to ongoing performance care, our goal is simple: Help you move better, feel better, and live Life. 0 ★★★★★ · 100 reviews Read all reviews on Google Charlie a month ago ★★★★★ What a great team. The front desk is warm and welcoming. Kyle’s adjustments are gentle and incredibly effective—one visit completely resolved nerve p",
-      "embedding_text": "Title: Bozeman Chiropractic in Four Corners Category: Sitemap Knowledge Tags: sitemap, services, locations Bozeman Chiropractic in Four Corners URL: Priority score: 2 Bozeman Chiropractic in Four Corners Care for Individuals and Families in Four Corners Looking for a Bozeman chiropractor in Four Corners? Windy Ridge Chiropractic provides expert, hands-on care for local residents, active families, and hardworking professionals who want to stay mobile, strong, and pain-free. Conveniently located near the Four Corners community, our clinic serves patients throughout Bozeman, Belgrade, and the Gallatin Valley . We help patients recover from back pain, neck pain, sports injuries, and work-related strain , while improving mobility and overall function. Whether you’re lifting, training, working long hours, or staying active outdoors, our care is designed to keep your body performing at a high level. If you’re searching for a Bozeman chiropractor in Four Corners, this location offers convenient access for patients coming from Belgrade, downtown Bozeman, and surrounding communities. Our Four Corners location is designed for convenience and efficiency. Whether you're heading in from work, the gym, or a day outside, we make it easy to get the care you need without disrupting your routine. With a focused, personalized approach, we help you stay consistent with your care and continue making progress toward your goals. At Windy Ridge Chiropractic, we specialize in personalized treatment plans that support long-term results—not just short-term relief. From injury recovery to ongoing performance care, our goal is simple: Help you move better, feel better, and live Life. 0 ★★★★★ · 100 reviews Read all reviews on Google Charlie a month ago ★★★★★ What a great team. The front desk is warm and welcoming. Kyle’s adjustments are gentle and incredibly effective—one visit completely resolved nerve p",
-      "embedding_model": null,
-      "embedding_updated_at": null,
-      "vector_id": null
-    },
-    {
-      "id": "sitemap-knowledge-31-are-your-headaches-coming-from-your-neck-a-guide-to-cervicogenic-headaches",
+      "id": "sitemap-knowledge-26-are-your-headaches-coming-from-your-neck-a-guide-to-cervicogenic-headaches",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Are Your Headaches Coming From Your Neck? A Guide to Cervicogenic Headaches",
@@ -5024,7 +4534,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-32-how-a-chiropractic-adjustment-works",
+      "id": "sitemap-knowledge-27-how-a-chiropractic-adjustment-works",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "How a Chiropractic Adjustment Works",
@@ -5046,7 +4556,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-33-what-is-included-in-a-chiropractic-exam",
+      "id": "sitemap-knowledge-28-what-is-included-in-a-chiropractic-exam",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "What Is Included in a Chiropractic Exam?",
@@ -5068,7 +4578,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-34-chiropractic-services",
+      "id": "sitemap-knowledge-29-chiropractic-services",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Chiropractic Services",
@@ -5090,7 +4600,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-35-chiropractic-massage",
+      "id": "sitemap-knowledge-30-chiropractic-massage",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Chiropractic Massage",
@@ -5112,7 +4622,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-36-cupping-therapy",
+      "id": "sitemap-knowledge-31-cupping-therapy",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Cupping Therapy",
@@ -5134,7 +4644,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-37-diversified-adjusting",
+      "id": "sitemap-knowledge-32-diversified-adjusting",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Diversified Adjusting",
@@ -5156,7 +4666,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-38-dry-needling-therapy",
+      "id": "sitemap-knowledge-33-dry-needling-therapy",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Dry Needling Therapy",
@@ -5178,7 +4688,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-39-functional-movement-taping",
+      "id": "sitemap-knowledge-34-functional-movement-taping",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Functional Movement Taping",
@@ -5200,7 +4710,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-40-iastm-technique",
+      "id": "sitemap-knowledge-35-iastm-technique",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "IASTM Technique",
@@ -5222,7 +4732,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-41-cupping-therapy-in-bozeman-what-it-is-and-how-it-helps",
+      "id": "sitemap-knowledge-36-cupping-therapy-in-bozeman-what-it-is-and-how-it-helps",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Cupping Therapy in Bozeman | What It Is and How It Helps",
@@ -5244,7 +4754,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-42-chiropractic-and-physical-therapy-do-you-have-to-choose",
+      "id": "sitemap-knowledge-37-chiropractic-and-physical-therapy-do-you-have-to-choose",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Chiropractic and Physical Therapy: Do You Have to Choose?",
@@ -5266,7 +4776,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-43-chiropractic-for-scoliosis-what-it-can-and-can-t-do",
+      "id": "sitemap-knowledge-38-chiropractic-for-scoliosis-what-it-can-and-can-t-do",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Chiropractic for Scoliosis: What It Can (and Can’t) Do",
@@ -5288,7 +4798,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-44-does-chiropractic-work-for-a-bulging-or-slipped-disc",
+      "id": "sitemap-knowledge-39-does-chiropractic-work-for-a-bulging-or-slipped-disc",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Does Chiropractic Work for a Bulging or Slipped Disc?",
@@ -5310,7 +4820,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-45-chiropractic-for-pinched-nerve-does-it-actually-work",
+      "id": "sitemap-knowledge-40-chiropractic-for-pinched-nerve-does-it-actually-work",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Chiropractic for Pinched Nerve: Does It Actually Work?",
@@ -5332,7 +4842,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-46-does-chiropractic-work-for-frozen-shoulder",
+      "id": "sitemap-knowledge-41-does-chiropractic-work-for-frozen-shoulder",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Does Chiropractic Work for Frozen Shoulder?",
@@ -5354,7 +4864,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-47-does-chiropractic-work-for-rib-pain",
+      "id": "sitemap-knowledge-42-does-chiropractic-work-for-rib-pain",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Does Chiropractic Work for Rib Pain?",
@@ -5376,7 +4886,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-48-dry-needling-aftercare-in-bozeman-what-to-expect-after-treatment",
+      "id": "sitemap-knowledge-43-dry-needling-aftercare-in-bozeman-what-to-expect-after-treatment",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Dry Needling Aftercare in Bozeman | What to Expect After Treatment",
@@ -5398,7 +4908,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-49-first-chiropractic-visit-in-bozeman-windy-ridge-chiropractic",
+      "id": "sitemap-knowledge-44-first-chiropractic-visit-in-bozeman-windy-ridge-chiropractic",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "First Chiropractic Visit in Bozeman | Windy Ridge Chiropractic",
@@ -5420,7 +4930,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-50-your-first-massage-therapy-appointment-explained-step-by-step",
+      "id": "sitemap-knowledge-45-your-first-massage-therapy-appointment-explained-step-by-step",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Your First Massage Therapy Appointment Explained Step by Step",
@@ -5442,7 +4952,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-51-chiropractic-and-massage-therapy-why-they-work-better-together",
+      "id": "sitemap-knowledge-46-chiropractic-and-massage-therapy-why-they-work-better-together",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Chiropractic and Massage Therapy: Why They Work Better Together",
@@ -5464,7 +4974,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-52-best-chiropractor-in-bozeman-how-to-choose",
+      "id": "sitemap-knowledge-47-best-chiropractor-in-bozeman-how-to-choose",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Best Chiropractor in Bozeman: How to Choose",
@@ -5486,7 +4996,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-53-how-to-improve-posture-in-bozeman-stop-slouching-move-better",
+      "id": "sitemap-knowledge-48-how-to-improve-posture-in-bozeman-stop-slouching-move-better",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "How to Improve Posture in Bozeman | Stop Slouching &#038; Move Better",
@@ -5508,7 +5018,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-54-ski-injury-prevention-in-bozeman-how-to-protect-your-knees-and-back-this-winter",
+      "id": "sitemap-knowledge-49-ski-injury-prevention-in-bozeman-how-to-protect-your-knees-and-back-this-winter",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Ski Injury Prevention in Bozeman: How to Protect Your Knees and Back This Winter",
@@ -5530,7 +5040,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-55-massage-therapy-big-sky-mt-recovery-for-active-adults",
+      "id": "sitemap-knowledge-50-massage-therapy-big-sky-mt-recovery-for-active-adults",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Massage Therapy Big Sky MT | Recovery for Active Adults",
@@ -5552,7 +5062,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-56-fifteen-years-in-still-learning-every-day",
+      "id": "sitemap-knowledge-51-fifteen-years-in-still-learning-every-day",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Fifteen Years In, Still Learning Every Day",
@@ -5574,7 +5084,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-57-mobility-exercises-for-active-adults-how-to-move-better-and-stay-pain-free",
+      "id": "sitemap-knowledge-52-mobility-exercises-for-active-adults-how-to-move-better-and-stay-pain-free",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Mobility Exercises for Active Adults: How to Move Better and Stay Pain-Free",
@@ -5596,7 +5106,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-58-neck-pain-after-skiing-causes-and-recovery-tips",
+      "id": "sitemap-knowledge-53-neck-pain-after-skiing-causes-and-recovery-tips",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Neck Pain After Skiing: Causes and Recovery Tips",
@@ -5618,7 +5128,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-59-new-year-health-intentions-in-bozeman-start-the-year-strong",
+      "id": "sitemap-knowledge-54-new-year-health-intentions-in-bozeman-start-the-year-strong",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "New Year Health Intentions in Bozeman | Start the Year Strong",
@@ -5640,7 +5150,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-60-how-to-calm-a-low-back-pain-flare-up-safe-movements-that-help",
+      "id": "sitemap-knowledge-55-how-to-calm-a-low-back-pain-flare-up-safe-movements-that-help",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "How to Calm a Low Back Pain Flare-Up (Safe Movements That Help)",
@@ -5662,7 +5172,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-61-si-joint-exercises-for-pain-relief-and-stability",
+      "id": "sitemap-knowledge-56-si-joint-exercises-for-pain-relief-and-stability",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "SI Joint Exercises for Pain Relief and Stability",
@@ -5684,7 +5194,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-62-how-bozeman-locals-stay-active-without-back-or-neck-pain",
+      "id": "sitemap-knowledge-57-how-bozeman-locals-stay-active-without-back-or-neck-pain",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "How Bozeman Locals Stay Active Without Back or Neck Pain",
@@ -5706,7 +5216,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-63-how-long-does-back-pain-last-what-to-expect-and-how-to-heal-faster",
+      "id": "sitemap-knowledge-58-how-long-does-back-pain-last-what-to-expect-and-how-to-heal-faster",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "How Long Does Back Pain Last? What to Expect and How to Heal Faster",
@@ -5728,7 +5238,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-64-the-science-of-sitting-why-creep-makes-15-minutes-the-magic-number",
+      "id": "sitemap-knowledge-59-the-science-of-sitting-why-creep-makes-15-minutes-the-magic-number",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "The Science of Sitting: Why “Creep” Makes 15 Minutes the Magic Number",
@@ -5750,7 +5260,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-65-bozeman-chiropractor-for-active-individuals-and-families",
+      "id": "sitemap-knowledge-60-bozeman-chiropractor-for-active-individuals-and-families",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Bozeman Chiropractor for Active Individuals and Families",
@@ -5772,7 +5282,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-66-5-simple-home-office-fixes-to-prevent-tech-neck-while-working-from-home",
+      "id": "sitemap-knowledge-61-5-simple-home-office-fixes-to-prevent-tech-neck-while-working-from-home",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "5 Simple Home Office Fixes to Prevent Tech Neck While Working From Home",
@@ -5794,7 +5304,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-67-acute-vs-chronic-pain-what-s-the-difference-and-why-it-matters",
+      "id": "sitemap-knowledge-62-acute-vs-chronic-pain-what-s-the-difference-and-why-it-matters",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Acute vs Chronic Pain: What’s the Difference and Why It Matters",
@@ -5816,7 +5326,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-68-are-chiropractors-real-doctors-what-their-training-really-looks-like",
+      "id": "sitemap-knowledge-63-are-chiropractors-real-doctors-what-their-training-really-looks-like",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Are Chiropractors Real Doctors? What Their Training Really Looks Like",
@@ -5838,7 +5348,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-69-benefits-of-staying-hydrated-how-much-water-do-you-really-need",
+      "id": "sitemap-knowledge-64-benefits-of-staying-hydrated-how-much-water-do-you-really-need",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Benefits of Staying Hydrated | How Much Water Do You Really Need?",
@@ -5860,7 +5370,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-70-seasonal-affective-disorder-treatment-in-bozeman-can-chiropractic-help",
+      "id": "sitemap-knowledge-65-seasonal-affective-disorder-treatment-in-bozeman-can-chiropractic-help",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Seasonal Affective Disorder Treatment in Bozeman | Can Chiropractic Help?",
@@ -5882,7 +5392,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-71-posterior-chain-exercises-for-back-pain-and-strength",
+      "id": "sitemap-knowledge-66-posterior-chain-exercises-for-back-pain-and-strength",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Posterior Chain Exercises for Back Pain and Strength",
@@ -5904,7 +5414,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-72-blog",
+      "id": "sitemap-knowledge-67-blog",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "BLOG",
@@ -5926,7 +5436,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-73-chiropractic-exam-palpation-joint-motion-testing-explained-part-4",
+      "id": "sitemap-knowledge-68-chiropractic-exam-palpation-joint-motion-testing-explained-part-4",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Chiropractic Exam: Palpation &#038; Joint Motion Testing Explained (Part 4)",
@@ -5948,7 +5458,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-74-contact-us-bozeman-big-sky-1-windy-ridge-chiropractic",
+      "id": "sitemap-knowledge-69-contact-us-bozeman-big-sky-1-windy-ridge-chiropractic",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Contact Us! Bozeman + Big Sky #1 | Windy Ridge Chiropractic",
@@ -5970,7 +5480,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-75-can-chiropractic-help-tinnitus-what-you-should-know",
+      "id": "sitemap-knowledge-70-can-chiropractic-help-tinnitus-what-you-should-know",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Can Chiropractic Help Tinnitus? What You Should Know",
@@ -5992,7 +5502,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-76-can-chiropractic-help-vertigo-what-to-know",
+      "id": "sitemap-knowledge-71-can-chiropractic-help-vertigo-what-to-know",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Can Chiropractic Help Vertigo? What to Know",
@@ -6014,7 +5524,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-77-does-chiropractic-work-what-the-research-says",
+      "id": "sitemap-knowledge-72-does-chiropractic-work-what-the-research-says",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Does Chiropractic Work? What the Research Says",
@@ -6036,7 +5546,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-78-dry-needling-for-lower-limb-pain-hip-knee-ankle-and-foot-relief",
+      "id": "sitemap-knowledge-73-dry-needling-for-lower-limb-pain-hip-knee-ankle-and-foot-relief",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Dry Needling for Lower Limb Pain | Hip, Knee, Ankle, and Foot Relief",
@@ -6058,7 +5568,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-79-dry-needling-for-upper-limb-pain-shoulder-elbow-and-wrist-relief",
+      "id": "sitemap-knowledge-74-dry-needling-for-upper-limb-pain-shoulder-elbow-and-wrist-relief",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Dry Needling for Upper Limb Pain | Shoulder, Elbow, and Wrist Relief",
@@ -6080,7 +5590,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-80-faq-s",
+      "id": "sitemap-knowledge-75-faq-s",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "FAQ's",
@@ -6102,7 +5612,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-81-from-slopes-to-trails-the-importance-of-chiropractic-care-and-staying-active-through-seaso",
+      "id": "sitemap-knowledge-76-from-slopes-to-trails-the-importance-of-chiropractic-care-and-staying-active-through-seaso",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "From Slopes to Trails: The Importance of Chiropractic Care and Staying Active Through Seasonal Transitions in Gallatin Valley",
@@ -6124,7 +5634,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-82-part-3-healing-our-wounds-remodeling-a-healed-body-and-returning-to-regular-activity",
+      "id": "sitemap-knowledge-77-part-3-healing-our-wounds-remodeling-a-healed-body-and-returning-to-regular-activity",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Part 3: Healing Our Wounds: Remodeling a Healed Body and Returning to Regular Activity",
@@ -6146,7 +5656,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-83-herniated-disc-vs-muscle-strain-in-the-lower-back",
+      "id": "sitemap-knowledge-78-herniated-disc-vs-muscle-strain-in-the-lower-back",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Herniated Disc vs Muscle Strain in the Lower Back",
@@ -6168,7 +5678,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-84-chiropractic-care-for-winter-sports-in-bozeman-stay-active-injury-free",
+      "id": "sitemap-knowledge-79-chiropractic-care-for-winter-sports-in-bozeman-stay-active-injury-free",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Chiropractic Care for Winter Sports in Bozeman | Stay Active &#038; Injury-Free",
@@ -6190,7 +5700,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-85-heat-vs-ice-when-to-use-hot-and-cold-therapy-for-injury",
+      "id": "sitemap-knowledge-80-heat-vs-ice-when-to-use-hot-and-cold-therapy-for-injury",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Heat vs Ice: When to Use Hot and Cold Therapy for Injury",
@@ -6212,7 +5722,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-86-i-m-a-chiropractor-and-it-doesn-t-bother-me-that-my-kids-crack-their-knuckles-here-s-why",
+      "id": "sitemap-knowledge-81-i-m-a-chiropractor-and-it-doesn-t-bother-me-that-my-kids-crack-their-knuckles-here-s-why",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "I’m a Chiropractor, and It Doesn’t Bother Me That My Kids Crack Their Knuckles — Here’s Why",
@@ -6234,7 +5744,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-87-trail-running-injury-prevention-tips-for-long-term-performance",
+      "id": "sitemap-knowledge-82-trail-running-injury-prevention-tips-for-long-term-performance",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Trail Running Injury Prevention Tips for Long-Term Performance",
@@ -6256,7 +5766,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-88-understanding-the-safety-of-chiropractic-care",
+      "id": "sitemap-knowledge-83-understanding-the-safety-of-chiropractic-care",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Understanding the Safety of Chiropractic Care",
@@ -6278,7 +5788,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-89-magnesium-for-sleep-and-muscle-recovery-what-you-need-to-know",
+      "id": "sitemap-knowledge-84-magnesium-for-sleep-and-muscle-recovery-what-you-need-to-know",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Magnesium for Sleep and Muscle Recovery: What You Need to Know",
@@ -6300,7 +5810,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-90-what-neurological-testing-in-a-chiropractic-exam-reveals-part-3",
+      "id": "sitemap-knowledge-85-what-neurological-testing-in-a-chiropractic-exam-reveals-part-3",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "What Neurological Testing in a Chiropractic Exam Reveals (Part 3)",
@@ -6322,7 +5832,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-91-part-1-the-injury-and-the-denial-i-ll-be-fine-right",
+      "id": "sitemap-knowledge-86-part-1-the-injury-and-the-denial-i-ll-be-fine-right",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Part 1: The Injury and the Denial – “I’ll Be Fine, Right?”",
@@ -6344,7 +5854,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-92-part-2-reality-sets-in-injury-identity-and-the-long-haul",
+      "id": "sitemap-knowledge-87-part-2-reality-sets-in-injury-identity-and-the-long-haul",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Part 2: Reality Sets In – Injury, Identity, and the Long Haul",
@@ -6366,7 +5876,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-93-why-sitting-too-long-is-worse-than-bad-posture",
+      "id": "sitemap-knowledge-88-why-sitting-too-long-is-worse-than-bad-posture",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Why Sitting Too Long Is Worse Than Bad Posture",
@@ -6388,7 +5898,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-94-sleep-for-muscle-recovery-why-it-matters-more-than-you-think",
+      "id": "sitemap-knowledge-89-sleep-for-muscle-recovery-why-it-matters-more-than-you-think",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Sleep for Muscle Recovery: Why It Matters More Than You Think",
@@ -6410,7 +5920,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-95-how-stress-affects-your-body-simple-ways-to-manage-stress-naturally",
+      "id": "sitemap-knowledge-90-how-stress-affects-your-body-simple-ways-to-manage-stress-naturally",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "How Stress Affects Your Body | Simple Ways to Manage Stress Naturally",
@@ -6432,7 +5942,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-96-calcium-and-magnesium-for-muscle-spasms-and-recovery",
+      "id": "sitemap-knowledge-91-calcium-and-magnesium-for-muscle-spasms-and-recovery",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Calcium and Magnesium for Muscle Spasms and Recovery",
@@ -6454,7 +5964,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-97-why-tight-muscles-keep-coming-back-and-how-massage-therapy-helps",
+      "id": "sitemap-knowledge-92-why-tight-muscles-keep-coming-back-and-how-massage-therapy-helps",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Why Tight Muscles Keep Coming Back and How Massage Therapy Helps",
@@ -6476,7 +5986,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-98-what-is-included-in-a-chiropractic-exam-orthopedic-tests-explained-part-2",
+      "id": "sitemap-knowledge-93-what-is-included-in-a-chiropractic-exam-orthopedic-tests-explained-part-2",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "What Is Included in a Chiropractic Exam? Orthopedic Tests Explained (Part 2)",
@@ -6498,7 +6008,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-99-what-actually-happens-during-a-chiropractic-exam-part-1",
+      "id": "sitemap-knowledge-94-what-actually-happens-during-a-chiropractic-exam-part-1",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "What Actually Happens During a Chiropractic Exam (Part 1)",
@@ -6520,7 +6030,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-100-why-do-chiropractic-adjustments-crack",
+      "id": "sitemap-knowledge-95-why-do-chiropractic-adjustments-crack",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Why Do Chiropractic Adjustments Crack?",
@@ -6542,7 +6052,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-101-what-to-eat-when-healing-from-injury-foods-that-help-recovery",
+      "id": "sitemap-knowledge-96-what-to-eat-when-healing-from-injury-foods-that-help-recovery",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "What to Eat When Healing from Injury (Foods That Help Recovery)",
@@ -6564,7 +6074,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-102-what-to-expect-at-a-dry-needling-appointment-bozeman-dry-needling-guide",
+      "id": "sitemap-knowledge-97-what-to-expect-at-a-dry-needling-appointment-bozeman-dry-needling-guide",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "What to Expect at a Dry Needling Appointment | Bozeman Dry Needling Guide",
@@ -6586,7 +6096,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-103-when-to-see-a-massage-therapist-for-muscle-pain-in-bozeman",
+      "id": "sitemap-knowledge-98-when-to-see-a-massage-therapist-for-muscle-pain-in-bozeman",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "When to See a Massage Therapist for Muscle Pain in Bozeman",
@@ -6608,7 +6118,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-104-why-chiropractic-treatment-works-and-when-it-doesn-t",
+      "id": "sitemap-knowledge-99-why-chiropractic-treatment-works-and-when-it-doesn-t",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Why Chiropractic Treatment Works (And When It Doesn’t)",
@@ -6630,7 +6140,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-105-why-you-wake-up-stiff-and-sore-and-what-to-do-about-it",
+      "id": "sitemap-knowledge-100-why-you-wake-up-stiff-and-sore-and-what-to-do-about-it",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Why You Wake Up Stiff and Sore (And What to Do About It)",
@@ -6652,7 +6162,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-106-chiropractic-tune-ups-stay-active-and-pain-free-in-bozeman",
+      "id": "sitemap-knowledge-101-chiropractic-tune-ups-stay-active-and-pain-free-in-bozeman",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Chiropractic Tune-Ups: Stay Active and Pain-Free in Bozeman",
@@ -6674,7 +6184,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-107-how-chiropractic-care-works-why-it-s-not-just-a-quick-fix",
+      "id": "sitemap-knowledge-102-how-chiropractic-care-works-why-it-s-not-just-a-quick-fix",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "How Chiropractic Care Works (Why It’s Not Just a Quick Fix)",
@@ -6696,7 +6206,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-108-winter-health-tips-in-bozeman-stay-active-healthy-pain-free-this-season",
+      "id": "sitemap-knowledge-103-winter-health-tips-in-bozeman-stay-active-healthy-pain-free-this-season",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Winter Health Tips in Bozeman | Stay Active, Healthy &#038; Pain-Free This Season",
@@ -6718,7 +6228,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-109-back-hurts-after-sitting-all-day-causes-fixes-in-bozeman",
+      "id": "sitemap-knowledge-104-back-hurts-after-sitting-all-day-causes-fixes-in-bozeman",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "Back Hurts After Sitting All Day? Causes + Fixes in Bozeman",
@@ -6740,7 +6250,7 @@
       "vector_id": null
     },
     {
-      "id": "sitemap-knowledge-110-you-re-looking-for-relief-we-don-t-make-you-wait-for-it",
+      "id": "sitemap-knowledge-105-you-re-looking-for-relief-we-don-t-make-you-wait-for-it",
       "source_type": "service",
       "chunk_type": "service_info",
       "title": "You’re Looking for Relief — We Don’t Make You Wait for It",

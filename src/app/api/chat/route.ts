@@ -30,6 +30,11 @@ import {
 } from "@/lib/retrieveKnowledge";
 import { getSupabaseDiagnostics } from "@/lib/supabaseServer";
 import { systemPrompt } from "@/lib/systemPrompt";
+import {
+  formatWendyDateTimePrompt,
+  getWendyDateTimeContext,
+  type WendyDateTimeContext,
+} from "@/lib/dateTimeContext";
 
 export const runtime = "nodejs";
 
@@ -79,7 +84,7 @@ const MAX_API_MESSAGES = 10;
 const ADMIN_DIAGNOSTIC_TERMS = /\b(status|diagnostics?|usage|report|performance|health|system\s+report)\b/i;
 const ADMIN_RETRIEVAL_DIAGNOSTIC_TERMS = /\b(retrieval matches|resource matches|why was no resource returned|why no resource|show retrieval|debug retrieval)\b/i;
 const ADMIN_KNOWLEDGE_DIAGNOSTIC_TERMS =
-  /\b(active knowledge sources|knowledge manifest|canonical for blogs|canonical blog|knowledge sources|knowledge index|provider knowledge)\b/i;
+  /\b(active knowledge sources|knowledge manifest|canonical for blogs|canonical blog|knowledge sources|knowledge index|provider knowledge|provider availability|dr\.?\s*claire availability|stale dr\.?\s*michelle references|who is in big sky today)\b/i;
 const ADMIN_CONVERSATION_REVIEW_TERMS =
   /\b(show|review|summarize|list|recent|open|details?|messages?)\b.*\b(wendy|conversations?|chats?|dry needling|leads?|resources?|recent-\d+|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{6,})\b|\b(conversations?|chats?)\s+(about|that became|where|for)\b/i;
 
@@ -304,7 +309,7 @@ function detectIntentCategories(
   if (
     includesAny(combinedContext, [
       /\b(provider|doctor|dr\.?|chiropractor|therapist|massage|who should|which doctor|which provider|who do i book)\b/,
-      /\b(kyle|dave|david|josh|joshua|claire|michelle|nichole|james)\b/,
+      /\b(kyle|dave|david|josh|joshua|claire|nichole|james)\b/,
       /\b(pregnan|postpartum|newborn|baby|pediatric|ski|skiing|athlete|performance|rehab|four corners|big sky massage|bozeman massage)\b/,
       /\b(pet|pets|dog|dogs|cat|cats|animal|animals|small animal|veterinary|animal adjustment|animal adjustments|chiropractic for pets)\b/,
     ])
@@ -402,9 +407,19 @@ function getProviderRoutingGuidance(messages: ChatMessage[], pageContext: string
   }
 
   if (/\b(pregnan|postpartum|newborn|baby|infant|pediatric|child|kids|mom|moms)\b/.test(text)) {
-    guidance.push(
-      "Pregnancy, postpartum, newborn, pediatric, or family care: conversationally mention Dr. Claire and Dr. Michelle. Dr. Claire is primarily Four Corners and also offers at-home mom/newborn visits; Dr. Michelle has limited hours at both locations, so users should check JaneApp or the website for current availability.",
-    );
+    if (/\bbig sky\b/.test(text)) {
+      guidance.push(
+        "Pregnancy, postpartum, perinatal, newborn, pediatric, child, baby, or family care in Big Sky: Dr. Claire is the primary provider to mention. Wednesdays are her Big Sky day. Do not say this care is unavailable in Big Sky; direct users to JaneApp or the clinic to confirm live openings.",
+      );
+    } else if (/\b(four corners|bozeman|belgrade|gallatin)\b/.test(text)) {
+      guidance.push(
+        "Pregnancy, postpartum, perinatal, newborn, pediatric, child, baby, or family care at Four Corners: Dr. Claire is the primary provider to mention, but she is not at Four Corners on Wednesdays because that is her Big Sky day. She also offers at-home mom/newborn visits when applicable.",
+      );
+    } else {
+      guidance.push(
+        "Pregnancy, postpartum, perinatal, newborn, pediatric, child, baby, or family care: Dr. Claire is the primary provider to mention. She is based at Four Corners, works in Big Sky on Wednesdays instead of Four Corners, and offers at-home mom/newborn visits when applicable.",
+      );
+    }
   }
 
   if (/\b(active|outdoor|ski|skiing|hiking|athlete|performance|training|trail|runner|rehab|mobility|movement|sport)\b/.test(text)) {
@@ -521,19 +536,25 @@ function getPricingLocationGuidance(messages: ChatMessage[], pageContext: string
   return guidance.join(" ");
 }
 
-function getHoursGuidance(messages: ChatMessage[], pageContext: string) {
+function getHoursGuidance(
+  messages: ChatMessage[],
+  pageContext: string,
+  dateTime: WendyDateTimeContext,
+) {
   const text = `${getLatestUserContent(messages)}\n${pageContext}`.toLowerCase();
   const mentionsFourCorners = /\b(four corners|bozeman|belgrade|gallatin|mill town)\b/.test(text);
   const mentionsBigSky = /\b(big sky|ousel falls)\b/.test(text);
   const asksOpenToday = /\b(open today|are you open|open right now|hours today|today's hours|today)\b/.test(text);
   const asksFridayBigSky = /\b(friday|fri)\b/.test(text) && mentionsBigSky;
   const asksKyleBigSky = /\b(kyle|dr\.?\s*kyle)\b/.test(text) && mentionsBigSky;
-  const asksMichelleBigSky = /\b(michelle|dr\.?\s*michelle)\b/.test(text) && mentionsBigSky;
+  const asksClaireWednesday = /\b(claire|dr\.?\s*claire)\b/.test(text) && /\b(wednesday|wed)\b/.test(text);
+  const asksWhoBigSkyToday = /\bwho\b.*\b(big sky)\b.*\btoday\b|\bwho is in big sky today\b/.test(text);
 
   const guidance = [
     "Clinic hours intent: answer by location and distinguish clinic hours from live appointment openings or provider availability.",
     "Bozeman / Four Corners address: 43 Mill Town Loop, Bozeman, MT 59718. Hours: Monday 7:30 AM-5:00 PM, Tuesday 8:00 AM-5:00 PM, Wednesday 7:30 AM-5:00 PM, Thursday 8:00 AM-5:00 PM, Friday 8:00 AM-2:00 PM, Saturday closed, Sunday closed.",
-    "Big Sky address: 116 Ousel Falls Road, Big Sky, MT 59716. Hours/availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Michelle 9:00 AM-4:00 PM, Thursday Dr. Kyle 8:00 AM-5:00 PM, Friday seasonal or at Dr. Dave's discretion, Saturday closed, Sunday closed.",
+    "Big Sky address: 116 Ousel Falls Road, Big Sky, MT 59716. General hours/provider schedule: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Claire is in Big Sky, Thursday Dr. Kyle is in Big Sky 8:00 AM-5:00 PM, Friday seasonal or at Dr. Dave's discretion, Saturday closed, Sunday closed.",
+    `Today in the clinic timezone is ${dateTime.dayOfWeek}, ${dateTime.date}; the local time is ${dateTime.localTime} (${dateTime.timeOfDay}). Use that weekday for "today" questions.`,
     "Do not guarantee same-day appointment availability. For live openings, provider schedule changes, or booking details, direct users to JaneApp or the clinic.",
   ];
 
@@ -553,8 +574,16 @@ function getHoursGuidance(messages: ChatMessage[], pageContext: string) {
     guidance.push("Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM.");
   }
 
-  if (asksMichelleBigSky) {
-    guidance.push("Dr. Michelle is in Big Sky Wednesdays 9:00 AM-4:00 PM.");
+  if (asksClaireWednesday) {
+    guidance.push("Wednesdays are Dr. Claire's Big Sky day; she is not at Four Corners on Wednesdays.");
+  }
+
+  if (asksWhoBigSkyToday && dateTime.dayOfWeek === "Wednesday") {
+    guidance.push("Today is Wednesday, so Dr. Claire is the scheduled Big Sky chiropractor today. Do not imply a live opening; recommend checking JaneApp or calling.");
+  } else if (asksWhoBigSkyToday && dateTime.dayOfWeek === "Thursday") {
+    guidance.push("Today is Thursday, so Dr. Kyle is scheduled in Big Sky from 8:00 AM-5:00 PM. Do not imply a live opening; recommend checking JaneApp or calling.");
+  } else if (asksWhoBigSkyToday && dateTime.dayOfWeek === "Friday") {
+    guidance.push("Today is Friday. Big Sky availability may be seasonal or at Dr. Dave's discretion and should be checked online or by calling.");
   }
 
   return guidance.join(" ");
@@ -607,6 +636,7 @@ function formatIntentGuidance(
   pageContext: string,
   sessionMemory: SessionMemory,
   providerRankingContext: string,
+  dateTime: WendyDateTimeContext,
 ) {
   const intents = detectIntentCategories(messages, pageContext);
   const providerGuidance = getProviderRoutingGuidance(messages, pageContext);
@@ -624,7 +654,7 @@ function formatIntentGuidance(
   }
 
   if (intents.includes("clinic hours intent")) {
-    strategy.push(getHoursGuidance(messages, pageContext));
+    strategy.push(getHoursGuidance(messages, pageContext, dateTime));
   }
 
   if (intents.includes("booking intent")) {
@@ -669,7 +699,7 @@ function formatIntentGuidance(
 
   if (intents.includes("location intent")) {
     strategy.push(
-      "Location intent: be specific about Bozeman Four Corners and Big Sky. Mention Big Sky Thursday availability for Dr. Kyle when relevant.",
+      "Location intent: be specific about Bozeman Four Corners and Big Sky. Dr. Claire is in Big Sky Wednesdays and not at Four Corners that day; Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM.",
     );
   }
 
@@ -1020,12 +1050,14 @@ async function getAdminDiagnosticsReport() {
   const topClickedResources = supabaseDiagnostics.topClickedResources
     .map((resource) => `${resource.title || resource.url || "Unknown resource"}: ${resource.count}`)
     .join(", ") || "No resource click data available";
+  const dateTime = getWendyDateTimeContext();
 
   return [
     "Wendy admin status report",
     "",
     `App status: Online`,
     `Current model: ${model}`,
+    `Clinic date/time: ${dateTime.dayOfWeek}, ${dateTime.date} at ${dateTime.localTime} (${dateTime.timeOfDay}; ${dateTime.timeZone})`,
     `OpenAI API configured: ${process.env.OPENAI_API_KEY ? "Yes" : "No"}`,
     `Blog index exists: ${blogIndex.exists ? "Yes" : "No"}`,
     `Indexed blog resources: ${blogIndex.articleCount}`,
@@ -1039,15 +1071,17 @@ async function getAdminDiagnosticsReport() {
       : "Category names: none available",
     `Jane/pricing knowledge exists: ${janeKnowledge ? "Yes" : "No"}`,
     `Clinic hours knowledge exists: ${
-      /43 Mill Town Loop|116 Ousel Falls Road|Dr\. Kyle[\s\S]*8:00 AM-5:00 PM|Dr\. Michelle[\s\S]*9:00 AM-4:00 PM/.test(clinicIdentity)
+      /43 Mill Town Loop|116 Ousel Falls Road|Dr\. Kyle[\s\S]*8:00 AM-5:00 PM|Dr\. Claire[\s\S]*Wednesday/.test(clinicIdentity)
         ? "Yes"
         : "No"
     }`,
     `Provider routing knowledge exists: ${
-      /dr\.?\s*(kyle|dave|josh|claire|michelle)|nichole|james/i.test(clinicIdentity)
+      /dr\.?\s*(kyle|dave|josh|claire)|nichole|james/i.test(clinicIdentity)
         ? "Yes"
         : "No"
     }`,
+    "Dr. Claire availability: Four Corners provider; Big Sky Wednesdays and not at Four Corners on Wednesdays; at-home mom/newborn visits when applicable.",
+    `Dr. Michelle active references: ${knowledgeDiagnostics.staleProviderWarnings.length ? knowledgeDiagnostics.staleProviderWarnings.join(" ") : "none"}`,
     `Conversation-insights endpoint health: ${
       isProductionRuntime()
         ? "Healthy; production filesystem persistence is skipped safely"
@@ -1138,7 +1172,7 @@ function getAdminRetrievalDiagnosticsReport(messages: ChatMessage[], pageContext
 
 function getProviderKnowledgeQuery(messages: ChatMessage[]) {
   const latest = getLatestUserContent(messages);
-  const providerMatch = latest.match(/\b(dr\.?\s*(?:dave|david|josh|kyle|claire|michelle)|nichole|james)\b/i);
+  const providerMatch = latest.match(/\b(dr\.?\s*(?:dave|david|josh|kyle|claire)|nichole|james)\b/i);
 
   return providerMatch?.[1] ?? "";
 }
@@ -1146,14 +1180,45 @@ function getProviderKnowledgeQuery(messages: ChatMessage[]) {
 function getAdminKnowledgeDiagnosticsReport(messages: ChatMessage[]) {
   const latest = getLatestUserContent(messages);
   const providerQuery = getProviderKnowledgeQuery(messages);
+  const dateTime = getWendyDateTimeContext();
+  const diagnostics = getKnowledgeSourceDiagnostics();
 
-  if (/\bprovider knowledge\b/i.test(latest) && providerQuery) {
+  if (/\bstale dr\.?\s*michelle references\b/i.test(latest)) {
+    return [
+      "Wendy stale provider knowledge check",
+      "",
+      `Dr. Michelle active references: ${diagnostics.staleProviderWarnings.length ? diagnostics.staleProviderWarnings.join(" ") : "none"}`,
+      `Current clinic date/time: ${dateTime.dayOfWeek}, ${dateTime.date} at ${dateTime.localTime} (${dateTime.timeOfDay})`,
+      "Admin-only diagnostic output.",
+    ].join("\n");
+  }
+
+  if (/\bwho is in big sky today\b/i.test(latest)) {
+    const todayAnswer = dateTime.dayOfWeek === "Wednesday"
+      ? "Dr. Claire is scheduled in Big Sky today; she is not at Four Corners on Wednesdays."
+      : dateTime.dayOfWeek === "Thursday"
+        ? "Dr. Kyle is scheduled in Big Sky today from 8:00 AM-5:00 PM."
+        : dateTime.dayOfWeek === "Friday"
+          ? "Friday Big Sky availability may be seasonal or at Dr. Dave's discretion."
+          : "No named recurring Big Sky provider shift is documented for today beyond the general clinic schedule.";
+
+    return [
+      "Wendy Big Sky provider diagnostic",
+      "",
+      `Current clinic date/time: ${dateTime.dayOfWeek}, ${dateTime.date} at ${dateTime.localTime} (${dateTime.timeOfDay})`,
+      todayAnswer,
+      "Live appointment availability is not guaranteed; confirm in JaneApp or by calling the clinic.",
+    ].join("\n");
+  }
+
+  if (/\b(provider knowledge|availability)\b/i.test(latest) && providerQuery) {
     const providerChunks = getProviderKnowledgeDiagnostics(providerQuery);
 
     return [
       "Wendy provider knowledge diagnostics",
       "",
       `Provider query: ${providerQuery}`,
+      `Current clinic date/time: ${dateTime.dayOfWeek}, ${dateTime.date} at ${dateTime.localTime} (${dateTime.timeOfDay})`,
       providerChunks.length
         ? providerChunks
             .map((chunk, index) =>
@@ -1174,7 +1239,6 @@ function getAdminKnowledgeDiagnosticsReport(messages: ChatMessage[]) {
     ].join("\n");
   }
 
-  const diagnostics = getKnowledgeSourceDiagnostics();
   const activeSourceLines = diagnostics.activeSources.length
     ? diagnostics.activeSources
         .map(
@@ -1205,6 +1269,9 @@ function getAdminKnowledgeDiagnosticsReport(messages: ChatMessage[]) {
     diagnostics.duplicateWarnings.length
       ? `Duplicate/stale warnings: ${diagnostics.duplicateWarnings.join(" ")}`
       : "Duplicate/stale warnings: none",
+    `Dr. Michelle active references: ${diagnostics.staleProviderWarnings.length ? diagnostics.staleProviderWarnings.join(" ") : "none"}`,
+    "Dr. Claire availability: Four Corners provider; Big Sky Wednesdays and not at Four Corners on Wednesdays; at-home mom/newborn visits when applicable.",
+    `Current clinic date/time: ${dateTime.dayOfWeek}, ${dateTime.date} at ${dateTime.localTime} (${dateTime.timeOfDay}; ${dateTime.timeZone})`,
     "",
     "Active retrieval sources:",
     activeSourceLines,
@@ -1220,6 +1287,7 @@ export async function POST(request: Request) {
   const sessionId = sanitizeContextValue(body.sessionId, 120);
   const pageTitle = sanitizeContextValue(body.pageTitle, 180);
   const pageUrl = sanitizeContextValue(body.pageUrl, 500);
+  const dateTimeContext = getWendyDateTimeContext();
 
   if (messages.length === 0) {
     return Response.json(
@@ -1315,6 +1383,7 @@ export async function POST(request: Request) {
     pageContext,
     sessionMemory,
     providerRankingContext,
+    dateTimeContext,
   );
   const hasResourceIntent = userHasResourceIntent(messages);
   const wantsMoreResources = userWantsMoreResources(messages);
@@ -1389,6 +1458,7 @@ export async function POST(request: Request) {
       model,
       messages: [
         { role: "system", content: systemPrompt },
+        { role: "system", content: formatWendyDateTimePrompt(dateTimeContext) },
         { role: "system", content: formatClinicKnowledge() },
         {
           role: "system" as const,

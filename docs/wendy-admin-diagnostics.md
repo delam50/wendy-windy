@@ -107,7 +107,7 @@ MONDAY_COL_STATUS=color_mm387nq4
 Expected Monday labels:
 
 - Preferred Location: `Four Corners`, `Big Sky`
-- Suggested Provider: `Dr. Josh`, `Dr. Kyle`, `Dr. Dave`, `Dr. Claire`, `Dr. Michelle`
+- Suggested Provider: `Dr. Josh`, `Dr. Kyle`, `Dr. Dave`, `Dr. Claire`
 - Status: `New`, `Contacted`, `Closed`
 
 Wendy sets new leads to `Status = New`. Bozeman leads are mapped to the Monday `Four Corners` location label. If a label does not exactly match an existing Monday label, Wendy leaves that status/provider/location field blank rather than creating labels dynamically or failing the whole lead.

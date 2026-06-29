@@ -91,9 +91,9 @@ export const clinicKnowledgeFacts: ClinicKnowledgeFact[] = [
     title: "Big Sky clinic hours and provider availability",
     priority: 105,
     category: "Clinic Hours",
-    tags: ["big sky", "hours", "dr kyle", "dr michelle", "friday availability"],
+    tags: ["big sky", "hours", "dr claire", "dr kyle", "friday availability"],
     text:
-      "Big Sky general availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Michelle 9:00 AM-4:00 PM, Thursday Dr. Kyle 8:00 AM-5:00 PM. Friday Big Sky availability may be seasonal and at Dr. Dave's discretion, so users should call or check JaneApp. Saturday and Sunday are closed.",
+      "Big Sky general availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Claire is in Big Sky, and Thursday Dr. Kyle is in Big Sky 8:00 AM-5:00 PM. Friday Big Sky availability may be seasonal and at Dr. Dave's discretion, so users should call or check JaneApp. Saturday and Sunday are closed. General clinic hours and provider availability are different, and neither guarantees live appointment openings.",
   },
   {
     id: "provider-availability",
@@ -102,9 +102,9 @@ export const clinicKnowledgeFacts: ClinicKnowledgeFact[] = [
     title: "Provider availability rules",
     priority: 103,
     category: "Providers",
-    tags: ["provider availability", "dr kyle", "dr michelle", "dr dave", "dr claire", "dr josh"],
+    tags: ["provider availability", "dr kyle", "dr dave", "dr claire", "dr josh"],
     text:
-      "Provider availability: Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM. Dr. Michelle is in Big Sky Wednesdays 9:00 AM-4:00 PM and has limited hours at both locations. Dr. Dave practices at both locations with varying hours. Dr. Josh is Four Corners only. Dr. Claire is Four Corners only and also offers at-home visits for mom and newborn.",
+      "Provider availability: Dr. Claire is a Four Corners provider whose Wednesday shift is in Big Sky; she is not at Four Corners on Wednesdays. She also offers at-home visits for mom and newborn when applicable. Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM. Dr. Dave practices at both locations with varying hours, and Friday Big Sky availability may be seasonal or at his discretion. Dr. Josh is Four Corners only. Nichole provides Big Sky massage therapy, and James provides Four Corners massage therapy. Live appointment openings must be confirmed in JaneApp or with the clinic.",
   },
   ...wendyProviders.map<ClinicKnowledgeFact>((provider) => ({
     id: `provider-${provider.id}`,
@@ -128,11 +128,8 @@ export const clinicKnowledgeFacts: ClinicKnowledgeFact[] = [
       provider.id === "dr-josh"
         ? "Dr. Josh also provides in-clinic small animal chiropractic care at Four Corners."
         : "",
-      provider.id === "dr-michelle"
-        ? "Dr. Michelle is also involved in pregnancy, pediatric, perinatal, women's health, family, and general chiropractic care. Do not overstate her availability; direct users to JaneApp or the website for current openings."
-        : "",
       provider.id === "dr-claire"
-        ? "Dr. Claire is a strong option for pregnancy, postpartum, pediatric, newborn, and family care at Four Corners, including at-home visits for moms and newborns."
+        ? "Dr. Claire is the primary provider to mention for pregnancy, postpartum, perinatal, pediatric, newborn, child, and family care. Wednesdays are her Big Sky day, so she is not at Four Corners on Wednesdays. She also offers at-home visits for moms and newborns when applicable."
         : "",
       provider.id === "dr-kyle"
         ? "Dr. Kyle is most directly aligned for sports, performance, skiing, hiking, lower limb, ankle mobility, rehab integration, active outdoor patients, and movement restoration questions."
@@ -236,4 +233,3 @@ export const clinicKnowledge = {
   bookingUrl,
   facts: clinicKnowledgeFacts,
 };
-

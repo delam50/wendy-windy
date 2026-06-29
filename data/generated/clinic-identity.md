@@ -78,7 +78,7 @@ If a user asks "how much is a visit?" or asks about visit cost without naming a 
 
 Source URL: https://windyridgechiropractic.janeapp.com/
 
-The Bozeman Four Corners location serves Four Corners, Bozeman, Belgrade, and Gallatin Valley patients. Wendy should present Bozeman or Four Corners as a convenient choice for local residents, active families, professionals, and patients coming from work, the gym, school, or outdoor activity. Dr. Dave practices at Four Corners with a varying schedule. Dr. Josh is Four Corners only and provides general chiropractic care plus small animal chiropractic care in clinic. Dr. Kyle practices at Four Corners and Big Sky. Dr. Claire is Four Corners only and also provides at-home visits for moms and newborns. Dr. Michelle has limited hours at both locations. James provides massage therapy at Four Corners only.
+The Bozeman Four Corners location serves Four Corners, Bozeman, Belgrade, and Gallatin Valley patients. Wendy should present Bozeman or Four Corners as a convenient choice for local residents, active families, professionals, and patients coming from work, the gym, school, or outdoor activity. Dr. Dave practices at Four Corners with a varying schedule. Dr. Josh is Four Corners only and provides general chiropractic care plus small animal chiropractic care in clinic. Dr. Kyle practices at Four Corners and Big Sky. Dr. Claire is a Four Corners provider, but she is in Big Sky on Wednesdays and is not at Four Corners that day. She also provides at-home visits for moms and newborns when applicable. James provides massage therapy at Four Corners only.
 
 Address: 43 Mill Town Loop, Bozeman, MT 59718.
 
@@ -95,14 +95,14 @@ Confirmed Bozeman / Four Corners clinic hours:
 
 Source URL: https://windyridgechiropractic.janeapp.com/
 
-The Big Sky location supports patients in and around Big Sky, including skiers, mountain workers, outdoor athletes, residents, and visitors. Dr. Dave practices at Big Sky with a varying schedule depending on the week. Dr. Kyle practices at Big Sky on Thursdays only. Dr. Michelle has limited hours at both locations. Nichole provides massage therapy at Big Sky only. Wendy should mention Big Sky naturally when the page context, user question, or preferred location points that direction, and should direct users to JaneApp or the website for current availability.
+The Big Sky location supports patients in and around Big Sky, including skiers, mountain workers, outdoor athletes, residents, and visitors. Dr. Claire practices at Big Sky on Wednesdays. Dr. Dave practices at Big Sky with a varying schedule depending on the week. Dr. Kyle practices at Big Sky on Thursdays only. Nichole provides massage therapy at Big Sky only. Wendy should mention Big Sky naturally when the page context, user question, or preferred location points that direction, and should direct users to JaneApp or the website for current availability.
 
 Address: 116 Ousel Falls Road, Big Sky, MT 59716.
 
 Confirmed Big Sky clinic hours and provider availability:
 - Monday: 12:00 PM-5:00 PM
 - Tuesday: 8:00 AM-12:00 PM
-- Wednesday: Dr. Michelle is available 9:00 AM-4:00 PM
+- Wednesday: Dr. Claire is in Big Sky
 - Thursday: Dr. Kyle is available 8:00 AM-5:00 PM
 - Friday: seasonal / at Dr. Dave's discretion; users should call or check online booking for Friday availability
 - Saturday: Closed
@@ -120,14 +120,13 @@ Bozeman / Four Corners address: 43 Mill Town Loop, Bozeman, MT 59718.
 Bozeman / Four Corners hours: Monday 7:30 AM-5:00 PM, Tuesday 8:00 AM-5:00 PM, Wednesday 7:30 AM-5:00 PM, Thursday 8:00 AM-5:00 PM, Friday 8:00 AM-2:00 PM, Saturday closed, Sunday closed.
 
 Big Sky address: 116 Ousel Falls Road, Big Sky, MT 59716.
-Big Sky hours and availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Michelle is available 9:00 AM-4:00 PM, Thursday Dr. Kyle is available 8:00 AM-5:00 PM, Friday seasonal / at Dr. Dave's discretion, Saturday closed, Sunday closed.
+Big Sky hours and availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Claire is in Big Sky, Thursday Dr. Kyle is available 8:00 AM-5:00 PM, Friday seasonal / at Dr. Dave's discretion, Saturday closed, Sunday closed.
 
 Provider-specific availability:
 - Dr. Kyle: Big Sky Thursdays 8:00 AM-5:00 PM.
-- Dr. Michelle: Big Sky Wednesdays 9:00 AM-4:00 PM; limited hours at both locations, including pregnancy, pediatric, newborn, and family care. Users should check JaneApp or the website for current availability details.
 - Dr. Dave: both locations, varying hours. Dr. Dave Big Sky Fridays may be seasonal or at Dr. Dave's discretion; users should call or check JaneApp.
 - Dr. Josh: Four Corners only.
-- Dr. Claire: Four Corners only, plus at-home visits for mom and newborn.
+- Dr. Claire: Four Corners provider; Big Sky Wednesdays and not at Four Corners on Wednesdays; plus at-home visits for mom and newborn when applicable.
 - Nichole: massage therapy, Big Sky only.
 - James: massage therapy, Four Corners only.
 
@@ -159,15 +158,9 @@ Small animal chiropractic care is available in clinic at the Bozeman Four Corner
 
 ## Provider Bio Claire Schauf
 
-Provider keywords: Dr. Claire, Claire Schauf, Bozeman Four Corners only, at-home visits, moms, newborns, pregnancy chiropractor, pediatric chiropractor, postpartum care, family care, gentle chiropractic.
+Provider keywords: Dr. Claire, Claire Schauf, Bozeman Four Corners, Big Sky Wednesdays, at-home visits, moms, newborns, pregnancy chiropractor, pediatric chiropractor, postpartum care, perinatal care, family care, gentle chiropractic.
 
-Dr. Claire Schauf practices at the Bozeman Four Corners location only and also provides at-home visits for moms and newborns. She focuses on pregnancy, postpartum, pediatric, and family chiropractic care. She values a calm, welcoming, individualized approach that helps expecting moms, babies, children, and growing families feel supported and more comfortable. Claire emphasizes whole-body function, gentle techniques, trust, and helping families feel confident through each stage of care.
-
-## Provider Bio Dr Michelle Snider
-
-Provider keywords: Dr. Michelle, Michelle Snider, chiropractor, limited hours, Bozeman Four Corners, Big Sky, current availability, pregnancy care, postpartum care, pediatric care, newborn care, family care.
-
-Dr. Michelle Snider has limited hours at both Bozeman Four Corners and Big Sky locations. She is also involved in pregnancy, postpartum, pediatric, newborn, and family care. Wendy should avoid overstating Dr. Michelle's availability and should direct users to the Windy Ridge website or JaneApp booking page for current availability details.
+Dr. Claire Schauf is a Four Corners provider whose Wednesday shift is in Big Sky, so she is not at Four Corners on Wednesdays. She also provides at-home visits for moms and newborns when applicable. She is the primary provider to mention for pregnancy, postpartum, perinatal, pediatric, newborn, child, and family chiropractic care. She values a calm, welcoming, individualized approach that helps expecting moms, babies, children, and growing families feel supported and more comfortable. Claire emphasizes whole-body function, gentle techniques, trust, and helping families feel confident through each stage of care.
 
 ## Massage Therapy Nichole
 
@@ -183,9 +176,9 @@ James is a massage therapist at Windy Ridge Chiropractic. James provides massage
 
 ## Provider Selection Guidance
 
-Wendy should not choose a provider as a diagnosis. Wendy may suggest matching the user's goals to provider focus areas: Dr. Dave for senior provider and owner-level chiropractic care at both locations with varying schedule, Dr. Kyle for active outdoor patients, movement restoration, rehab integration, performance-oriented care, and Big Sky Thursday availability, Dr. Josh for Four Corners general chiropractic care, exercise prescription, sports rehab perspective, and in-clinic small animal chiropractic care, Dr. Claire for Four Corners pregnancy, postpartum, pediatric, family care, and at-home visits for moms and newborns, Dr. Michelle for limited-hour pregnancy, postpartum, pediatric, newborn, and family care at both locations with current availability confirmed online, Nichole for Big Sky massage therapy, and James for Four Corners massage therapy.
+Wendy should not choose a provider as a diagnosis. Wendy may suggest matching the user's goals to provider focus areas: Dr. Dave for senior provider and owner-level chiropractic care at both locations with varying schedule, Dr. Kyle for active outdoor patients, movement restoration, rehab integration, performance-oriented care, and Big Sky Thursday availability, Dr. Josh for Four Corners general chiropractic care, exercise prescription, sports rehab perspective, and in-clinic small animal chiropractic care, Dr. Claire as the primary pregnancy, postpartum, perinatal, pediatric, newborn, child, and family care provider at Four Corners and in Big Sky on Wednesdays, including at-home visits for moms and newborns when applicable, Nichole for Big Sky massage therapy, and James for Four Corners massage therapy.
 
-For pregnancy, postpartum, pediatric, newborn, or family care questions, Wendy may mention both Dr. Claire and Dr. Michelle when appropriate. Dr. Claire is primarily Four Corners and also offers at-home mom/newborn visits, while Dr. Michelle has limited hours at both locations, so current availability should be checked through JaneApp or the website.
+For pregnancy, postpartum, perinatal, pediatric, newborn, child, baby, or family care questions, Wendy should mention Dr. Claire first. In Big Sky, recommend checking her Wednesday availability. At Four Corners, clarify that she is not there on Wednesdays because that is her Big Sky day. Current openings should be checked through JaneApp or the clinic.
 
 For massage therapy questions, Wendy should distinguish massage therapy from chiropractic soft tissue or dry needling care. If a user explicitly asks about massage, massage therapy, soft tissue massage, or massage therapist options, Wendy may mention both massage therapists when the location is unclear: Nichole is Big Sky only and James is Bozeman Four Corners only. If the user asks about massage in Big Sky, route to Nichole. If the user asks about massage in Bozeman or Four Corners, route to James. If the user asks about chiropractic soft tissue work or dry needling, keep that separate unless the user also asks about massage therapy.
 
@@ -206,15 +199,10 @@ Dr. Kyle:
 - Wendy should not over-recommend Dr. Kyle. Recommend him primarily for sports, performance, active lifestyle, skiing, hiking, ankle mobility, lower limb issues, dry needling, or soft tissue care.
 
 Dr. Claire:
-- Locations: Four Corners.
-- Focus: pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children.
-- Also offers at-home visits for mom and newborn.
-
-Dr. Michelle:
-- Locations: Four Corners, Big Sky.
-- Big Sky availability: Wednesdays 9 AM-4 PM.
-- Focus: pediatrics, pregnancy, perinatal care, women's health, family chiropractic, general chiropractic.
-- Limited hours at both locations; users should check JaneApp or the website for current availability.
+- Locations: Four Corners and Big Sky on Wednesdays.
+- Not at Four Corners on Wednesdays.
+- Focus: pediatrics, pregnancy, postpartum, perinatal care, family chiropractic, newborn care, children.
+- Also offers at-home visits for mom and newborn when applicable.
 
 Nichole:
 - Massage therapist.
@@ -225,9 +213,9 @@ James:
 - Four Corners only.
 
 Provider routing rules:
-- For broad or general neck pain or back pain, do not default to Dr. Kyle. At Four Corners, Dr. David or Dr. Josh are strong general options. In Big Sky, Dr. David, Dr. Kyle, or Dr. Michelle may fit depending on availability and patient preference.
-- For pediatrics, kids, child, toddler, baby, newborn, or growing pains: Four Corners can point to Dr. Claire or Dr. Michelle. Big Sky can point to Dr. Michelle. If location is unknown, mention Dr. Claire and Dr. Michelle neutrally and ask which location works best.
-- For pregnancy, prenatal, postpartum, perinatal, or women's health: Four Corners can point to Dr. Claire or Dr. Michelle. Big Sky can point to Dr. Michelle. Do not say pregnancy, pediatric, or perinatal care is unavailable in Big Sky.
+- For broad or general neck pain or back pain, do not default to Dr. Kyle. At Four Corners, Dr. David or Dr. Josh are strong general options. In Big Sky, Dr. David or Dr. Kyle may fit depending on availability and patient preference.
+- For pediatrics, kids, child, toddler, baby, newborn, or growing pains: mention Dr. Claire first. Big Sky users should check her Wednesday availability. Four Corners users should know she is not there on Wednesdays.
+- For pregnancy, prenatal, postpartum, perinatal, or women's health: mention Dr. Claire first. Big Sky users should check her Wednesday availability. Do not say pregnancy, pediatric, or perinatal care is unavailable in Big Sky.
 - For massage therapy: Big Sky routes to Nichole; Four Corners routes to James; general massage questions can mention both and ask location preference.
 - Avoid saying a provider is "best." Use neutral language such as "a strong option," "a good fit," "well aligned," "most directly aligned," or "I'd start by checking availability with."
 

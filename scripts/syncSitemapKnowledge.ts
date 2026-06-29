@@ -11,6 +11,7 @@ const JANE_OUTPUT_PATH = path.join(
   process.cwd(),
   "data/generated/jane-knowledge.md",
 );
+const INACTIVE_PROVIDER_PATTERN = /\b(?:dr\.?\s*)?michelle\b|\bsnider\b/i;
 
 const PRIORITY_TERMS = [
   "chiropractic",
@@ -536,6 +537,31 @@ async function fetchJaneLocationKnowledge(location: {
       return null;
     }
 
+    const staffMembers = parseJaneArray<JaneStaffMember>(routerSource, "staff_members:");
+    const inactiveStaffIds = new Set(
+      staffMembers
+        .filter((staffMember) =>
+          INACTIVE_PROVIDER_PATTERN.test(
+            `${staffMember.professional_name ?? ""} ${staffMember.full_name}`,
+          ),
+        )
+        .map((staffMember) => staffMember.id),
+    );
+    const activeStaffMembers = staffMembers.filter(
+      (staffMember) => !inactiveStaffIds.has(staffMember.id),
+    );
+    const treatments = parseJaneArray<JaneTreatment>(routerSource, "treatments:")
+      .map((treatment) => ({
+        ...treatment,
+        staff_member_ids: treatment.staff_member_ids?.filter(
+          (staffId) => !inactiveStaffIds.has(staffId),
+        ),
+        description: INACTIVE_PROVIDER_PATTERN.test(treatment.description ?? "")
+          ? undefined
+          : treatment.description,
+      }))
+      .filter((treatment) => (treatment.staff_member_ids?.length ?? 0) > 0);
+
     return {
       url: location.bookingUrl,
       locationName: location.name,
@@ -544,7 +570,7 @@ async function fetchJaneLocationKnowledge(location: {
       bookingUrl: location.bookingUrl,
       primaryEmail: extractScriptString(routerSource, "primary_email"),
       primaryPhone: extractScriptString(routerSource, "primary_phone"),
-      treatments: parseJaneArray<JaneTreatment>(routerSource, "treatments:"),
+      treatments,
       disciplines: parseJaneArray<JaneDiscipline>(routerSource, "disciplines:").map(
         (discipline) => ({
           id: discipline.id,
@@ -553,7 +579,7 @@ async function fetchJaneLocationKnowledge(location: {
           professional_title_plural: discipline.professional_title_plural,
         }),
       ),
-      staffMembers: parseJaneArray<JaneStaffMember>(routerSource, "staff_members:"),
+      staffMembers: activeStaffMembers,
     };
   } catch (error) {
     console.warn(`Skipping Jane location ${location.bookingUrl}`, error);

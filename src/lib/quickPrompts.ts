@@ -140,8 +140,8 @@ const quickPromptBank: QuickPrompt[] = [
     bucket: "provider-location",
   },
   {
-    label: "Who is available in Big Sky?",
-    prompt: "Who is available in Big Sky?",
+    label: "Who is in Big Sky today?",
+    prompt: "Who is in Big Sky today?",
     topic: "Big Sky",
     bucket: "provider-location",
   },

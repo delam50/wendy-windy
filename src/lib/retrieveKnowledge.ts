@@ -159,8 +159,6 @@ const PRIORITY_TERMS = [
   "prange",
   "claire",
   "schauf",
-  "michelle",
-  "snider",
   "david",
   "dalgardno",
   "james",
@@ -604,7 +602,7 @@ function scoreChunk(
     score += 70;
   }
 
-  if (/provider|doctor|dr\.?|who should|which provider|which doctor|kyle|dave|david|josh|claire|michelle|nichole|james/.test(normalizedQuery) && chunk.sourceType === "provider") {
+  if (/provider|doctor|dr\.?|who should|which provider|which doctor|kyle|dave|david|josh|claire|nichole|james/.test(normalizedQuery) && chunk.sourceType === "provider") {
     score += 65;
   }
 
@@ -682,7 +680,7 @@ function scoreChunk(
   }
 
   if (/hours|open|closed|clinic hours|office hours|monday|tuesday|wednesday|thursday|friday|saturday|sunday/i.test(normalizedQuery)) {
-    if (/clinic hours|confirmed.*hours|bozeman \/ four corners hours|big sky hours|dr\. kyle.*thursday|dr\. michelle.*wednesday/i.test(normalizedText)) {
+    if (/clinic hours|confirmed.*hours|bozeman \/ four corners hours|big sky hours|dr\. kyle.*thursday|dr\. claire.*wednesday/i.test(normalizedText)) {
       score += 36;
     }
   }
@@ -1094,7 +1092,7 @@ function scoreBlogArticle(
   }
 
   if (!explicitMode && /\b(dr\.?|doctor|provider|who should|which provider|which doctor)\b/.test(contextText)) {
-    if (!/\b(provider|doctor|dr\.?|kyle|david|dave|josh|claire|michelle|nichole|james|staff|location|service)\b/.test(strongFieldText)) {
+    if (!/\b(provider|doctor|dr\.?|kyle|david|dave|josh|claire|nichole|james|staff|location|service)\b/.test(strongFieldText)) {
       score -= 120;
       reasons.push("penalty: provider intent without provider/location/service match");
     }
@@ -1485,6 +1483,18 @@ export function getKnowledgeSourceDiagnostics() {
   const chunks = loadKnowledgeChunks();
   const blogIndex = loadBlogIndex();
   const activeSources = manifest?.sources?.filter((source) => source.used_by_retrieval) ?? [];
+  const staleProviderWarnings = activeSources.flatMap((source) => {
+    if (!source.file_path) return [];
+
+    try {
+      const content = readFileSync(path.join(process.cwd(), source.file_path), "utf8");
+      return /\b(?:dr\.?\s*)?michelle\b|\bsnider\b/i.test(content)
+        ? [`Stale former-provider reference found in active source ${source.file_path}.`]
+        : [];
+    } catch {
+      return [];
+    }
+  });
   const duplicateWarnings = [
     manifest?.sources?.some((source) => source.file_path === "data/blog-knowledge.md")
       ? "data/blog-knowledge.md is legacy/non-canonical and should not be used for active retrieval."
@@ -1511,6 +1521,7 @@ export function getKnowledgeSourceDiagnostics() {
     activeSources,
     allSources: manifest?.sources ?? [],
     duplicateWarnings,
+    staleProviderWarnings,
     blogIndexCount: blogIndex.length,
     knowledgeIndexChunkCount: chunks.length,
     countsBySourceType,

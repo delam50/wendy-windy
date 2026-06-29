@@ -97,7 +97,10 @@ Authorized managers can ask Wendy:
 - `Which file is canonical for blogs?`
 - `Show retrieval matches for dry needling`
 - `Why did Wendy not return a dry needling article?`
-- `Show provider knowledge for Dr. Michelle`
+- `Show provider knowledge`
+- `Show Dr. Claire availability`
+- `Check for stale Dr. Michelle references`
+- `Who is in Big Sky today?`
 
 Admin diagnostics require `WENDY_ADMIN_CODE`. The admin code must stay server-side and must never be exposed in client code.
 

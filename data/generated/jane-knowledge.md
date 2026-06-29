@@ -12,33 +12,6 @@ Phone: (406) 285-8753
 Email: frontdesk@windyridgechiropractic.com
 Public disciplines: Chiropractic, Massage Therapy
 ### Appointment Types, Durations, and Listed Prices
-### New Patient Evaluation and Adjustment
-Discipline: Chiropractic
-Duration: 30 minutes
-Scheduled time: 30 minutes
-Current listed price: $130.00
-Providers: Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider
-Booking type: Online bookable
-Description: If you’re new to our office, this is the perfect place to start. Your visit includes a comprehensive exam and chiropractic adjustment. If additional soft tissue therapies are recommended, we’ll review options and any additional costs with you beforehand.
-
-### Adjustment and Soft Tissue Treatment
-Discipline: Chiropractic
-Duration: 30 minutes
-Scheduled time: 30 minutes
-Current listed price: $140.00
-Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider
-Booking type: Online bookable
-Description: This visit includes a chiropractic adjustment along with manual or instrument-assisted soft tissue work, such as cranial techniques, taping, cupping, or dry needling, as clinically appropriate.
-
-### Pediatric New Patient Evaluation and Treatment
-Discipline: Chiropractic
-Duration: 30 minutes
-Scheduled time: 30 minutes
-Current listed price: $130.00
-Providers: Dr. Claire Schauf, Dr. Michelle Snider
-Booking type: Online bookable
-Description: This visit is designed for children age 12 and under who are new to our office. It includes a comprehensive pediatric evaluation and a gentle, age-appropriate chiropractic adjustment. We’ll review your child’s health history, discuss any concerns, and outline clear next steps to support healthy growth, development, and overall well-being.
-
 ### Small Animal Follow-Up
 Discipline: Chiropractic
 Duration: 15 minutes
@@ -47,24 +20,6 @@ Current listed price: $60.00
 Providers: Dr. Joshua Prange
 Booking type: Online bookable
 Description: This follow-up visit is for established small animal patients continuing chiropractic care. We’ll review any changes in mobility, behavior, or performance since the last visit and provide a focused assessment and adjustment as appropriate. The goal is to support joint function, movement quality, and overall comfort while monitoring progress over time.
-
-### Follow-Up Appointment
-Discipline: Chiropractic
-Duration: 15 minutes
-Scheduled time: 15 minutes
-Current listed price: $65.00
-Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider
-Booking type: Online bookable
-Description: For returning patients, choose this appointment. If you’re new to our office, please schedule a New Patient Exam. If you’d like care that includes both an adjustment and soft tissue work, select the Adjustment + Soft Tissue appointment option.
-
-### Established Patient Re-Evaluation and Treatment
-Discipline: Chiropractic
-Duration: 30 minutes
-Scheduled time: 30 minutes
-Current listed price: $120.00
-Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Joshua Prange, Dr. Claire Schauf, Dr. Michelle Snider
-Booking type: Online bookable
-Description: Choose this visit if you’re an established patient with a new concern that needs additional evaluation, or if it’s been more than six months since your last appointment. This visit also serves as a progress review of your current corrective phase to assess how you’re progressing and make any necessary updates to your care.
 
 ### Soft Tissue Appointment
 Discipline: Chiropractic
@@ -137,15 +92,6 @@ Providers: Dr. Claire Schauf
 Booking type: Online bookable
 Description: This visit includes a chiropractic adjustment combined with fire cupping therapy. After a focused assessment, we’ll apply cupping to targeted areas to support circulation, reduce muscle tension, and improve tissue mobility, followed by an adjustment as clinically appropriate.
 
-### Pregnancy New Patient Evaluation and Treatment
-Discipline: Chiropractic
-Duration: 30 minutes
-Scheduled time: 30 minutes
-Current listed price: $130.00
-Providers: Dr. Michelle Snider
-Booking type: Online bookable
-Description: This visit is designed for expectant mothers who are new to our office. It includes a comprehensive pregnancy-specific evaluation and your first chiropractic adjustment, tailored to your current stage of pregnancy. We’ll review your health history, discuss any concerns, and create a care plan focused on comfort, pelvic balance, and supporting a healthy pregnancy.
-
 ### Therapeutic Massage - 60 Minutes
 Discipline: Massage Therapy
 Duration: 60 minutes
@@ -173,13 +119,6 @@ Providers: Mr. James Beaudry
 Booking type: Online bookable
 Description: Professional therapeutic massage tailored to your needs. No referral or pre-authorization required. Book anytime for relaxation, recovery, or performance.
 
-### Home Visit
-Discipline: Chiropractic
-Duration: 60 minutes
-Scheduled time: 60 minutes
-Current listed price: Call to book; pricing may need confirmation
-Providers: Dr. Claire Schauf, Dr. Michelle Snider
-Booking type: Call to book
 ### Providers
 ### Mr. James Beaudry
 Credentials/suffix: LMT
@@ -202,12 +141,6 @@ Bio summary: Dr. Josh was born and raised in St. Louis, MO. He attended Westmins
 Disciplines: Chiropractic
 Bio summary: Dr. Claire’s love for chiropractic began after her undergraduate studies at the University of St. Thomas in St. Paul, Minnesota, where working in a chiropractic office sparked her passion for supporting healthy beginnings from day one. Inspired by the body’s natural ability to heal, she went on to earn her degree from Northwestern Health Sciences University and later moved to Bozeman, Montana, to complete her training and begin her career. She now specializes in pregnancy, postpartum, and pediatric care, using a variety of techniques to help each patient feel supported and cared for while focusing on their whole health and the meaningful changes chiropractic care can create.
 
-### Dr. Michelle Snider
-Disciplines: Chiropractic
-Bio summary: Originally from Keystone, Colorado, Dr. Michelle grew up ski racing, where frequent injuries sparked her journey in becoming a Chiropractor. She earned her Doctor of Chiropractic degree from the University of Western States. After a decade of moving around the country with her Navy husband, she’s excited to call Montana home and join the Windy Ridge Chiropractic team. Dr. Michelle provides compassionate, family-focused care for patients of all ages — from newborns and expectant mothers to athletes and active families. She personally tailors each visit to her patient’s needs using soft tissue techniques, cranial work, and a wide range of adjusting styles, including low-force methods. She is a
-
----
-
 ## Windy Ridge Chiropractic - Big Sky
 Booking URL: https://windyridgechiropractic.janeapp.com/locations/windy-ridge-chiropractic-big-sky/book
 Location note: Our Big Sky Location
@@ -216,60 +149,6 @@ Phone: (406) 995-4050
 Email: frontdesk@windyridgechiropractic.com
 Public disciplines: Chiropractic, Massage Therapy
 ### Appointment Types, Durations, and Listed Prices
-### New Patient Evaluation and Adjustment - Big Sky
-Discipline: Chiropractic
-Duration: 30 minutes
-Scheduled time: 30 minutes
-Current listed price: $150.00
-Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Michelle Snider
-Booking type: Online bookable
-Description: If you’re new to our office, this is the perfect place to start. Your visit includes a comprehensive exam and chiropractic adjustment. If additional soft tissue therapies are recommended, we’ll review options and any additional costs with you beforehand.
-
-### Established Patient Re-Evaluation and Treatment
-Discipline: Chiropractic
-Duration: 30 minutes
-Scheduled time: 30 minutes
-Current listed price: $120.00
-Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Michelle Snider
-Booking type: Online bookable
-Description: Choose this visit if you’re an established patient with a new concern that needs additional evaluation, or if it’s been more than six months since your last appointment. This visit also serves as a progress review of your current corrective phase to assess how you’re progressing and make any necessary updates to your care.
-
-### Return Visit - Big Sky
-Discipline: Chiropractic
-Duration: 15 minutes
-Scheduled time: 15 minutes
-Current listed price: $85.00
-Providers: Dr. David Dalgardno, Dr. Kyle Delamielleure, Dr. Michelle Snider
-Booking type: Online bookable
-Description: Select this visit if you&#39;ve been seen before, and need another visit!
-
-### Signature Wellness Visit
-Discipline: Chiropractic
-Duration: 30 minutes
-Scheduled time: 30 minutes
-Current listed price: $130.00
-Providers: Dr. Michelle Snider
-Booking type: Online bookable
-Description: This visit blends chiropractic care with advanced soft tissue and cranial techniques to restore balance throughout the body. Dr. Michelle supports each patient’s unique needs—physical, emotional, and nutritional—using a blend of hands-on therapy, personalized supplement insight, and wellness coaching for lasting results.
-
-### Pediatric New Patient- Big Sky
-Discipline: Chiropractic
-Duration: 30 minutes
-Scheduled time: 30 minutes
-Current listed price: $150.00
-Providers: Dr. Michelle Snider
-Booking type: Online bookable
-Description: Book this appointment if your child has never been seen before.
-
-### Pregnancy New Patient Evaluation and Treatment
-Discipline: Chiropractic
-Duration: 30 minutes
-Scheduled time: 30 minutes
-Current listed price: $150.00
-Providers: Dr. Michelle Snider
-Booking type: Online bookable
-Description: This visit is designed for expectant mothers who are new to our office. It includes a comprehensive pregnancy-specific evaluation and your first chiropractic adjustment, tailored to your current stage of pregnancy. We’ll review your health history, discuss any concerns, and create a care plan focused on comfort, pelvic balance, and supporting a healthy pregnancy.
-
 ### Adjustment and Soft Tissue Treatment - Big Sky
 Discipline: Chiropractic
 Duration: 30 minutes
@@ -306,13 +185,6 @@ Providers: Nichole Wambsgans
 Booking type: Online bookable
 Description: 90-Minute Massage – Full Body Therapeutic Myofascial Release This full-body session blends therapeutic massage with targeted myofascial release techniques to reduce pain, restore movement, and support long-term recovery. Using slow, intentional pressure and sustained holds, your therapist works through the fascial system—releasing restrictions, easing tension, and improving tissue health. Ideal for chronic tightness, postural strain, or athletic recovery, this treatment is deeply restorative and tailored to your body’s needs.
 
-### Home Visit
-Discipline: Chiropractic
-Duration: 60 minutes
-Scheduled time: 60 minutes
-Current listed price: Call to book; pricing may need confirmation
-Providers: Dr. Michelle Snider
-Booking type: Call to book
 ### Providers
 ### Dr. David Dalgardno
 Disciplines: Chiropractic
@@ -321,10 +193,6 @@ Bio summary: Dr. David Dalgardno’s passion for helping injured individuals ret
 ### Dr. Kyle Delamielleure
 Disciplines: Chiropractic
 Bio summary: Dr. Kyle DeLamielleure is a third-generation Doctor of Chiropractic. Originally from Grand Rapids, Michigan, he spent much of his time in the North Woods of Cheboygan and Marquette before moving west. Drawn to Montana by its mountains, wide-open spaces, and strong sense of community, he is proud to build his life and practice here. Dr. Kyle is passionate about helping a wide range of patients, from athletes and weekend warriors to individuals simply looking to feel and function at their best. His mission is to help people regain control of their health, restore function, and return to the activities they love. With special interests in the neurology of chiropractic, Dr. Kyle combines precise
-
-### Dr. Michelle Snider
-Disciplines: Chiropractic
-Bio summary: Originally from Keystone, Colorado, Dr. Michelle grew up ski racing, where frequent injuries sparked her journey in becoming a Chiropractor. She earned her Doctor of Chiropractic degree from the University of Western States. After a decade of moving around the country with her Navy husband, she’s excited to call Montana home and join the Windy Ridge Chiropractic team. Dr. Michelle provides compassionate, family-focused care for patients of all ages — from newborns and expectant mothers to athletes and active families. She personally tailors each visit to her patient’s needs using soft tissue techniques, cranial work, and a wide range of adjusting styles, including low-force methods. She is a
 
 ### Nichole Wambsgans
 Disciplines: Massage Therapy

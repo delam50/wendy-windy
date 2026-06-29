@@ -17,7 +17,6 @@ const PROVIDER_LABELS = new Set([
   "Dr. Kyle",
   "Dr. Dave",
   "Dr. Claire",
-  "Dr. Michelle",
 ]);
 const STATUS_LABELS = new Set(["New", "Contacted", "Closed"]);
 

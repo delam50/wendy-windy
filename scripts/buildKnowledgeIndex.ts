@@ -73,6 +73,7 @@ const blogKnowledgePath = path.join(generatedDir, "blog-knowledge.md");
 const clinicKnowledgePath = path.join(generatedDir, "clinic-knowledge.json");
 const knowledgeManifestPath = path.join(generatedDir, "knowledge-manifest.json");
 const knowledgeIndexPath = path.join(generatedDir, "knowledge-index.json");
+const INACTIVE_PROVIDER_PATTERN = /\b(?:dr\.?\s*)?michelle\b|\bsnider\b/i;
 
 const generatedKnowledgeSources = [
   {
@@ -211,6 +212,16 @@ async function readJsonIfExists<T>(filePath: string, fallback: T): Promise<T> {
   } catch {
     return fallback;
   }
+}
+
+function removeInactiveProviderSections(markdown: string) {
+  return markdown
+    .split(/(?=^#{2,4}\s+)/m)
+    .filter((section) => !INACTIVE_PROVIDER_PATTERN.test(section))
+    .join("")
+    .replace(/\n{3,}/g, "\n\n")
+    .trimEnd()
+    .concat("\n");
 }
 
 function normalizeBlogArticle(article: BlogArticleInput): CanonicalBlogArticle {
@@ -390,6 +401,20 @@ async function getManifestEntry(source: (typeof generatedKnowledgeSources)[numbe
 
 async function main() {
   await mkdir(generatedDir, { recursive: true });
+
+  for (const fileName of [
+    "jane-knowledge.md",
+    "website-knowledge.md",
+    "sitemap-knowledge.md",
+  ]) {
+    const filePath = path.join(generatedDir, fileName);
+    const markdown = await readTextIfExists(filePath);
+
+    if (markdown && INACTIVE_PROVIDER_PATTERN.test(markdown)) {
+      await writeFile(filePath, removeInactiveProviderSections(markdown), "utf8");
+      console.warn(`[Wendy knowledge build] Removed stale former-provider sections from ${fileName}`);
+    }
+  }
 
   const rawBlogArticles = await readJsonIfExists<BlogArticleInput[]>(blogIndexPath, []);
   const blogArticles = rawBlogArticles

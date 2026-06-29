@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-15T18:05:49.783Z",
+  "generatedAt": "2026-06-29T15:34:18.319Z",
   "canonical": true,
   "bookingUrl": "https://windyridgechiropractic.janeapp.com/",
   "facts": [
@@ -74,11 +74,11 @@
       "tags": [
         "big sky",
         "hours",
+        "dr claire",
         "dr kyle",
-        "dr michelle",
         "friday availability"
       ],
-      "text": "Big Sky general availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Michelle 9:00 AM-4:00 PM, Thursday Dr. Kyle 8:00 AM-5:00 PM. Friday Big Sky availability may be seasonal and at Dr. Dave's discretion, so users should call or check JaneApp. Saturday and Sunday are closed."
+      "text": "Big Sky general availability: Monday 12:00 PM-5:00 PM, Tuesday 8:00 AM-12:00 PM, Wednesday Dr. Claire is in Big Sky, and Thursday Dr. Kyle is in Big Sky 8:00 AM-5:00 PM. Friday Big Sky availability may be seasonal and at Dr. Dave's discretion, so users should call or check JaneApp. Saturday and Sunday are closed. General clinic hours and provider availability are different, and neither guarantees live appointment openings."
     },
     {
       "id": "provider-availability",
@@ -90,12 +90,11 @@
       "tags": [
         "provider availability",
         "dr kyle",
-        "dr michelle",
         "dr dave",
         "dr claire",
         "dr josh"
       ],
-      "text": "Provider availability: Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM. Dr. Michelle is in Big Sky Wednesdays 9:00 AM-4:00 PM and has limited hours at both locations. Dr. Dave practices at both locations with varying hours. Dr. Josh is Four Corners only. Dr. Claire is Four Corners only and also offers at-home visits for mom and newborn."
+      "text": "Provider availability: Dr. Claire is a Four Corners provider whose Wednesday shift is in Big Sky; she is not at Four Corners on Wednesdays. She also offers at-home visits for mom and newborn when applicable. Dr. Kyle is in Big Sky Thursdays 8:00 AM-5:00 PM. Dr. Dave practices at both locations with varying hours, and Friday Big Sky availability may be seasonal or at his discretion. Dr. Josh is Four Corners only. Nichole provides Big Sky massage therapy, and James provides Four Corners massage therapy. Live appointment openings must be confirmed in JaneApp or with the clinic."
     },
     {
       "id": "provider-dr-david",
@@ -173,6 +172,7 @@
         "dr. claire",
         "chiropractor",
         "four corners",
+        "big sky",
         "pediatrics",
         "pregnancy",
         "postpartum",
@@ -180,28 +180,7 @@
         "newborn care",
         "children"
       ],
-      "text": "Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners. Availability: Also offers at-home visits for mom and newborn. Focus areas: pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children. Dr. Claire is a strong option for pregnancy, postpartum, pediatric, newborn, and family care at Four Corners, including at-home visits for moms and newborns."
-    },
-    {
-      "id": "provider-dr-michelle",
-      "sourceType": "provider",
-      "chunkType": "provider_profile",
-      "title": "Dr. Michelle provider profile",
-      "priority": 102,
-      "category": "Providers",
-      "tags": [
-        "dr. michelle",
-        "chiropractor",
-        "four corners",
-        "big sky",
-        "pediatrics",
-        "pregnancy",
-        "perinatal care",
-        "women's health",
-        "family chiropractic",
-        "general chiropractic"
-      ],
-      "text": "Dr. Michelle is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Limited hours at both locations; Big Sky Wednesdays 9 AM-4 PM. Check JaneApp or the website for current availability. Focus areas: pediatrics, pregnancy, perinatal care, women's health, family chiropractic, general chiropractic. Dr. Michelle is also involved in pregnancy, pediatric, perinatal, women's health, family, and general chiropractic care. Do not overstate her availability; direct users to JaneApp or the website for current openings."
+      "text": "Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Big Sky on Wednesdays and not at Four Corners on Wednesdays. Also offers at-home visits for mom and newborn when applicable. Focus areas: pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children. Dr. Claire is the primary provider to mention for pregnancy, postpartum, perinatal, pediatric, newborn, child, and family care. Wednesdays are her Big Sky day, so she is not at Four Corners on Wednesdays. She also offers at-home visits for moms and newborns when applicable."
     },
     {
       "id": "provider-nichole",

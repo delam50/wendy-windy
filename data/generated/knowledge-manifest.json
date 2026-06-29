@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T18:05:49.784Z",
+  "generated_at": "2026-06-29T15:34:18.320Z",
   "architecture": "canonical-wendy-knowledge-v1",
   "notes": [
     "Structured clinic facts, provider routing, pricing, hours, safety, booking, massage, and animal chiropractic outrank blog/resource content.",
@@ -11,37 +11,37 @@
       "source_id": "clinic-knowledge",
       "source_type": "clinic_fact",
       "file_path": "data/generated/clinic-knowledge.json",
-      "generated_at": "2026-05-15T18:05:49.784Z",
+      "generated_at": "2026-06-29T15:34:18.320Z",
       "priority": 110,
       "freshness": "canonical structured facts",
       "canonical": true,
       "used_by_retrieval": true,
       "exists": true,
-      "bytes": 14229
+      "bytes": 13745
     },
     {
       "source_id": "blog-index",
       "source_type": "blog",
       "file_path": "data/generated/blog-index.json",
-      "generated_at": "2026-05-15T18:05:49.783Z",
+      "generated_at": "2026-06-29T15:34:18.318Z",
       "priority": 70,
       "freshness": "generated from sitemap by npm run sync:blogs",
       "canonical": true,
       "used_by_retrieval": true,
       "exists": true,
-      "bytes": 318904
+      "bytes": 401066
     },
     {
       "source_id": "generated-jane-knowledge",
       "source_type": "booking",
       "file_path": "data/generated/jane-knowledge.md",
-      "generated_at": "2026-05-07T21:25:39.398Z",
+      "generated_at": "2026-06-29T15:34:18.308Z",
       "priority": 90,
       "freshness": "generated from public JaneApp pages",
       "canonical": true,
       "used_by_retrieval": true,
       "exists": true,
-      "bytes": 23928
+      "bytes": 15660
     },
     {
       "source_id": "generated-website-knowledge",
@@ -59,19 +59,19 @@
       "source_id": "generated-sitemap-knowledge",
       "source_type": "service",
       "file_path": "data/generated/sitemap-knowledge.md",
-      "generated_at": "2026-05-07T21:25:36.098Z",
+      "generated_at": "2026-06-29T15:34:18.311Z",
       "priority": 50,
       "freshness": "generated sitemap supplement; structured facts outrank this",
       "canonical": false,
       "used_by_retrieval": true,
       "exists": true,
-      "bytes": 102342
+      "bytes": 89041
     },
     {
       "source_id": "generated-blog-knowledge",
       "source_type": "blog",
       "file_path": "data/generated/blog-knowledge.md",
-      "generated_at": "2026-05-15T18:05:49.784Z",
+      "generated_at": "2026-06-29T15:34:18.320Z",
       "priority": 45,
       "freshness": "generated from blog-index.json for human review and fallback documentation",
       "canonical": false,

@@ -64,8 +64,9 @@ export const wendyProviders: WendyProvider[] = [
     id: "dr-claire",
     name: "Dr. Claire",
     role: "chiropractor",
-    locations: ["Four Corners"],
-    availabilityNote: "Also offers at-home visits for mom and newborn.",
+    locations: ["Four Corners", "Big Sky"],
+    availabilityNote:
+      "Big Sky on Wednesdays and not at Four Corners on Wednesdays. Also offers at-home visits for mom and newborn when applicable.",
     focus: [
       "pediatrics",
       "pregnancy",
@@ -73,22 +74,6 @@ export const wendyProviders: WendyProvider[] = [
       "family chiropractic",
       "newborn care",
       "children",
-    ],
-  },
-  {
-    id: "dr-michelle",
-    name: "Dr. Michelle",
-    role: "chiropractor",
-    locations: ["Four Corners", "Big Sky"],
-    availabilityNote:
-      "Limited hours at both locations; Big Sky Wednesdays 9 AM-4 PM. Check JaneApp or the website for current availability.",
-    focus: [
-      "pediatrics",
-      "pregnancy",
-      "perinatal care",
-      "women's health",
-      "family chiropractic",
-      "general chiropractic",
     ],
   },
   {
@@ -222,27 +207,14 @@ export function rankWendyProviders(input: {
     }
 
     if (pediatricIntent || pregnancyIntent) {
-      if (mentionsBigSky) {
-        if (provider.id === "dr-michelle") {
-          addScore(provider, 76, "Big Sky pediatric / pregnancy / perinatal care");
-        }
-        if (provider.id === "dr-claire") {
-          provider.score -= 8;
-        }
-      } else if (mentionsFourCorners) {
-        if (provider.id === "dr-claire") {
-          addScore(provider, 70, "Four Corners pregnancy / pediatric / newborn care");
-        }
-        if (provider.id === "dr-michelle") {
-          addScore(provider, 64, "pregnancy / pediatric / family care");
-        }
-      } else {
-        if (provider.id === "dr-claire") {
-          addScore(provider, 62, "pregnancy / pediatric / newborn care");
-        }
-        if (provider.id === "dr-michelle") {
-          addScore(provider, 62, "pregnancy / pediatric / perinatal care at both locations");
-        }
+      if (provider.id === "dr-claire") {
+        addScore(
+          provider,
+          mentionsBigSky ? 76 : mentionsFourCorners ? 70 : 68,
+          mentionsBigSky
+            ? "Wednesday Big Sky pediatric / pregnancy / perinatal care"
+            : "primary pregnancy / pediatric / newborn care provider",
+        );
       }
     }
 
@@ -267,7 +239,7 @@ export function rankWendyProviders(input: {
 
     if (generalNeckBackIntent) {
       if (mentionsBigSky) {
-        if (["dr-david", "dr-kyle", "dr-michelle"].includes(provider.id)) {
+        if (["dr-david", "dr-kyle"].includes(provider.id)) {
           addScore(provider, 34, "Big Sky general neck/back care option");
         }
       } else if (mentionsFourCorners) {
@@ -281,7 +253,7 @@ export function rankWendyProviders(input: {
         if (["dr-david", "dr-josh"].includes(provider.id)) {
           addScore(provider, 34, "general neck/back care");
         }
-        if (["dr-kyle", "dr-michelle"].includes(provider.id)) {
+        if (provider.id === "dr-kyle") {
           addScore(provider, 18, "location-dependent general care option");
         }
       }
