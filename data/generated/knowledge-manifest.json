@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T15:34:18.320Z",
+  "generated_at": "2026-07-08T22:15:54.730Z",
   "architecture": "canonical-wendy-knowledge-v1",
   "notes": [
     "Structured clinic facts, provider routing, pricing, hours, safety, booking, massage, and animal chiropractic outrank blog/resource content.",
@@ -11,25 +11,25 @@
       "source_id": "clinic-knowledge",
       "source_type": "clinic_fact",
       "file_path": "data/generated/clinic-knowledge.json",
-      "generated_at": "2026-06-29T15:34:18.320Z",
+      "generated_at": "2026-07-08T22:15:54.730Z",
       "priority": 110,
       "freshness": "canonical structured facts",
       "canonical": true,
       "used_by_retrieval": true,
       "exists": true,
-      "bytes": 13745
+      "bytes": 18168
     },
     {
       "source_id": "blog-index",
       "source_type": "blog",
       "file_path": "data/generated/blog-index.json",
-      "generated_at": "2026-06-29T15:34:18.318Z",
+      "generated_at": "2026-07-08T22:15:54.729Z",
       "priority": 70,
       "freshness": "generated from sitemap by npm run sync:blogs",
       "canonical": true,
       "used_by_retrieval": true,
       "exists": true,
-      "bytes": 401066
+      "bytes": 236742
     },
     {
       "source_id": "generated-jane-knowledge",
@@ -71,7 +71,7 @@
       "source_id": "generated-blog-knowledge",
       "source_type": "blog",
       "file_path": "data/generated/blog-knowledge.md",
-      "generated_at": "2026-06-29T15:34:18.320Z",
+      "generated_at": "2026-07-08T22:15:54.730Z",
       "priority": 45,
       "freshness": "generated from blog-index.json for human review and fallback documentation",
       "canonical": false,

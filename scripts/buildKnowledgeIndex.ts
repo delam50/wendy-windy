@@ -240,7 +240,6 @@ function normalizeBlogArticle(article: BlogArticleInput): CanonicalBlogArticle {
   const excerpt = article.excerpt || summary;
   const searchableText = compactText(
     [
-      article.searchable_text,
       article.title,
       canonicalUrl,
       slug.replace(/[-_]+/g, " "),

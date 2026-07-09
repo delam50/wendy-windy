@@ -106,6 +106,38 @@ const PRIORITY_TERMS = [
   "cash rate",
   "cash rates",
   "insurance",
+  "insurances accepted",
+  "accepted insurance",
+  "insurance accepted",
+  "verification",
+  "insurance verification",
+  "blue cross blue shield",
+  "allegiance",
+  "pacificsource",
+  "mountain health co-op",
+  "first choice",
+  "allied",
+  "ebms",
+  "cigna",
+  "aetna",
+  "medicare",
+  "medicaid",
+  "unitedhealthcare",
+  "united healthcare",
+  "uhc",
+  "out of network",
+  "out-of-network",
+  "in network",
+  "in-network",
+  "auto insurance",
+  "workers compensation",
+  "workers' compensation",
+  "workers comp",
+  "work comp",
+  "insurance card",
+  "referral",
+  "authorization",
+  "claim information",
   "first visit",
   "new patient",
   "new patient exam",
@@ -245,6 +277,9 @@ const RELATED_TERM_GROUPS = [
     "cost",
     "pricing",
     "insurance",
+    "insurances accepted",
+    "accepted insurance",
+    "insurance verification",
     "cash",
     "cash pricing",
     "cash rate",
@@ -256,6 +291,16 @@ const RELATED_TERM_GROUPS = [
     "copay",
     "copays",
     "patient responsibility",
+    "medicare",
+    "medicaid",
+    "unitedhealthcare",
+    "uhc",
+    "out-of-network",
+    "auto insurance",
+    "workers compensation",
+    "insurance card",
+    "referral",
+    "authorization",
   ],
   ["four corners", "bozeman", "big sky", "location", "locations"],
   ["new patient exam", "new patient evaluation", "new patient", "first visit", "exam", "evaluation"],
@@ -596,8 +641,24 @@ function scoreChunk(
     score += 80;
   }
 
-  if (/pricing|cost|cash|rate|insurance|\$|how much/.test(normalizedQuery) && chunk.sourceType === "pricing") {
+  if (
+    /pricing|cost|cash|rate|insurance|coverage|benefits|medicare|medicaid|unitedhealthcare|united healthcare|uhc|out[-\s]?of[-\s]?network|auto insurance|workers'? compensation|workers'? comp|insurance card|referral|authorization|\$|how much/.test(
+      normalizedQuery,
+    ) &&
+    chunk.sourceType === "pricing"
+  ) {
     score += 70;
+  }
+
+  if (
+    /insurance|coverage|benefits|medicare|medicaid|unitedhealthcare|united healthcare|uhc|out[-\s]?of[-\s]?network|auto insurance|workers'? compensation|workers'? comp|insurance card|referral|authorization/.test(
+      normalizedQuery,
+    ) &&
+    /insurance|coverage|benefits|medicare|medicaid|unitedhealthcare|uhc|auto insurance|workers'? compensation|workers'? comp|insurance card|referral|authorization|windy ridge does not participate with medicare/.test(
+      normalizedText,
+    )
+  ) {
+    score += 45;
   }
 
   if (/hours|open|closed|today|monday|tuesday|wednesday|thursday|friday|saturday|sunday/.test(normalizedQuery) && chunk.sourceType === "hours") {
@@ -655,8 +716,8 @@ function scoreChunk(
     }
   }
 
-  if (/pricing|cost|insurance|\$|price/i.test(chunk.text)) {
-    if (/pricing|cost|insurance|price|cash|rate/i.test(normalizedQuery)) {
+  if (/pricing|cost|insurance|\$|price|medicare|medicaid|unitedhealthcare|uhc/i.test(chunk.text)) {
+    if (/pricing|cost|insurance|coverage|benefits|price|cash|rate|medicare|medicaid|unitedhealthcare|united healthcare|uhc|out[-\s]?of[-\s]?network/i.test(normalizedQuery)) {
       score += 12;
     }
   }

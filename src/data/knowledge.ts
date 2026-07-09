@@ -39,6 +39,14 @@ export const clinicKnowledge: ClinicKnowledge = {
       label: "Jane online booking",
       url: "https://windyridgechiropractic.janeapp.com/",
     },
+    {
+      label: "Insurances accepted",
+      url: "https://windyridgechiropractic.com/insurances-accepted/",
+    },
+    {
+      label: "Contact Windy Ridge",
+      url: "https://windyridgechiropractic.com/contact/",
+    },
   ],
   sections: [
     {
@@ -79,6 +87,29 @@ export const clinicKnowledge: ClinicKnowledge = {
         "Online booking is associated with the Windy Ridge Chiropractic Jane app booking link.",
         "The assistant may direct users to the official website or Jane booking page for appointments.",
         "The assistant should not invent clinic hours, provider availability, pricing, insurance coverage, cancellation policies, address details, or phone numbers.",
+      ],
+    },
+    {
+      title: "Insurance policies and verification",
+      sourceUrls: [
+        "https://windyridgechiropractic.com/insurances-accepted/",
+        "https://windyridgechiropractic.com/contact/",
+        "https://windyridgechiropractic.janeapp.com/",
+      ],
+      facts: [
+        "Windy Ridge has an Insurances Accepted page at https://windyridgechiropractic.com/insurances-accepted/.",
+        "For insurance verification questions, the primary call to action is the contact page: https://windyridgechiropractic.com/contact/.",
+        "JaneApp booking is a secondary call to action for scheduling: https://windyridgechiropractic.janeapp.com/.",
+        "Commonly accepted plans may include Blue Cross Blue Shield, Allegiance, PacificSource, Mountain Health Co-op, First Choice, Allied, EBMS, Cigna, Aetna, select employer-sponsored plans, select auto insurance claims, select workers' compensation claims, and Medicaid for patients age 20 and under only.",
+        "Use the correct name Mountain Health Co-op, not Montana Health Co-op.",
+        "Insurance verification is an estimate, not a guarantee of payment or coverage. Final patient responsibility is determined after the carrier processes the claim.",
+        "Windy Ridge does not participate with Medicare. Medicare coverage can be limited and may not cover comprehensive chiropractic visit services; Medicare patients can ask about cash-pay options.",
+        "Medicaid is for patients age 20 and under only. Coverage can be more complicated, so patients should call the office for details.",
+        "Windy Ridge may not be in network with certain UnitedHealthcare plans. Patients should contact the office to ask about out-of-network benefits or cash-pay options.",
+        "Auto insurance and workers' compensation claims vary by case. Wendy should say: Please call the office for details.",
+        "For insurance visits, patients should bring their insurance card, any referral or authorization if their plan requires one, and claim information for auto or workers' compensation cases.",
+        "Do not tell patients that photo ID is required unless current clinic policy is later provided.",
+        "Use patient-friendly, non-combative insurance wording and avoid negative statements about insurers.",
       ],
     },
     {

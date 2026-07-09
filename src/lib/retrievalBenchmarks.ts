@@ -72,6 +72,42 @@ const tests: RetrievalBenchmarkTest[] = [
     mode: "explicit_resource_request",
   },
   {
+    id: "accepted-insurance",
+    question: "What insurance do you take?",
+    expectedTopic: "Accepted insurance",
+    expectedTerms: ["blue cross blue shield", "mountain health co-op", "contact"],
+    expectedUrlIncludes: "insurances-accepted",
+    mode: "pricing_answer",
+  },
+  {
+    id: "medicare-insurance",
+    question: "Do you accept Medicare?",
+    expectedTopic: "Medicare insurance",
+    expectedTerms: ["does not participate", "medicare", "cash-pay"],
+    mode: "pricing_answer",
+  },
+  {
+    id: "medicaid-insurance",
+    question: "Do you accept Medicaid?",
+    expectedTopic: "Medicaid insurance",
+    expectedTerms: ["medicaid", "20 and under", "call"],
+    mode: "pricing_answer",
+  },
+  {
+    id: "unitedhealthcare-insurance",
+    question: "Do you take UnitedHealthcare?",
+    expectedTopic: "UnitedHealthcare insurance",
+    expectedTerms: ["unitedhealthcare", "out-of-network", "cash-pay"],
+    mode: "pricing_answer",
+  },
+  {
+    id: "insurance-visit-prep",
+    question: "What should I bring to my appointment for insurance?",
+    expectedTopic: "Insurance visit preparation",
+    expectedTerms: ["insurance card", "referral", "claim information"],
+    mode: "pricing_answer",
+  },
+  {
     id: "big-sky-hours",
     question: "What are Big Sky hours?",
     expectedTopic: "Big Sky clinic hours",
@@ -131,7 +167,7 @@ function detectIntent(question: string, mode: RetrievalTestMode) {
     intents.push("article/resource intent");
   }
 
-  if (/\b(cost|price|pricing|insurance|how much|\$)\b/.test(text)) {
+  if (/\b(cost|price|pricing|insurance|coverage|benefits|medicare|medicaid|united\s*health\s*care|unitedhealthcare|uhc|out[-\s]?of[-\s]?network|how much|\$)\b/.test(text)) {
     intents.push("pricing intent");
   }
 
@@ -211,6 +247,8 @@ function resultMatches(test: RetrievalBenchmarkTest, result: RetrievedDiagnostic
       result.sourceType,
       result.chunkType,
       result.sourceBucket,
+      result.category,
+      result.tags.join(" "),
       result.preview,
       result.canonicalSource,
     ]

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T15:34:18.329Z",
+  "generated_at": "2026-07-08T22:15:54.736Z",
   "architecture": "canonical-wendy-knowledge-v1",
   "vector_ready": true,
   "embedding_plan": {
@@ -242,16 +242,17 @@
         "pediatrics",
         "pregnancy",
         "postpartum",
+        "perinatal care",
         "family chiropractic",
         "newborn care",
         "children"
       ],
       "priority": 102,
-      "text": "Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Big Sky on Wednesdays and not at Four Corners on Wednesdays. Also offers at-home visits for mom and newborn when applicable. Focus areas: pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children. Dr. Claire is the primary provider to mention for pregnancy, postpartum, perinatal, pediatric, newborn, child, and family care. Wednesdays are her Big Sky day, so she is not at Four Corners on Wednesdays. She also offers at-home visits for moms and newborns when applicable.",
+      "text": "Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Big Sky on Wednesdays and not at Four Corners on Wednesdays. Also offers at-home visits for mom and newborn when applicable. Focus areas: pediatrics, pregnancy, postpartum, perinatal care, family chiropractic, newborn care, children. Dr. Claire is the primary provider to mention for pregnancy, postpartum, perinatal, pediatric, newborn, child, and family care. Wednesdays are her Big Sky day, so she is not at Four Corners on Wednesdays. She also offers at-home visits for moms and newborns when applicable.",
       "metadata": {},
       "canonical_source": "data/generated/clinic-knowledge.json",
-      "searchable_text": "Dr. Claire provider profile Providers dr. claire chiropractor four corners big sky pediatrics pregnancy postpartum family chiropractic newborn care children Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Big Sky on Wednesdays and not at Four Corners on Wednesdays. Also offers at-home visits for mom and newborn when applicable. Focus areas: pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children. Dr. Claire is the primary provider to mention for pregnancy, postpartum, perinatal, pediatric, newborn, child, and family care. Wednesdays are her Big Sky day, so she is not at Four Corners on Wednesdays. She also offers at-home visits for moms and newborns when applicable.",
-      "embedding_text": "Title: Dr. Claire provider profile Category: Providers Tags: dr. claire, chiropractor, four corners, big sky, pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Big Sky on Wednesdays and not at Four Corners on Wednesdays. Also offers at-home visits for mom and newborn when applicable. Focus areas: pediatrics, pregnancy, postpartum, family chiropractic, newborn care, children. Dr. Claire is the primary provider to mention for pregnancy, postpartum, perinatal, pediatric, newborn, child, and family care. Wednesdays are her Big Sky day, so she is not at Four Corners on Wednesdays. She also offers at-home visits for moms and newborns when applicable.",
+      "searchable_text": "Dr. Claire provider profile Providers dr. claire chiropractor four corners big sky pediatrics pregnancy postpartum perinatal care family chiropractic newborn care children Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Big Sky on Wednesdays and not at Four Corners on Wednesdays. Also offers at-home visits for mom and newborn when applicable. Focus areas: pediatrics, pregnancy, postpartum, perinatal care, family chiropractic, newborn care, children. Dr. Claire is the primary provider to mention for pregnancy, postpartum, perinatal, pediatric, newborn, child, and family care. Wednesdays are her Big Sky day, so she is not at Four Corners on Wednesdays. She also offers at-home visits for moms and newborns when applicable.",
+      "embedding_text": "Title: Dr. Claire provider profile Category: Providers Tags: dr. claire, chiropractor, four corners, big sky, pediatrics, pregnancy, postpartum, perinatal care, family chiropractic, newborn care, children Dr. Claire is a Windy Ridge chiropractor. Locations: Four Corners, Big Sky. Availability: Big Sky on Wednesdays and not at Four Corners on Wednesdays. Also offers at-home visits for mom and newborn when applicable. Focus areas: pediatrics, pregnancy, postpartum, perinatal care, family chiropractic, newborn care, children. Dr. Claire is the primary provider to mention for pregnancy, postpartum, perinatal, pediatric, newborn, child, and family care. Wednesdays are her Big Sky day, so she is not at Four Corners on Wednesdays. She also offers at-home visits for moms and newborns when applicable.",
       "embedding_model": null,
       "embedding_updated_at": null,
       "vector_id": null
@@ -330,21 +331,121 @@
       "id": "insurance-rules",
       "source_type": "pricing",
       "chunk_type": "pricing_rule",
-      "title": "Insurance and patient responsibility",
-      "category": "Pricing",
+      "title": "Insurance verification and patient responsibility",
+      "category": "Insurance",
       "tags": [
         "insurance",
         "benefits",
         "deductible",
         "copay",
-        "patient responsibility"
+        "patient responsibility",
+        "verification",
+        "insurances accepted",
+        "contact",
+        "janeapp"
       ],
-      "priority": 104,
-      "text": "Insurance benefits vary by plan. Final patient responsibility can depend on benefits, deductibles, copays, covered services, and services performed. Wendy should avoid guaranteeing coverage and should encourage confirmation through the clinic or JaneApp when appropriate.",
-      "metadata": {},
+      "priority": 114,
+      "text": "Windy Ridge has an Insurances Accepted page at https://windyridgechiropractic.com/insurances-accepted/. For insurance verification, Wendy should use the contact page as the primary call to action: https://windyridgechiropractic.com/contact/. JaneApp booking is the secondary call to action: https://windyridgechiropractic.janeapp.com/. Insurance verification is only an estimate, not a guarantee of payment or coverage. Final patient responsibility is determined after the insurance carrier processes the claim and may depend on benefits, deductibles, copays, covered services, and services performed. Wendy should answer insurance questions transparently and should not guarantee coverage.",
+      "metadata": {
+        "url": "https://windyridgechiropractic.com/insurances-accepted/",
+        "contactUrl": "https://windyridgechiropractic.com/contact/",
+        "bookingUrl": "https://windyridgechiropractic.janeapp.com/"
+      },
       "canonical_source": "data/generated/clinic-knowledge.json",
-      "searchable_text": "Insurance and patient responsibility Pricing insurance benefits deductible copay patient responsibility Insurance benefits vary by plan. Final patient responsibility can depend on benefits, deductibles, copays, covered services, and services performed. Wendy should avoid guaranteeing coverage and should encourage confirmation through the clinic or JaneApp when appropriate.",
-      "embedding_text": "Title: Insurance and patient responsibility Category: Pricing Tags: insurance, benefits, deductible, copay, patient responsibility Insurance benefits vary by plan. Final patient responsibility can depend on benefits, deductibles, copays, covered services, and services performed. Wendy should avoid guaranteeing coverage and should encourage confirmation through the clinic or JaneApp when appropriate.",
+      "searchable_text": "Insurance verification and patient responsibility Insurance insurance benefits deductible copay patient responsibility verification insurances accepted contact janeapp Windy Ridge has an Insurances Accepted page at For insurance verification, Wendy should use the contact page as the primary call to action: JaneApp booking is the secondary call to action: Insurance verification is only an estimate, not a guarantee of payment or coverage. Final patient responsibility is determined after the insurance carrier processes the claim and may depend on benefits, deductibles, copays, covered services, and services performed. Wendy should answer insurance questions transparently and should not guarantee coverage.",
+      "embedding_text": "Title: Insurance verification and patient responsibility Category: Insurance Tags: insurance, benefits, deductible, copay, patient responsibility, verification, insurances accepted, contact, janeapp Windy Ridge has an Insurances Accepted page at For insurance verification, Wendy should use the contact page as the primary call to action: JaneApp booking is the secondary call to action: Insurance verification is only an estimate, not a guarantee of payment or coverage. Final patient responsibility is determined after the insurance carrier processes the claim and may depend on benefits, deductibles, copays, covered services, and services performed. Wendy should answer insurance questions transparently and should not guarantee coverage.",
+      "embedding_model": null,
+      "embedding_updated_at": null,
+      "vector_id": null
+    },
+    {
+      "id": "insurance-accepted-plans",
+      "source_type": "pricing",
+      "chunk_type": "pricing_rule",
+      "title": "Commonly accepted insurance plans",
+      "category": "Insurance",
+      "tags": [
+        "insurance",
+        "accepted insurance",
+        "blue cross blue shield",
+        "allegiance",
+        "pacificsource",
+        "mountain health co-op",
+        "first choice",
+        "allied",
+        "ebms",
+        "cigna",
+        "aetna",
+        "employer-sponsored"
+      ],
+      "priority": 115,
+      "text": "Commonly accepted insurance plans may include Blue Cross Blue Shield, Allegiance, PacificSource, Mountain Health Co-op, First Choice, Allied, EBMS, Cigna, Aetna, select employer-sponsored plans, select auto insurance claims, select workers' compensation claims, and Medicaid for patients age 20 and under only. Use the correct plan name Mountain Health Co-op, not Montana Health Co-op. Wendy should phrase this as commonly accepted plans that may include these carriers and should direct patients to contact the office for plan-specific verification.",
+      "metadata": {
+        "url": "https://windyridgechiropractic.com/insurances-accepted/",
+        "contactUrl": "https://windyridgechiropractic.com/contact/"
+      },
+      "canonical_source": "data/generated/clinic-knowledge.json",
+      "searchable_text": "Commonly accepted insurance plans Insurance insurance accepted insurance blue cross blue shield allegiance pacificsource mountain health co-op first choice allied ebms cigna aetna employer-sponsored Commonly accepted insurance plans may include Blue Cross Blue Shield, Allegiance, PacificSource, Mountain Health Co-op, First Choice, Allied, EBMS, Cigna, Aetna, select employer-sponsored plans, select auto insurance claims, select workers' compensation claims, and Medicaid for patients age 20 and under only. Use the correct plan name Mountain Health Co-op, not Montana Health Co-op. Wendy should phrase this as commonly accepted plans that may include these carriers and should direct patients to contact the office for plan-specific verification.",
+      "embedding_text": "Title: Commonly accepted insurance plans Category: Insurance Tags: insurance, accepted insurance, blue cross blue shield, allegiance, pacificsource, mountain health co-op, first choice, allied, ebms, cigna, aetna, employer-sponsored Commonly accepted insurance plans may include Blue Cross Blue Shield, Allegiance, PacificSource, Mountain Health Co-op, First Choice, Allied, EBMS, Cigna, Aetna, select employer-sponsored plans, select auto insurance claims, select workers' compensation claims, and Medicaid for patients age 20 and under only. Use the correct plan name Mountain Health Co-op, not Montana Health Co-op. Wendy should phrase this as commonly accepted plans that may include these carriers and should direct patients to contact the office for plan-specific verification.",
+      "embedding_model": null,
+      "embedding_updated_at": null,
+      "vector_id": null
+    },
+    {
+      "id": "insurance-special-cases",
+      "source_type": "pricing",
+      "chunk_type": "pricing_rule",
+      "title": "Insurance special cases: Medicare, Medicaid, UnitedHealthcare, auto, workers comp",
+      "category": "Insurance",
+      "tags": [
+        "medicare",
+        "medicaid",
+        "unitedhealthcare",
+        "uhc",
+        "out of network",
+        "cash pay",
+        "auto insurance",
+        "workers compensation",
+        "workers comp",
+        "claim"
+      ],
+      "priority": 116,
+      "text": "Insurance special cases: Windy Ridge does not participate with Medicare. Medicare coverage for chiropractic care can be limited and may not cover comprehensive chiropractic visit services, so Medicare patients can ask the clinic about cash-pay options. Medicaid is accepted for patients age 20 and under only; coverage can be more complicated, so patients should call the office for details. Windy Ridge may not be in network with certain UnitedHealthcare plans; patients should contact the office to ask about out-of-network benefits or cash-pay options. Auto insurance claims and workers' compensation claims vary by case, so Wendy should say: Please call the office for details.",
+      "metadata": {
+        "url": "https://windyridgechiropractic.com/insurances-accepted/",
+        "contactUrl": "https://windyridgechiropractic.com/contact/"
+      },
+      "canonical_source": "data/generated/clinic-knowledge.json",
+      "searchable_text": "Insurance special cases: Medicare, Medicaid, UnitedHealthcare, auto, workers comp Insurance medicare medicaid unitedhealthcare uhc out of network cash pay auto insurance workers compensation workers comp claim Insurance special cases: Windy Ridge does not participate with Medicare. Medicare coverage for chiropractic care can be limited and may not cover comprehensive chiropractic visit services, so Medicare patients can ask the clinic about cash-pay options. Medicaid is accepted for patients age 20 and under only; coverage can be more complicated, so patients should call the office for details. Windy Ridge may not be in network with certain UnitedHealthcare plans; patients should contact the office to ask about out-of-network benefits or cash-pay options. Auto insurance claims and workers' compensation claims vary by case, so Wendy should say: Please call the office for details.",
+      "embedding_text": "Title: Insurance special cases: Medicare, Medicaid, UnitedHealthcare, auto, workers comp Category: Insurance Tags: medicare, medicaid, unitedhealthcare, uhc, out of network, cash pay, auto insurance, workers compensation, workers comp, claim Insurance special cases: Windy Ridge does not participate with Medicare. Medicare coverage for chiropractic care can be limited and may not cover comprehensive chiropractic visit services, so Medicare patients can ask the clinic about cash-pay options. Medicaid is accepted for patients age 20 and under only; coverage can be more complicated, so patients should call the office for details. Windy Ridge may not be in network with certain UnitedHealthcare plans; patients should contact the office to ask about out-of-network benefits or cash-pay options. Auto insurance claims and workers' compensation claims vary by case, so Wendy should say: Please call the office for details.",
+      "embedding_model": null,
+      "embedding_updated_at": null,
+      "vector_id": null
+    },
+    {
+      "id": "insurance-visit-preparation",
+      "source_type": "pricing",
+      "chunk_type": "pricing_rule",
+      "title": "What to bring for insurance visits",
+      "category": "Insurance",
+      "tags": [
+        "insurance card",
+        "what to bring",
+        "referral",
+        "authorization",
+        "auto claim",
+        "workers comp claim",
+        "claim information"
+      ],
+      "priority": 112,
+      "text": "For insurance-related visit preparation, patients should bring their insurance card, any referral or authorization if their plan requires one, and claim information for auto insurance or workers' compensation cases. Wendy should not tell patients that photo ID is required unless the clinic later provides that as current policy.",
+      "metadata": {
+        "url": "https://windyridgechiropractic.com/insurances-accepted/",
+        "contactUrl": "https://windyridgechiropractic.com/contact/"
+      },
+      "canonical_source": "data/generated/clinic-knowledge.json",
+      "searchable_text": "What to bring for insurance visits Insurance insurance card what to bring referral authorization auto claim workers comp claim claim information For insurance-related visit preparation, patients should bring their insurance card, any referral or authorization if their plan requires one, and claim information for auto insurance or workers' compensation cases. Wendy should not tell patients that photo ID is required unless the clinic later provides that as current policy.",
+      "embedding_text": "Title: What to bring for insurance visits Category: Insurance Tags: insurance card, what to bring, referral, authorization, auto claim, workers comp claim, claim information For insurance-related visit preparation, patients should bring their insurance card, any referral or authorization if their plan requires one, and claim information for auto insurance or workers' compensation cases. Wendy should not tell patients that photo ID is required unless the clinic later provides that as current policy.",
       "embedding_model": null,
       "embedding_updated_at": null,
       "vector_id": null

@@ -1,6 +1,6 @@
 # Windy Ridge Chiropractic Blog Knowledge
 
-Generated from data/generated/blog-index.json at 2026-06-29T15:34:18.318Z.
+Generated from data/generated/blog-index.json at 2026-07-08T22:15:54.729Z.
 
 Canonical resource cards should use `data/generated/blog-index.json`; this Markdown file is generated documentation/fallback context.
 

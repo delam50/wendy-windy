@@ -242,7 +242,13 @@ function detectIntentCategories(
     intents.add("pricing intent");
   }
 
-  if (includesAny(combinedContext, [/\b(insurance|insured|coverage|covered|copay|deductible|benefits)\b/])) {
+  if (
+    includesAny(combinedContext, [
+      /\b(insurance|insured|coverage|covered|copay|deductible|benefits|out[-\s]?of[-\s]?network|in[-\s]?network)\b/,
+      /\b(medicare|medicaid|united\s*health\s*care|unitedhealthcare|uhc|blue cross|blue shield|allegiance|pacificsource|mountain health co-op|cigna|aetna|ebms|first choice|allied)\b/,
+      /\b(auto insurance|car insurance|workers'? compensation|workers'? comp|work comp|claim|insurance card|referral|authorization|pre[-\s]?authorization|what should i bring|bring to (my )?appointment)\b/,
+    ])
+  ) {
     intents.add("insurance intent");
   }
 
@@ -313,7 +319,7 @@ function detectTopicCategory(messages: ChatMessage[], pageContext: string) {
     return "clinic hours";
   }
 
-  if (/\b(insurance|coverage|copay|deductible|benefits)\b/.test(text)) {
+  if (/\b(insurance|coverage|copay|deductible|benefits|medicare|medicaid|united\s*health\s*care|unitedhealthcare|uhc|out[-\s]?of[-\s]?network|in[-\s]?network|auto insurance|workers'? compensation|workers'? comp|work comp|insurance card|referral|authorization)\b/.test(text)) {
     return "insurance";
   }
 
@@ -488,6 +494,73 @@ function getPricingLocationGuidance(messages: ChatMessage[], pageContext: string
   return guidance.join(" ");
 }
 
+function getInsuranceGuidance(messages: ChatMessage[], pageContext: string) {
+  const text = `${getLatestUserContent(messages)}\n${pageContext}`.toLowerCase();
+  const asksAcceptedPlans =
+    /\b(what insurance|which insurance|insurance do you take|insurance accepted|take my insurance|accept insurance|accepted plans|in network|in-network)\b/.test(
+      text,
+    );
+  const asksMedicare = /\bmedicare\b/.test(text);
+  const asksMedicaid = /\bmedicaid\b/.test(text);
+  const asksUnitedHealthcare = /\b(united\s*health\s*care|unitedhealthcare|uhc)\b/.test(text);
+  const asksAuto = /\b(auto insurance|car insurance|auto claim|car accident claim)\b/.test(text);
+  const asksWorkersComp = /\b(workers'? compensation|workers'? comp|work comp)\b/.test(text);
+  const asksWhatToBring = /\b(what should i bring|bring to (my )?appointment|insurance card|referral|authorization|pre[-\s]?authorization|claim info|claim information)\b/.test(
+    text,
+  );
+
+  const guidance = [
+    "Insurance intent: answer transparently and avoid guarantees. Insurance verification is an estimate, not a guarantee of payment or coverage; final responsibility is determined after the carrier processes the claim.",
+    "Primary insurance CTA: send users to the contact page for verification: https://windyridgechiropractic.com/contact/. Secondary CTA for booking: https://windyridgechiropractic.janeapp.com/.",
+    "Relevant insurance page: https://windyridgechiropractic.com/insurances-accepted/.",
+    "Use patient-friendly, non-combative language. Do not criticize insurers or use phrasing like 'reimbursement is terrible.'",
+  ];
+
+  if (asksAcceptedPlans) {
+    guidance.push(
+      "Accepted plan questions: say commonly accepted plans may include Blue Cross Blue Shield, Allegiance, PacificSource, Mountain Health Co-op, First Choice, Allied, EBMS, Cigna, Aetna, select employer-sponsored plans, select auto insurance claims, select workers' compensation claims, and Medicaid for patients age 20 and under only. Use Mountain Health Co-op, not Montana Health Co-op. Direct users to contact the office for plan-specific verification.",
+    );
+  }
+
+  if (asksMedicare) {
+    guidance.push(
+      "Medicare questions: Windy Ridge does not participate with Medicare. Medicare coverage can be limited and may not cover comprehensive chiropractic visit services. Medicare patients can ask the office about cash-pay options.",
+    );
+  }
+
+  if (asksMedicaid) {
+    guidance.push(
+      "Medicaid questions: Medicaid is for patients age 20 and under only. Coverage can be more complicated, so patients should call the office for details.",
+    );
+  }
+
+  if (asksUnitedHealthcare) {
+    guidance.push(
+      "UnitedHealthcare/UHC questions: Windy Ridge may not be in network with certain UnitedHealthcare plans. Patients should contact the office about out-of-network benefits or cash-pay options.",
+    );
+  }
+
+  if (asksAuto) {
+    guidance.push(
+      "Auto insurance questions: select auto insurance claims may be accepted, but auto insurance claims vary by case. Say: Please call the office for details.",
+    );
+  }
+
+  if (asksWorkersComp) {
+    guidance.push(
+      "Workers' compensation questions: select workers' compensation claims may be accepted, but workers' comp varies by case. Say: Please call the office for details.",
+    );
+  }
+
+  if (asksWhatToBring) {
+    guidance.push(
+      "What-to-bring questions for insurance visits: patients should bring their insurance card, any referral or authorization if their plan requires one, and claim information for auto insurance or workers' compensation cases. Do not say photo ID is required.",
+    );
+  }
+
+  return guidance.join(" ");
+}
+
 function getHoursGuidance(
   messages: ChatMessage[],
   pageContext: string,
@@ -638,9 +711,7 @@ function formatIntentGuidance(
   }
 
   if (intents.includes("insurance intent")) {
-    strategy.push(
-      "Insurance intent: keep it practical and cautious; do not promise coverage. Suggest confirming benefits with insurance and current options with the clinic or JaneApp.",
-    );
+    strategy.push(getInsuranceGuidance(messages, pageContext));
   }
 
   if (intents.includes("provider matching")) {
@@ -1100,7 +1171,7 @@ function classifyAdminRetrieval(query: string): {
 } {
   const text = query.toLowerCase();
 
-  if (/\b(price|pricing|cost|cash|rate|insurance|how much|\$)\b/.test(text)) {
+  if (/\b(price|pricing|cost|cash|rate|insurance|coverage|benefits|medicare|medicaid|united\s*health\s*care|unitedhealthcare|uhc|out[-\s]?of[-\s]?network|auto insurance|workers'? compensation|workers'? comp|how much|\$)\b/.test(text)) {
     return { detectedIntent: "pricing intent", mode: "pricing_answer" };
   }
 
